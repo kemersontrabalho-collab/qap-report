@@ -14,7 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bulletins: {
+        Row: {
+          bulletin_type: string
+          category: string | null
+          content: string
+          context: string | null
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_favorite: boolean
+          keywords: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bulletin_type: string
+          category?: string | null
+          content?: string
+          context?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_favorite?: boolean
+          keywords?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bulletin_type?: string
+          category?: string | null
+          content?: string
+          context?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_favorite?: boolean
+          keywords?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          functional_id: string | null
+          id: string
+          phone: string | null
+          rank: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          functional_id?: string | null
+          id: string
+          phone?: string | null
+          rank?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          functional_id?: string | null
+          id?: string
+          phone?: string | null
+          rank?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
