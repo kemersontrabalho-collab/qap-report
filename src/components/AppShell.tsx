@@ -114,37 +114,21 @@ export const BULLETIN_TYPES = [
     code: "BA",
     name: "Boletim de Atendimento",
     desc: "Condução à delegacia (inclui tráfico em flagrante).",
-    categories: [
-      "Abordagem com Condução",
-      "Trânsito com Condução",
-      "Violência Doméstica com Condução",
-      "Tráfico de Drogas (flagrante)",
-    ],
   },
   {
     code: "BO-COP",
     name: "Comunicação de Ocorrência Policial",
     desc: "Indivíduo presente no local (inclui consumo de maconha).",
-    categories: [
-      "Crimes Patrimoniais",
-      "Crimes Graves & Flagrante",
-      "Violência Doméstica (Local)",
-      "Proteção a Vulneráveis",
-      "Homicídio / Encontro de Cadáver",
-      "Consumo de Maconha (indivíduo presente)",
-    ],
   },
   {
     code: "BO-TC",
     name: "Termo Circunstanciado",
     desc: "Infrações de menor potencial ofensivo.",
-    categories: ["Crimes de Menor Potencial Ofensivo", "Posse de Cocaína para Consumo Pessoal"],
   },
   {
     code: "BOAT",
     name: "Boletim de Acidente de Trânsito",
     desc: "Ocorrências específicas de trânsito.",
-    categories: ["Acidente de Trânsito", "Infração de Trânsito"],
   },
 ] as const;
 
