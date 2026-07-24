@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2 } from "lucide-react";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -185,6 +185,47 @@ function SettingsPage() {
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
             Salvar alterações
           </button>
+        </section>
+
+        <section className="rounded-2xl border bg-card p-5">
+          <h2 className="font-semibold">Instalar o aplicativo</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            O RedaPol funciona como app instalável (PWA). Sem download em loja — usa o próprio navegador do celular.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button
+              onClick={() =>
+                alert(
+                  "iOS (iPhone/iPad):\n1. Abra o site no Safari.\n2. Toque no botão Compartilhar (quadrado com seta).\n3. Escolha 'Adicionar à Tela de Início'.\n4. Confirme em 'Adicionar'.",
+                )
+              }
+              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent"
+            >
+              <Apple className="mt-0.5 h-5 w-5 shrink-0" />
+              <div>
+                <div className="font-medium">Instalar no iOS</div>
+                <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                  <Share2 className="h-3 w-3" /> Safari → Compartilhar → Adicionar à Tela de Início
+                </div>
+              </div>
+            </button>
+            <button
+              onClick={() =>
+                alert(
+                  "Android:\n1. Abra o site no Chrome.\n2. Toque no menu (três pontos) no canto superior direito.\n3. Escolha 'Instalar aplicativo' ou 'Adicionar à tela inicial'.\n4. Confirme em 'Instalar'.",
+                )
+              }
+              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent"
+            >
+              <Smartphone className="mt-0.5 h-5 w-5 shrink-0" />
+              <div>
+                <div className="font-medium">Instalar no Android</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  Chrome → Menu → Instalar aplicativo
+                </div>
+              </div>
+            </button>
+          </div>
         </section>
 
         <section className="rounded-2xl border bg-card p-5">

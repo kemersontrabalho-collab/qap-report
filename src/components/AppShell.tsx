@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ShieldCheck, LayoutDashboard, Settings, LogOut, Moon, Sun, Plus } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const navItems = [
     { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
+    { to: "/ai-chat", label: "Dúvidas IA", icon: MessageCircle },
     { to: "/settings", label: "Configurações", icon: Settings },
   ] as const;
 
@@ -85,7 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background/95 backdrop-blur md:hidden">
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-3">
           {navItems.map((item) => {
             const active = pathname.startsWith(item.to);
             return (
@@ -113,37 +114,21 @@ export const BULLETIN_TYPES = [
     code: "BA",
     name: "Boletim de Atendimento",
     desc: "Condução à delegacia (inclui tráfico em flagrante).",
-    categories: [
-      "Abordagem com Condução",
-      "Trânsito com Condução",
-      "Violência Doméstica com Condução",
-      "Tráfico de Drogas (flagrante)",
-    ],
   },
   {
     code: "BO-COP",
     name: "Comunicação de Ocorrência Policial",
     desc: "Indivíduo presente no local (inclui consumo de maconha).",
-    categories: [
-      "Crimes Patrimoniais",
-      "Crimes Graves & Flagrante",
-      "Violência Doméstica (Local)",
-      "Proteção a Vulneráveis",
-      "Homicídio / Encontro de Cadáver",
-      "Consumo de Maconha (indivíduo presente)",
-    ],
   },
   {
     code: "BO-TC",
     name: "Termo Circunstanciado",
     desc: "Infrações de menor potencial ofensivo.",
-    categories: ["Crimes de Menor Potencial Ofensivo", "Posse de Cocaína para Consumo Pessoal"],
   },
   {
     code: "BOAT",
     name: "Boletim de Acidente de Trânsito",
     desc: "Ocorrências específicas de trânsito.",
-    categories: ["Acidente de Trânsito", "Infração de Trânsito"],
   },
 ] as const;
 
