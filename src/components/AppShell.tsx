@@ -22,6 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const navItems = [
     { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
+    { to: "/ai-chat", label: "Dúvidas IA", icon: MessageCircle },
     { to: "/settings", label: "Configurações", icon: Settings },
   ] as const;
 
