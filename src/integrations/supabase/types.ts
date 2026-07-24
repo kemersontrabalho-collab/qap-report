@@ -21,14 +21,23 @@ export type Database = {
           content: string
           context: string | null
           created_at: string
+          crew_address: string | null
+          crew_composition: string | null
+          crew_lat: number | null
+          crew_lng: number | null
           deleted_at: string | null
           id: string
           is_favorite: boolean
           keywords: string | null
+          occurrence_address: string | null
+          occurrence_at: string | null
+          occurrence_lat: number | null
+          occurrence_lng: number | null
           status: string
           title: string
           updated_at: string
           user_id: string
+          vehicle_prefix: string | null
         }
         Insert: {
           bulletin_type: string
@@ -36,14 +45,23 @@ export type Database = {
           content?: string
           context?: string | null
           created_at?: string
+          crew_address?: string | null
+          crew_composition?: string | null
+          crew_lat?: number | null
+          crew_lng?: number | null
           deleted_at?: string | null
           id?: string
           is_favorite?: boolean
           keywords?: string | null
+          occurrence_address?: string | null
+          occurrence_at?: string | null
+          occurrence_lat?: number | null
+          occurrence_lng?: number | null
           status?: string
           title?: string
           updated_at?: string
           user_id: string
+          vehicle_prefix?: string | null
         }
         Update: {
           bulletin_type?: string
@@ -51,14 +69,23 @@ export type Database = {
           content?: string
           context?: string | null
           created_at?: string
+          crew_address?: string | null
+          crew_composition?: string | null
+          crew_lat?: number | null
+          crew_lng?: number | null
           deleted_at?: string | null
           id?: string
           is_favorite?: boolean
           keywords?: string | null
+          occurrence_address?: string | null
+          occurrence_at?: string | null
+          occurrence_lat?: number | null
+          occurrence_lng?: number | null
           status?: string
           title?: string
           updated_at?: string
           user_id?: string
+          vehicle_prefix?: string | null
         }
         Relationships: []
       }
