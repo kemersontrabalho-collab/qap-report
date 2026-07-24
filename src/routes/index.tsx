@@ -4,13 +4,13 @@ import { ShieldCheck, Feather, Search, WifiOff, Moon, Sparkles } from "lucide-re
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Assistente  Policial" },
+      { title: "QAP REPORT" },
       {
         name: "description",
         content:
           "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica, offline e sincronização automática.",
       },
-      { property: "og:title", content: "Assistente  Policial" },
+      { property: "og:title", content: "QAP REPORT" },
       {
         property: "og:description",
         content: "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica, offline e sincronização automática.",
