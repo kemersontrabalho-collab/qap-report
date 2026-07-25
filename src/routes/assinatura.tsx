@@ -101,6 +101,16 @@ function SubscriptionPage() {
 
   const canCheckout = accepted && !checkoutMut.isPending;
 
+  if (status?.isFounder) {
+    return (
+      <AppShell>
+        <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Redirecionando...
+        </div>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <div className="mx-auto max-w-2xl">
@@ -110,6 +120,7 @@ function SubscriptionPage() {
         </div>
 
         {subLoading || billingLoading ? (
+
           <div className="flex items-center justify-center py-12">
             <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Carregando...
           </div>
