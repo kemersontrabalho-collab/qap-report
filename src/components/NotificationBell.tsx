@@ -97,6 +97,7 @@ export function NotificationBell() {
 
   const items = data?.items ?? [];
   const unread = data?.unread ?? 0;
+  const filtered = items.filter((n) => showRead || !n.read);
 
   return (
     <div className="relative" ref={ref}>
