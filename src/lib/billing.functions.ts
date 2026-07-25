@@ -169,7 +169,7 @@ export const checkPixPaymentStatus = createServerFn({ method: "POST" })
       .eq("id", data.paymentId)
       .eq("user_id", context.userId)
       .maybeSingle();
-    if (!payment) return { status: "not_found" };
+    if (!payment || !payment.external_id) return { status: "not_found" };
     if (payment.status === "approved") return { status: "approved" };
     const mp = await fetchMP(`/v1/payments/${payment.external_id}`);
     const status = mp.status;
