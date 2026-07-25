@@ -4,6 +4,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { translateAuthError } from "@/lib/i18n-errors";
 import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 
 const search = z.object({ mode: z.enum(["login", "signup"]).optional() });
