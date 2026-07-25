@@ -154,7 +154,9 @@ export function NotificationBell() {
               <>
                 <div className="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
                   <span className="text-xs text-muted-foreground">
-                    {showRead ? `Mostrando todas (${items.length})` : `Não lidas (${unread})`}
+                    {showRead
+                      ? `Mostrando todas (${items.length})`
+                      : `Não lidas (${filtered.length})`}
                   </span>
                   <button
                     onClick={() => setShowRead((v) => !v)}
@@ -171,51 +173,61 @@ export function NotificationBell() {
                     )}
                   </button>
                 </div>
-                <ul className="divide-y">
-                  {items
-                    .filter((n) => showRead || !n.read)
-                    .map((n) => (
-                  <li
-                    key={n.id}
-                    role="button"
-                    tabIndex={0}
-                    className={`cursor-pointer px-3 py-2.5 outline-none focus-visible:bg-accent/60 ${
-                      !n.read ? "bg-accent/30" : ""
-                    }`}
-                    onClick={() => {
-                      if (!n.read) markMut.mutate([n.id]);
-                    }}
-                    onKeyDown={(e) => {
-                      if ((e.key === "Enter" || e.key === " ") && !n.read) {
-                        e.preventDefault();
-                        markMut.mutate([n.id]);
-                      }
-                    }}
-                  >
-                    <div className="flex items-start gap-2">
-                      {!n.read && (
-                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <p className="truncate text-sm font-medium">{n.title}</p>
-                          <span className="shrink-0 text-[10px] text-muted-foreground">
-                            {new Date(n.created_at).toLocaleString("pt-BR", {
-                              dateStyle: "short",
-                              timeStyle: "short",
-                            })}
-                          </span>
+                {filtered.length === 0 ? (
+                  <div className="p-6 text-center text-sm text-muted-foreground">
+                    Nenhuma notificação não lida.
+                    <button
+                      onClick={() => setShowRead(true)}
+                      className="ml-1 text-xs text-primary hover:underline"
+                    >
+                      Mostrar lidas
+                    </button>
+                  </div>
+                ) : (
+                  <ul className="divide-y">
+                    {filtered.map((n) => (
+                      <li
+                        key={n.id}
+                        role="button"
+                        tabIndex={0}
+                        className={`cursor-pointer px-3 py-2.5 outline-none focus-visible:bg-accent/60 ${
+                          !n.read ? "bg-accent/30" : ""
+                        }`}
+                        onClick={() => {
+                          if (!n.read) markMut.mutate([n.id]);
+                        }}
+                        onKeyDown={(e) => {
+                          if ((e.key === "Enter" || e.key === " ") && !n.read) {
+                            e.preventDefault();
+                            markMut.mutate([n.id]);
+                          }
+                        }}
+                      >
+                        <div className="flex items-start gap-2">
+                          {!n.read && (
+                            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-baseline justify-between gap-2">
+                              <p className="truncate text-sm font-medium">{n.title}</p>
+                              <span className="shrink-0 text-[10px] text-muted-foreground">
+                                {new Date(n.created_at).toLocaleString("pt-BR", {
+                                  dateStyle: "short",
+                                  timeStyle: "short",
+                                })}
+                              </span>
+                            </div>
+                            <p className="mt-0.5 whitespace-pre-wrap text-xs text-muted-foreground">
+                              {n.body}
+                            </p>
+                          </div>
                         </div>
-                        <p className="mt-0.5 whitespace-pre-wrap text-xs text-muted-foreground">
-                          {n.body}
-                        </p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
           </div>
         </div>
       )}
