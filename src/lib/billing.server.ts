@@ -31,11 +31,6 @@ export function getPublishableSupabase() {
   });
 }
 
-export function getSupabaseAdmin() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return supabaseAdmin;
-}
-
 export async function fetchMP(endpoint: string, options: RequestInit = {}) {
   const token = getMPAccessToken();
   const url = `${MP_BASE}${endpoint}`;
