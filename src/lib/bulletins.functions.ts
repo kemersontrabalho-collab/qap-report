@@ -66,12 +66,17 @@ export const generateBulletin = createServerFn({ method: "POST" })
       ? new Date(data.occurrenceAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
       : undefined;
 
+    // Nomenclatura padronizada (Requisito 04). Estes rótulos DEVEM aparecer
+    // literalmente no documento final para alimentar corretamente a base de
+    // conhecimento e a exportação em PDF.
     const structured = [
-      data.crewComposition && `- Composição da guarnição: ${data.crewComposition}`,
+      `- Título do Boletim: ${data.category ? `${data.category}` : "{TÍTULO}"}`,
+      data.category && `- Categoria: ${data.category}`,
+      data.crewComposition && `- Composição da Guarnição: ${data.crewComposition}`,
       data.vehiclePrefix && `- Prefixo da viatura: ${data.vehiclePrefix}`,
-      fmtDate && `- Data/hora da ocorrência: ${fmtDate}`,
-      data.crewAddress && `- Endereço da guarnição (despacho): ${data.crewAddress}`,
-      data.occurrenceAddress && `- Endereço do local da ocorrência: ${data.occurrenceAddress}`,
+      `- Data e Hora: ${fmtDate ?? "{DATA E HORA}"}`,
+      data.crewAddress && `- LOCALIZAÇÃO DA GUARNIÇÃO: ${data.crewAddress}`,
+      data.occurrenceAddress && `- Localização da Ocorrência: ${data.occurrenceAddress}`,
     ]
       .filter(Boolean)
       .join("\n");
@@ -80,14 +85,14 @@ export const generateBulletin = createServerFn({ method: "POST" })
       data.category ? ` (${data.category})` : ""
     }
 
-Dados estruturados:
-${structured || "(nenhum campo estruturado preenchido)"}
+Campos padronizados do boletim (use EXATAMENTE estes rótulos no cabeçalho do documento gerado):
+${structured}
 
 Palavras-chave:
 ${data.keywords}
 ${data.context ? `\nContexto adicional:\n${data.context}` : ""}
 
-Produza o boletim seguindo rigorosamente as regras. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE}.`;
+Produza o boletim seguindo rigorosamente as regras. O documento final deve iniciar com um cabeçalho contendo, nesta ordem: Título do Boletim, Categoria, Composição da Guarnição, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora. Em seguida, o HISTÓRICO/VERSÃO POLICIAL. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — jamais invente informação.`;
 
     const content = await callGateway([
       { role: "system", content: SYSTEM_PROMPT },
