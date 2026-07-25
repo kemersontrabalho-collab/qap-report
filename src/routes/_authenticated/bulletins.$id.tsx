@@ -7,6 +7,7 @@ import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { toast } from "sonner";
 import { SimilarCases } from "@/components/SimilarCases";
+import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import {
   ArrowLeft,
   Sparkles,
@@ -21,6 +22,7 @@ import {
   ExternalLink,
   FileDown,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
   head: () => ({ meta: [{ title: "Editar boletim · QAP Report" }] }),
@@ -66,6 +68,15 @@ function stripBraces(text: string): string {
   return text.replace(/\{[^{}]*\}/g, "").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function EditBulletin() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
@@ -79,6 +90,8 @@ function EditBulletin() {
   const [b, setB] = useState<Bulletin | null>(null);
   const [online, setOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
   const dirtyRef = useRef(false);
+  const bRef = useRef<Bulletin | null>(null);
+  bRef.current = b;
 
   const typeInfo = useMemo(() => BULLETIN_TYPES.find((t) => t.code === b?.bulletin_type), [b]);
   const categories = useMemo(
@@ -86,6 +99,7 @@ function EditBulletin() {
     [b],
   );
   const cacheKey = `bulletin-cache:${id}`;
+  const dirtyKey = `bulletin-dirty:${id}`;
 
   useEffect(() => {
     const on = () => setOnline(true);
@@ -100,21 +114,35 @@ function EditBulletin() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("bulletins").select("*").eq("id", id).single();
-      if (error || !data) {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          setB(JSON.parse(cached));
-          toast.info("Carregado do cache local (offline).");
-        } else {
-          toast.error("Boletim não encontrado");
-          navigate({ to: "/dashboard" });
-        }
-      } else {
+      const { data, error } = await supabase.from("bulletins").select("*").eq("id", id).maybeSingle();
+      if (data) {
         const loaded = data as Bulletin;
-        // Auto-preenche data/hora se ainda estiver vazia
         if (!loaded.occurrence_at) loaded.occurrence_at = new Date().toISOString();
         setB(loaded);
+        // Se tinha alterações pendentes salvas localmente, mantém como dirty
+        // para o effect de "online" ressincronizar.
+        if (localStorage.getItem(dirtyKey) === "1") dirtyRef.current = true;
+      } else if (!error || error.code === "PGRST116") {
+        // 404 real (registro não existe / RLS). Não tentar cache — evita
+        // reviver boletins apagados por outro dispositivo.
+        toast.error("Boletim não encontrado");
+        navigate({ to: "/dashboard" });
+      } else {
+        // Erro de rede — tenta o cache local.
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          try {
+            setB(JSON.parse(cached));
+            toast.info("Carregado do cache local (offline).");
+            if (localStorage.getItem(dirtyKey) === "1") dirtyRef.current = true;
+          } catch {
+            toast.error(translateDbError(error));
+            navigate({ to: "/dashboard" });
+          }
+        } else {
+          toast.error(translateDbError(error));
+          navigate({ to: "/dashboard" });
+        }
       }
       setLoading(false);
     })();
@@ -124,10 +152,13 @@ function EditBulletin() {
   useEffect(() => {
     if (!b) return;
     localStorage.setItem(cacheKey, JSON.stringify(b));
-  }, [b, cacheKey]);
+    if (dirtyRef.current) localStorage.setItem(dirtyKey, "1");
+  }, [b, cacheKey, dirtyKey]);
 
   useEffect(() => {
-    if (!online || !b || !dirtyRef.current) return;
+    if (!online) return;
+    if (!bRef.current) return;
+    if (!dirtyRef.current) return;
     save();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [online]);
@@ -135,8 +166,10 @@ function EditBulletin() {
   function update<K extends keyof Bulletin>(key: K, value: Bulletin[K]) {
     if (!b) return;
     dirtyRef.current = true;
+    localStorage.setItem(dirtyKey, "1");
     setB({ ...b, [key]: value });
   }
+
 
   async function save(nextStatus?: "draft" | "done") {
     if (!b) return;
