@@ -1,12 +1,13 @@
 {
-  "name": "RedaPol — Assistente de Redação Policial",
-  "short_name": "RedaPol",
+  "name": "QAP Report — Assistente de Redação Policial",
+  "short_name": "QAP Report",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f1220",
   "theme_color": "#1f2b57",
   "description": "Assistente de redação de boletins policiais (BA, BO-COP, BO-TC, BOAT).",
   "icons": [
-    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" },
+    { "src": "/__l5e/assets-v1/e716bed5-e7b7-4b6e-a2bb-e756903fc025/qap-report-logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }

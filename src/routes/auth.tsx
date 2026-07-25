@@ -3,7 +3,8 @@ import { useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 
 const search = z.object({ mode: z.enum(["login", "signup"]).optional() });
 
@@ -11,8 +12,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: search,
   head: () => ({
     meta: [
-      { title: "Entrar · RedaPol" },
-      { name: "description", content: "Acesse sua conta RedaPol." },
+      { title: "Entrar · QAP Report" },
+      { name: "description", content: "Acesse sua conta QAP Report." },
     ],
   }),
   component: AuthPage,
@@ -68,10 +69,8 @@ function AuthPage() {
       <div className="mx-auto grid min-h-screen max-w-6xl grid-cols-1 md:grid-cols-2">
         <div className="hidden flex-col justify-between bg-primary p-10 text-primary-foreground md:flex">
           <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary-foreground/10">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <span className="text-lg font-semibold">RedaPol</span>
+            <img src={logoAsset.url} alt="QAP Report" className="h-10 w-10 object-contain" />
+            <span className="text-lg font-semibold">QAP Report</span>
           </Link>
           <div>
             <h2 className="text-3xl font-bold leading-tight">
@@ -82,15 +81,15 @@ function AuthPage() {
               e fidelidade aos fatos.
             </p>
           </div>
-          <div className="text-xs opacity-70">© {new Date().getFullYear()} RedaPol</div>
+          <div className="text-xs opacity-70">© {new Date().getFullYear()} QAP Report</div>
         </div>
 
         <div className="flex items-center justify-center p-6 md:p-10">
           <div className="w-full max-w-sm">
             <div className="mb-8 md:hidden">
               <Link to="/" className="flex items-center gap-2 text-foreground">
-                <ShieldCheck className="h-5 w-5" />
-                <span className="font-semibold">RedaPol</span>
+                <img src={logoAsset.url} alt="QAP Report" className="h-6 w-6 object-contain" />
+                <span className="font-semibold">QAP Report</span>
               </Link>
             </div>
             <h1 className="text-2xl font-bold">

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/bulletins/new")({
-  head: () => ({ meta: [{ title: "Novo boletim · RedaPol" }] }),
+  head: () => ({ meta: [{ title: "Novo boletim · QAP Report" }] }),
   component: NewBulletin,
 });
 

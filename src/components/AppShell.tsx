@@ -1,5 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ShieldCheck, LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle, Shield } from "lucide-react";
+import { LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle, Shield } from "lucide-react";
+import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
@@ -43,10 +44,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-            <span className="font-semibold tracking-tight">RedaPol</span>
+            <img src={logoAsset.url} alt="QAP Report" className="h-8 w-8 object-contain" />
+            <span className="font-semibold tracking-tight">QAP Report</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">

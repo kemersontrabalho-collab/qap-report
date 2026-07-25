@@ -7,7 +7,7 @@ import { Loader2, Shield, Users, FileText, Activity, Ban, CheckCircle2, Trash2, 
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "Administração · RedaPol" }] }),
+  head: () => ({ meta: [{ title: "Administração · QAP Report" }] }),
   beforeLoad: async () => {
     try {
       const { founder } = await isFounder();
