@@ -77,6 +77,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Novo</span>
             </Link>
+            <NotificationBell />
             <button
               onClick={toggle}
               className="grid h-9 w-9 place-items-center rounded-lg border hover:bg-accent"
