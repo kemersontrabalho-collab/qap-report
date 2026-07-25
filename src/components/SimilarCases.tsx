@@ -24,22 +24,29 @@ export function SimilarCases({ bulletinType, keywords, category, context, onUseR
       setItems([]);
       return;
     }
+    let cancelled = false;
     const t = setTimeout(async () => {
       setLoading(true);
       setErr(null);
       try {
         const res = await findFn({ data: { query, bulletinType, limit: 3 } });
+        if (cancelled) return; // Ignora resposta obsoleta (race).
         setItems(res);
       } catch (e) {
+        if (cancelled) return;
         setErr(e instanceof Error ? e.message : "Erro ao buscar casos");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }, 600);
-    return () => clearTimeout(t);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [query, bulletinType, findFn]);
 
   if (query.length < 5) return null;
+
 
   return (
     <div className="rounded-2xl border bg-card p-4">

@@ -24,12 +24,19 @@ export function AppShell({ children }: { children: ReactNode }) {
   const founder = founderData?.founder === true;
 
   async function signOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    toast.success("Sessão encerrada");
-    navigate({ to: "/auth", replace: true });
+    try {
+      await qc.cancelQueries();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      qc.clear();
+      toast.success("Sessão encerrada");
+      navigate({ to: "/auth", replace: true });
+    } catch (e) {
+      // Não limpar o cache se o signOut falhou — o usuário ainda tem sessão.
+      toast.error(e instanceof Error ? e.message : "Não foi possível encerrar a sessão. Tente novamente.");
+    }
   }
+
 
   const baseNav = [
     { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
