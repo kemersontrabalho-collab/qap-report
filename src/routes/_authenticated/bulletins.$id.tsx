@@ -380,15 +380,16 @@ function EditBulletin() {
 
           <div className="space-y-3 rounded-2xl border bg-card p-4">
             <div>
-              <label className="text-sm font-medium">Título</label>
+              <label className="text-sm font-medium">Título do Boletim *</label>
               <input
                 value={b.title}
                 onChange={(e) => update("title", e.target.value)}
+                placeholder="Ex.: Abordagem com apreensão de entorpecente"
                 className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Categoria</label>
+              <label className="text-sm font-medium">Categoria *</label>
               <select
                 value={b.category ?? ""}
                 onChange={(e) => update("category", e.target.value || null)}
@@ -413,9 +414,9 @@ function EditBulletin() {
           </div>
 
           <div className="space-y-3 rounded-2xl border bg-card p-4">
-            <h3 className="text-sm font-semibold">Guarnição e ocorrência</h3>
+            <h3 className="text-sm font-semibold">Dados operacionais</h3>
             <div>
-              <label className="text-sm font-medium">Composição da guarnição</label>
+              <label className="text-sm font-medium">Composição da Guarnição *</label>
               <input
                 value={b.crew_composition ?? ""}
                 onChange={(e) => update("crew_composition", e.target.value)}
@@ -434,7 +435,7 @@ function EditBulletin() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Data / hora</label>
+                <label className="text-sm font-medium">Data e Hora *</label>
                 <input
                   type="datetime-local"
                   value={toLocalInput(b.occurrence_at)}
@@ -445,7 +446,7 @@ function EditBulletin() {
             </div>
 
             <div>
-              <label className="text-sm font-medium">Endereço da guarnição</label>
+              <label className="text-sm font-medium">LOCALIZAÇÃO DA GUARNIÇÃO *</label>
               <textarea
                 value={b.crew_address ?? ""}
                 onChange={(e) => update("crew_address", e.target.value)}
@@ -476,7 +477,7 @@ function EditBulletin() {
             </div>
 
             <div>
-              <label className="text-sm font-medium">Local da ocorrência (despacho)</label>
+              <label className="text-sm font-medium">Localização da Ocorrência *</label>
               <textarea
                 value={b.occurrence_address ?? ""}
                 onChange={(e) => update("occurrence_address", e.target.value)}
