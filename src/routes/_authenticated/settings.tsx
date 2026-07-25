@@ -1,16 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send, Shield, ArrowRight } from "lucide-react";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { TutorialModal } from "@/components/TutorialModal";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
-
+import { isFounder } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
@@ -44,7 +44,13 @@ function SettingsPage() {
   const [supportMsg, setSupportMsg] = useState("");
   const [sendingSupport, setSendingSupport] = useState(false);
   const sendSupportFn = useServerFn(sendSupportMessage);
-
+  const founderFn = useServerFn(isFounder);
+  const { data: founderData } = useQuery({
+    queryKey: ["is-founder"],
+    queryFn: () => founderFn(),
+    staleTime: 5 * 60_000,
+  });
+  const founder = founderData?.founder === true;
 
 
   async function requestNotifications() {
@@ -176,8 +182,27 @@ function SettingsPage() {
           </p>
         </div>
 
-
-
+        {founder && (
+          <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
+            <div className="flex items-start gap-4">
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
+                <Shield className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <h2 className="font-semibold">Painel do Criador</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Acesso exclusivo ao administrador. Visualize usuários, estatísticas, envie notificações e gerencie contas.
+                </p>
+                <Link
+                  to="/admin"
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+                >
+                  Acessar administração <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Aparência</h2>
