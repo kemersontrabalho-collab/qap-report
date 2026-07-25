@@ -42,6 +42,27 @@ export function NotificationBell() {
     };
   }, [qc]);
 
+  const clearMut = useMutation({
+    mutationFn: () => markFn({ data: {} }),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ["notifications"] });
+      const prev = qc.getQueryData<{ items: NotificationRow[]; unread: number }>(["notifications"]);
+      if (prev) {
+        const nextItems = prev.items.map((n) => ({ ...n, read: true }));
+        qc.setQueryData(["notifications"], {
+          items: nextItems,
+          unread: 0,
+        });
+      }
+      setShowRead(false);
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["notifications"], ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+  });
+
   const markMut = useMutation({
     mutationFn: (ids?: string[]) => markFn({ data: { ids } }),
     onMutate: async (ids) => {
