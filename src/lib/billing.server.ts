@@ -88,6 +88,53 @@ export function getPlanLabel(plan: "monthly" | "yearly"): string {
   return plan === "yearly" ? "Anual" : "Mensal";
 }
 
+export async function verifyWebhookSignature(body: string, signatureHeader: string | null): Promise<boolean> {
+  const secret = getWebhookSecret();
+  if (!secret || !signatureHeader) return true;
+  try {
+    const parts = signatureHeader.split(",");
+    let ts = "";
+    let hash = "";
+    for (const part of parts) {
+      const [k, v] = part.split("=");
+      if (k.trim() === "ts") ts = v.trim();
+      if (k.trim() === "v1") hash = v.trim();
+    }
+    if (!ts || !hash) return false;
+    const payload = `${ts}.${body}`;
+    const expected = await cryptoHmacHex(payload, secret);
+    return timingSafeEqual(expected, hash);
+  } catch {
+    return false;
+  }
+}
+
+async function cryptoHmacHex(payload: string, secret: string): Promise<string> {
+  if (typeof crypto !== "undefined" && "subtle" in crypto) {
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
+    const buf = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+  return "";
+}
+
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 export async function createPixPayment(
   userId: string,
   email: string,
