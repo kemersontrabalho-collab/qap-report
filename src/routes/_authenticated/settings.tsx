@@ -548,7 +548,7 @@ function MyPlanSection() {
         )}
       </div>
 
-      {isActive && !isExpired && sub?.status !== "canceled" && (
+      {!status?.isFounder && isActive && !isExpired && sub?.status !== "canceled" && (
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
             to="/assinatura"
@@ -569,7 +569,7 @@ function MyPlanSection() {
         </div>
       )}
 
-      {!isActive && (
+      {!status?.isFounder && !isActive && (
         <div className="mt-4">
           <Link
             to="/assinatura"
@@ -580,7 +580,7 @@ function MyPlanSection() {
         </div>
       )}
 
-      {mySub && mySub.payments.length > 0 && (
+      {!status?.isFounder && mySub && mySub.payments.length > 0 && (
         <div className="mt-4">
           <h3 className="mb-2 text-sm font-medium">Histórico de pagamentos</h3>
           <div className="max-h-40 overflow-y-auto rounded-lg border">
