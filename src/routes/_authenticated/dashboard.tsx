@@ -58,17 +58,24 @@ function Dashboard() {
   const [search, setSearch] = useState("");
   const [creatingType, setCreatingType] = useState<string | null>(null);
 
-  // Auto-purge trash items older than 7 days
+  // Auto-purga da lixeira: uma vez por sessão (evita spam de DELETE a cada
+  // montagem do dashboard). O servidor ainda respeita RLS e só apaga do próprio
+  // usuário. Um cron poderia substituir isso no futuro.
   useEffect(() => {
+    if (typeof sessionStorage === "undefined") return;
+    if (sessionStorage.getItem("trash-purged")) return;
+    sessionStorage.setItem("trash-purged", "1");
     const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     supabase
       .from("bulletins")
       .delete()
+      .not("deleted_at", "is", null)
       .lt("deleted_at", cutoff)
       .then(({ error }) => {
         if (!error) qc.invalidateQueries({ queryKey: ["bulletins"] });
       });
   }, [qc]);
+
 
   const filtered = useMemo(() => {
     const s = search.toLowerCase().trim();
@@ -158,12 +165,20 @@ function Dashboard() {
   const emptyTrash = async () => {
     if (!confirm("Esvaziar a lixeira? Esta ação é definitiva.")) return;
     const trashed = bulletins.filter((b) => b.deleted_at);
-    for (const b of trashed) {
-      await supabase.from("bulletins").delete().eq("id", b.id);
+    if (!trashed.length) return;
+    // Batch — uma única requisição em vez de N requests sequenciais.
+    const { error } = await supabase
+      .from("bulletins")
+      .delete()
+      .in("id", trashed.map((b) => b.id));
+    if (error) {
+      toast.error("Não foi possível esvaziar a lixeira. Tente novamente.");
+      return;
     }
     qc.invalidateQueries({ queryKey: ["bulletins"] });
     toast.success("Lixeira esvaziada");
   };
+
 
   const tabs: { key: Tab; label: string; icon: typeof FileText }[] = [
     { key: "drafts", label: "Rascunhos", icon: ClipboardEdit },
