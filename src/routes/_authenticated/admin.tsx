@@ -107,15 +107,39 @@ function AdminPage() {
         <Stat icon={FileText} label="Boletins criados" value={data.stats.totalBulletins} />
       </section>
 
+      {stats && <ChartsPanel stats={stats} />}
+
       <NotificationComposer users={data.users} />
 
       <section className="overflow-hidden rounded-2xl border bg-card">
-
-        <div className="border-b p-4">
-          <h2 className="font-semibold">Usuários</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {data.users.length} conta{data.users.length === 1 ? "" : "s"} no sistema.
-          </p>
+        <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Usuários</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {data.users.length} conta{data.users.length === 1 ? "" : "s"} no sistema.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar por email ou nome"
+                className="w-full rounded-lg border bg-background py-2 pl-8 pr-3 text-sm sm:w-64"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+              className="rounded-lg border bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">Todos</option>
+              <option value="active">Ativos (30d)</option>
+              <option value="blocked">Bloqueados</option>
+              <option value="inactive">Inativos (30d+)</option>
+            </select>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -130,7 +154,14 @@ function AdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {data.users.map((u) => {
+              {filteredUsers.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                    Nenhum usuário encontrado com esses filtros.
+                  </td>
+                </tr>
+              )}
+              {filteredUsers.map((u) => {
                 const blocked = u.banned_until && new Date(u.banned_until).getTime() > Date.now();
                 return (
                   <tr key={u.id} className="hover:bg-accent/30">
