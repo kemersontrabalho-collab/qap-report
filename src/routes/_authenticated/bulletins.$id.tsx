@@ -422,7 +422,7 @@ function EditBulletin() {
               <input
                 value={b.crew_composition ?? ""}
                 onChange={(e) => update("crew_composition", e.target.value)}
-                placeholder="Ex.: SD PM Kemerson; CB PM Silva"
+                placeholder="Ex.: SD PM FULANO; SD PM BELTRANO"
                 className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               />
             </div>

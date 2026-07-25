@@ -26,7 +26,7 @@ function ResetPage() {
       toast.success("Senha atualizada com sucesso.");
       navigate({ to: "/dashboard" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Não foi possível atualizar");
+      toast.error(translateAuthError(err));
     } finally {
       setLoading(false);
     }
