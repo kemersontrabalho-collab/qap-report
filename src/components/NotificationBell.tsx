@@ -151,8 +151,30 @@ export function NotificationBell() {
                 Sem notificações no momento.
               </div>
             ) : (
-              <ul className="divide-y">
-                {items.map((n) => (
+              <>
+                <div className="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
+                  <span className="text-xs text-muted-foreground">
+                    {showRead ? `Mostrando todas (${items.length})` : `Não lidas (${unread})`}
+                  </span>
+                  <button
+                    onClick={() => setShowRead((v) => !v)}
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    {showRead ? (
+                      <>
+                        <EyeOff className="h-3 w-3" /> Ocultar lidas
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="h-3 w-3" /> Mostrar lidas
+                      </>
+                    )}
+                  </button>
+                </div>
+                <ul className="divide-y">
+                  {items
+                    .filter((n) => showRead || !n.read)
+                    .map((n) => (
                   <li
                     key={n.id}
                     role="button"
