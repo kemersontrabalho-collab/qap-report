@@ -33,6 +33,62 @@ function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [notifPerm, setNotifPerm] = useState<NotificationPermission | "unsupported">(
+    typeof window !== "undefined" && "Notification" in window
+      ? Notification.permission
+      : "unsupported",
+  );
+  const [supportSubject, setSupportSubject] = useState<"duvida" | "reclamacao" | "sugestao" | "outro">("duvida");
+  const [supportMsg, setSupportMsg] = useState("");
+  const [sendingSupport, setSendingSupport] = useState(false);
+  const sendSupportFn = useServerFn(sendSupportMessage);
+
+  async function requestNotifications() {
+    if (!("Notification" in window)) {
+      toast.error("Este dispositivo/navegador não suporta notificações.");
+      return;
+    }
+    try {
+      const perm = await Notification.requestPermission();
+      setNotifPerm(perm);
+      if (perm === "granted") {
+        toast.success("Notificações ativadas neste dispositivo.");
+        try {
+          new Notification("QAP Report", {
+            body: "Notificações ativadas com sucesso.",
+            icon: "/icon-192.png",
+          });
+        } catch {
+          /* alguns navegadores exigem SW para exibir */
+        }
+      } else if (perm === "denied") {
+        toast.error("Permissão negada. Ative manualmente nas configurações do navegador.");
+      } else {
+        toast.info("Permissão não concedida.");
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao solicitar permissão");
+    }
+  }
+
+  async function submitSupport(e: React.FormEvent) {
+    e.preventDefault();
+    if (supportMsg.trim().length < 5) {
+      toast.error("Escreva uma mensagem com pelo menos 5 caracteres.");
+      return;
+    }
+    setSendingSupport(true);
+    try {
+      await sendSupportFn({ data: { subject: supportSubject, message: supportMsg.trim() } });
+      toast.success("Mensagem enviada ao administrador. Obrigado!");
+      setSupportMsg("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não foi possível enviar");
+    } finally {
+      setSendingSupport(false);
+    }
+  }
 
   useEffect(() => {
     (async () => {
