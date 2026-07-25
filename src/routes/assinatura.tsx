@@ -43,7 +43,7 @@ function SubscriptionPage() {
     paymentId: string;
     qrCode: string;
     qrCodeBase64: string;
-    expiration: string;
+    expiration: Date;
   } | null>(null);
   const [cardUrl, setCardUrl] = useState<string | null>(null);
 
