@@ -233,6 +233,250 @@ function Stat({
   );
 }
 
+function TabButton({
+  active,
+  onClick,
+  icon: Icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: typeof Users;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 rounded-t-lg px-4 py-2 text-sm font-medium ${
+        active ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      <Icon className="h-4 w-4" /> {label}
+    </button>
+  );
+}
+
+function CouponsManager({
+  couponsData,
+  createCouponFn,
+}: {
+  couponsData: { coupons: unknown[] } | undefined;
+  createCouponFn: ReturnType<typeof useServerFn<typeof adminCreateCoupon>>;
+}) {
+  const qc = useQueryClient();
+  const [duration, setDuration] = useState<1 | 12>(1);
+  const [maxUses, setMaxUses] = useState(1);
+  const [expiresAt, setExpiresAt] = useState("");
+
+  const createMut = useMutation({
+    mutationFn: () =>
+      createCouponFn({
+        data: {
+          durationMonths: duration,
+          maxUses,
+          expiresAt: expiresAt || undefined,
+        },
+      }),
+    onSuccess: (res) => {
+      toast.success(`Cupom ${res.code} gerado`);
+      qc.invalidateQueries({ queryKey: ["admin-coupons"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
+  });
+
+  const coupons = (couponsData?.coupons ?? []) as Array<{
+    id: string;
+    code: string;
+    duration_months: number;
+    max_uses: number;
+    used_count: number;
+    active: boolean;
+    expires_at: string | null;
+    coupon_redemptions: Array<{ user_id: string; redeemed_at: string }>;
+  }>;
+
+  return (
+    <section className="space-y-5">
+      <div className="rounded-2xl border bg-card p-5">
+        <h2 className="font-semibold">Gerar novo cupom</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Cupons dão acesso premium ao usuário que os resgatar. Cada código pode ser de uso único por pessoa.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <label className="text-sm">
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">Duração</span>
+            <select
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value) as 1 | 12)}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+            >
+              <option value={1}>1 mês grátis</option>
+              <option value={12}>1 ano grátis</option>
+            </select>
+          </label>
+          <label className="text-sm">
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">Limite de usos</span>
+            <input
+              type="number"
+              min={1}
+              value={maxUses}
+              onChange={(e) => setMaxUses(Math.max(1, Number(e.target.value)))}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">Expira em (opcional)</span>
+            <input
+              type="date"
+              value={expiresAt}
+              onChange={(e) => setExpiresAt(e.target.value)}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+            />
+          </label>
+        </div>
+        <button
+          onClick={() => createMut.mutate()}
+          disabled={createMut.isPending}
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+        >
+          {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ticket className="h-4 w-4" />}
+          Gerar cupom
+        </button>
+      </div>
+
+      <div className="rounded-2xl border bg-card p-5">
+        <h2 className="font-semibold">Cupons criados</h2>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40 text-left text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2">Código</th>
+                <th className="px-3 py-2">Duração</th>
+                <th className="px-3 py-2">Usos</th>
+                <th className="px-3 py-2">Status</th>
+                <th className="px-3 py-2">Resgatado por</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {coupons.map((c) => {
+                const exhausted = c.used_count >= c.max_uses;
+                const expired = c.expires_at ? new Date(c.expires_at) < new Date() : false;
+                return (
+                  <tr key={c.id} className="hover:bg-accent/30">
+                    <td className="px-3 py-2 font-mono text-xs">
+                      <div className="flex items-center gap-2">
+                        {c.code}
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(c.code);
+                            toast.success("Código copiado");
+                          }}
+                          className="rounded border px-1.5 py-0.5 text-[10px] hover:bg-accent"
+                        >
+                          Copiar
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2">
+                      {c.duration_months} {c.duration_months === 1 ? "mês" : "meses"}
+                    </td>
+                    <td className="px-3 py-2">
+                      {c.used_count}/{c.max_uses}
+                    </td>
+                    <td className="px-3 py-2">
+                      {!c.active || expired || exhausted ? (
+                        <span className="text-xs text-destructive">Inativo</span>
+                      ) : (
+                        <span className="text-xs text-success">Ativo</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                      {c.coupon_redemptions.length === 0
+                        ? "Não resgatado"
+                        : c.coupon_redemptions
+                            .map((r) => `${r.user_id.slice(0, 8)} em ${new Date(r.redeemed_at).toLocaleDateString("pt-BR")}`)
+                            .join("; ")}
+                    </td>
+                  </tr>
+                );
+              })}
+              {coupons.length === 0 && (
+                <tr>
+                  <td className="px-3 py-4 text-center text-sm text-muted-foreground" colSpan={5}>
+                    Nenhum cupom criado ainda.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PricingManager({
+  billing,
+  updatePricesFn,
+}: {
+  billing: { monthlyPrice: number; yearlyPrice: number } | undefined;
+  updatePricesFn: ReturnType<typeof useServerFn<typeof adminUpdatePrices>>;
+}) {
+  const qc = useQueryClient();
+  const [monthly, setMonthly] = useState(billing?.monthlyPrice ?? 10);
+  const [yearly, setYearly] = useState(billing?.yearlyPrice ?? 90);
+
+  const updateMut = useMutation({
+    mutationFn: () => updatePricesFn({ data: { monthlyPrice: monthly, yearlyPrice: yearly } }),
+    onSuccess: () => {
+      toast.success("Preços atualizados");
+      qc.invalidateQueries({ queryKey: ["billing-settings"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
+  });
+
+  return (
+    <section className="rounded-2xl border bg-card p-5">
+      <h2 className="font-semibold">Preços dos planos</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Alterações só valem para novas assinaturas ou renovações. Planos ativos mantêm o valor original até o fim do ciclo.
+      </p>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <label className="text-sm">
+          <span className="mb-1 block text-xs font-medium text-muted-foreground">Plano mensal (R$)</span>
+          <input
+            type="number"
+            min={1}
+            step={0.01}
+            value={monthly}
+            onChange={(e) => setMonthly(Number(e.target.value))}
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+        </label>
+        <label className="text-sm">
+          <span className="mb-1 block text-xs font-medium text-muted-foreground">Plano anual (R$)</span>
+          <input
+            type="number"
+            min={1}
+            step={0.01}
+            value={yearly}
+            onChange={(e) => setYearly(Number(e.target.value))}
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+        </label>
+      </div>
+      <button
+        onClick={() => updateMut.mutate()}
+        disabled={updateMut.isPending}
+        className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+      >
+        {updateMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+        Salvar preços
+      </button>
+    </section>
+  );
+}
+
 function NotificationComposer({ users }: { users: Array<{ id: string; email: string | null; full_name: string | null }> }) {
   const qc = useQueryClient();
   const sendFn = useServerFn(sendNotification);
