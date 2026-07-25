@@ -88,7 +88,10 @@ function AdminPage() {
         <Stat icon={FileText} label="Boletins criados" value={data.stats.totalBulletins} />
       </section>
 
+      <NotificationComposer users={data.users} />
+
       <section className="overflow-hidden rounded-2xl border bg-card">
+
         <div className="border-b p-4">
           <h2 className="font-semibold">Usuários</h2>
           <p className="mt-1 text-xs text-muted-foreground">
