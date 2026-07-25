@@ -214,7 +214,8 @@ export function NotificationBell() {
                   </li>
                 ))}
               </ul>
-            )}
+            </>
+          )}
           </div>
         </div>
       )}
