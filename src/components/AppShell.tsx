@@ -121,12 +121,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`flex flex-col items-center justify-center gap-1 py-2 text-xs ${
+                className={`flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] leading-tight ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
               >
-                <item.icon className="h-5 w-5" />
-                {item.label}
+                <item.icon className="h-5 w-5 shrink-0" />
+                <span className="w-full truncate text-center">{item.label}</span>
               </Link>
             );
           })}
