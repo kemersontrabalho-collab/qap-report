@@ -72,7 +72,7 @@ export const getMySubscription = createServerFn({ method: "GET" })
 
     const { data: redemptions } = await context.supabase
       .from("coupon_redemptions")
-      .select("id, redeemed_at, duration_months, coupons(code)")
+      .select("id, redeemed_at, coupons(code, duration_months)")
       .eq("user_id", userId)
       .order("redeemed_at", { ascending: false });
 
