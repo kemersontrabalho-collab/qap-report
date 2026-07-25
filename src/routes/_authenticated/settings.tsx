@@ -1,15 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send, CreditCard, Calendar, AlertCircle, Crown, QrCode } from "lucide-react";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { TutorialModal } from "@/components/TutorialModal";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
+import { getSubscriptionStatus, getMySubscription, cancelSubscription, getBillingSettings } from "@/lib/billing.functions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
@@ -247,6 +248,8 @@ function SettingsPage() {
           </button>
         </section>
 
+        <MyPlanSection />
+
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="flex items-center gap-2 font-semibold"><BookOpen className="h-4 w-4" /> Tutorial do aplicativo</h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -480,6 +483,133 @@ function SettingsPage() {
       </div>
       <TutorialModal open={tutorialOpen} onClose={() => setTutorialOpen(false)} />
     </AppShell>
+  );
+}
+
+function MyPlanSection() {
+  const qc = useQueryClient();
+  const statusFn = useServerFn(getSubscriptionStatus);
+  const mySubFn = useServerFn(getMySubscription);
+  const billingFn = useServerFn(getBillingSettings);
+  const cancelFn = useServerFn(cancelSubscription);
+
+  const { data: status } = useQuery({ queryKey: ["subscription-status"], queryFn: () => statusFn() });
+  const { data: mySub } = useQuery({ queryKey: ["my-subscription"], queryFn: () => mySubFn() });
+  const { data: billing } = useQuery({ queryKey: ["billing-settings"], queryFn: () => billingFn() });
+
+  const cancelMut = useMutation({
+    mutationFn: () => cancelFn(),
+    onSuccess: (res) => {
+      toast.success(`Renovação cancelada. Acesso até ${new Date(res.validUntil).toLocaleDateString("pt-BR")}`);
+      qc.invalidateQueries({ queryKey: ["subscription-status", "my-subscription"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao cancelar"),
+  });
+
+  const sub = mySub?.subscription;
+  const isActive = sub && (sub.status === "active" || sub.status === "trial");
+  const isExpired = !isActive || (sub?.current_period_end && new Date(sub.current_period_end) < new Date());
+  const daysLeft = sub?.current_period_end
+    ? Math.max(0, Math.ceil((new Date(sub.current_period_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
+
+  return (
+    <section className="rounded-2xl border bg-card p-5">
+      <div className="mb-4 flex items-center gap-2">
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+          <Crown className="h-4 w-4" />
+        </div>
+        <h2 className="font-semibold">Meu plano</h2>
+      </div>
+
+      <div className="rounded-lg bg-muted/40 p-3 text-sm">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <span className="text-muted-foreground">Plano atual:</span>
+          <span className="font-medium">
+            {status?.isFounder && "Fundador (acesso vitalício)"}
+            {!status?.isFounder && sub?.status === "trial" && "Teste grátis de 7 dias"}
+            {!status?.isFounder && sub?.status === "active" && `${sub.plan === "yearly" ? "Anual" : "Mensal"}`}
+            {!status?.isFounder && (!sub || sub.status === "expired" || sub.status === "canceled") && "Sem plano ativo"}
+          </span>
+        </div>
+        {sub?.current_period_end && (
+          <div className="mt-2 flex items-center gap-2">
+            <AlertCircle className={`h-4 w-4 ${isExpired ? "text-destructive" : "text-muted-foreground"}`} />
+            <span>
+              {isExpired ? "Expirado em " : "Válido até "}
+              <strong>{new Date(sub.current_period_end).toLocaleDateString("pt-BR")}</strong>
+              {!isExpired && daysLeft > 0 && ` (${daysLeft} ${daysLeft === 1 ? "dia" : "dias"} restantes)`}
+            </span>
+          </div>
+        )}
+        {status?.isFounder && (
+          <div className="mt-2 text-xs text-muted-foreground">Como fundador, você possui acesso a todas as funcionalidades.</div>
+        )}
+      </div>
+
+      {isActive && !isExpired && sub?.status !== "canceled" && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            to="/assinatura"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
+            <CreditCard className="h-4 w-4" /> Trocar plano
+          </Link>
+          <button
+            onClick={() => {
+              if (confirm("Cancelar renovação? O acesso continua até o fim do período pago.")) cancelMut.mutate();
+            }}
+            disabled={cancelMut.isPending}
+            className="inline-flex items-center gap-2 rounded-lg border border-destructive/40 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+          >
+            {cancelMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <AlertCircle className="h-4 w-4" />}
+            Cancelar renovação
+          </button>
+        </div>
+      )}
+
+      {!isActive && (
+        <div className="mt-4">
+          <Link
+            to="/assinatura"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
+            <QrCode className="h-4 w-4" /> Assinar agora
+          </Link>
+        </div>
+      )}
+
+      {mySub && mySub.payments.length > 0 && (
+        <div className="mt-4">
+          <h3 className="mb-2 text-sm font-medium">Histórico de pagamentos</h3>
+          <div className="max-h-40 overflow-y-auto rounded-lg border">
+            <table className="w-full text-xs">
+              <thead className="bg-muted/40 text-left text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2">Data</th>
+                  <th className="px-3 py-2">Plano</th>
+                  <th className="px-3 py-2">Valor</th>
+                  <th className="px-3 py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {mySub.payments.map((p) => (
+                  <tr key={p.id}>
+                    <td className="px-3 py-2">{p.paid_at ? new Date(p.paid_at).toLocaleDateString("pt-BR") : "—"}</td>
+                    <td className="px-3 py-2">{p.plan === "yearly" ? "Anual" : "Mensal"}</td>
+                    <td className="px-3 py-2">
+                      {p.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    </td>
+                    <td className="px-3 py-2 capitalize">{p.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
