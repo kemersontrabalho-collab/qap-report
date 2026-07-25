@@ -10,6 +10,7 @@ export function NotificationBell() {
   const markFn = useServerFn(markNotificationsRead);
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [showRead, setShowRead] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
 
   const { data } = useQuery({
