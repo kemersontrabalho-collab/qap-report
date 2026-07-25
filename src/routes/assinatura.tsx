@@ -1,9 +1,9 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getBillingSettings, getMySubscription, createCheckout, redeemCoupon, cancelSubscription } from "@/lib/billing.functions";
+import { getBillingSettings, getMySubscription, createCheckout, redeemCoupon, cancelSubscription, getSubscriptionStatus } from "@/lib/billing.functions";
 import { Loader2, CheckCircle2, CreditCard, QrCode, Calendar, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,11 +23,19 @@ export const Route = createFileRoute("/assinatura")({
 
 function SubscriptionPage() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const billingFn = useServerFn(getBillingSettings);
   const subFn = useServerFn(getMySubscription);
   const checkoutFn = useServerFn(createCheckout);
   const couponFn = useServerFn(redeemCoupon);
   const cancelFn = useServerFn(cancelSubscription);
+  const statusFn = useServerFn(getSubscriptionStatus);
+
+  const { data: status } = useQuery({ queryKey: ["subscription-status"], queryFn: () => statusFn() });
+  useEffect(() => {
+    if (status?.isFounder) navigate({ to: "/dashboard", replace: true });
+  }, [status?.isFounder, navigate]);
+
 
   const { data: billing, isLoading: billingLoading } = useQuery({
     queryKey: ["billing-settings"],
