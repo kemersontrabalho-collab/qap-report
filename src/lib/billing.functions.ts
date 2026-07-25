@@ -35,6 +35,25 @@ export const getBillingSettings = createServerFn({ method: "GET" }).handler(asyn
   };
 });
 
+export const getSubscriptionStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await syncSubscriptionStatus(context.userId);
+    const { data: sub } = await context.supabase
+      .from("subscriptions")
+      .select("status, current_period_end, plan")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    const { data: isFounder } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "fundador" });
+    const now = new Date();
+    const active =
+      isFounder ||
+      (sub &&
+        (sub.status === "active" || sub.status === "trial") &&
+        new Date(sub.current_period_end) > now);
+    return { active, status: sub?.status ?? "none", validUntil: sub?.current_period_end ?? null, isFounder };
+  });
+
 export const getMySubscription = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
