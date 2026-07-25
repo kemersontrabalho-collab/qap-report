@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Bell, Check, X } from "lucide-react";
+import { Bell, Check, X, Eraser, Eye, EyeOff } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { listNotifications, markNotificationsRead, type NotificationRow } from "@/lib/notifications.functions";
@@ -10,6 +10,7 @@ export function NotificationBell() {
   const markFn = useServerFn(markNotificationsRead);
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [showRead, setShowRead] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
 
   const { data } = useQuery({
@@ -40,6 +41,27 @@ export function NotificationBell() {
       void supabase.removeChannel(channel);
     };
   }, [qc]);
+
+  const clearMut = useMutation({
+    mutationFn: () => markFn({ data: {} }),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ["notifications"] });
+      const prev = qc.getQueryData<{ items: NotificationRow[]; unread: number }>(["notifications"]);
+      if (prev) {
+        const nextItems = prev.items.map((n) => ({ ...n, read: true }));
+        qc.setQueryData(["notifications"], {
+          items: nextItems,
+          unread: 0,
+        });
+      }
+      setShowRead(false);
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["notifications"], ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+  });
 
   const markMut = useMutation({
     mutationFn: (ids?: string[]) => markFn({ data: { ids } }),
@@ -75,6 +97,7 @@ export function NotificationBell() {
 
   const items = data?.items ?? [];
   const unread = data?.unread ?? 0;
+  const filtered = items.filter((n) => showRead || !n.read);
 
   return (
     <div className="relative" ref={ref}>
@@ -96,6 +119,16 @@ export function NotificationBell() {
           <div className="flex items-center justify-between border-b px-3 py-2">
             <span className="text-sm font-semibold">Notificações</span>
             <div className="flex items-center gap-1">
+              {items.length > 0 && (
+                <button
+                  onClick={() => clearMut.mutate()}
+                  disabled={clearMut.isPending}
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent disabled:opacity-50"
+                  title="Limpar notificações (marcar todas como lidas e ocultar)"
+                >
+                  <Eraser className="h-3 w-3" /> Limpar
+                </button>
+              )}
               {unread > 0 && (
                 <button
                   onClick={() => markMut.mutate(undefined)}
@@ -119,47 +152,82 @@ export function NotificationBell() {
                 Sem notificações no momento.
               </div>
             ) : (
-              <ul className="divide-y">
-                {items.map((n) => (
-                  <li
-                    key={n.id}
-                    role="button"
-                    tabIndex={0}
-                    className={`cursor-pointer px-3 py-2.5 outline-none focus-visible:bg-accent/60 ${
-                      !n.read ? "bg-accent/30" : ""
-                    }`}
-                    onClick={() => {
-                      if (!n.read) markMut.mutate([n.id]);
-                    }}
-                    onKeyDown={(e) => {
-                      if ((e.key === "Enter" || e.key === " ") && !n.read) {
-                        e.preventDefault();
-                        markMut.mutate([n.id]);
-                      }
-                    }}
+              <>
+                <div className="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
+                  <span className="text-xs text-muted-foreground">
+                    {showRead
+                      ? `Mostrando todas (${items.length})`
+                      : `Não lidas (${filtered.length})`}
+                  </span>
+                  <button
+                    onClick={() => setShowRead((v) => !v)}
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                   >
-                    <div className="flex items-start gap-2">
-                      {!n.read && (
-                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <p className="truncate text-sm font-medium">{n.title}</p>
-                          <span className="shrink-0 text-[10px] text-muted-foreground">
-                            {new Date(n.created_at).toLocaleString("pt-BR", {
-                              dateStyle: "short",
-                              timeStyle: "short",
-                            })}
-                          </span>
+                    {showRead ? (
+                      <>
+                        <EyeOff className="h-3 w-3" /> Ocultar lidas
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="h-3 w-3" /> Mostrar lidas
+                      </>
+                    )}
+                  </button>
+                </div>
+                {filtered.length === 0 ? (
+                  <div className="p-6 text-center text-sm text-muted-foreground">
+                    Nenhuma notificação não lida.
+                    <button
+                      onClick={() => setShowRead(true)}
+                      className="ml-1 text-xs text-primary hover:underline"
+                    >
+                      Mostrar lidas
+                    </button>
+                  </div>
+                ) : (
+                  <ul className="divide-y">
+                    {filtered.map((n) => (
+                      <li
+                        key={n.id}
+                        role="button"
+                        tabIndex={0}
+                        className={`cursor-pointer px-3 py-2.5 outline-none focus-visible:bg-accent/60 ${
+                          !n.read ? "bg-accent/30" : ""
+                        }`}
+                        onClick={() => {
+                          if (!n.read) markMut.mutate([n.id]);
+                        }}
+                        onKeyDown={(e) => {
+                          if ((e.key === "Enter" || e.key === " ") && !n.read) {
+                            e.preventDefault();
+                            markMut.mutate([n.id]);
+                          }
+                        }}
+                      >
+                        <div className="flex items-start gap-2">
+                          {!n.read && (
+                            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-baseline justify-between gap-2">
+                              <p className="truncate text-sm font-medium">{n.title}</p>
+                              <span className="shrink-0 text-[10px] text-muted-foreground">
+                                {new Date(n.created_at).toLocaleString("pt-BR", {
+                                  dateStyle: "short",
+                                  timeStyle: "short",
+                                })}
+                              </span>
+                            </div>
+                            <p className="mt-0.5 whitespace-pre-wrap text-xs text-muted-foreground">
+                              {n.body}
+                            </p>
+                          </div>
                         </div>
-                        <p className="mt-0.5 whitespace-pre-wrap text-xs text-muted-foreground">
-                          {n.body}
-                        </p>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
             )}
           </div>
         </div>
