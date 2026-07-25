@@ -1,15 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send, Shield, ArrowRight } from "lucide-react";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { TutorialModal } from "@/components/TutorialModal";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
+import { isFounder } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
