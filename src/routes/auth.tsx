@@ -4,6 +4,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { translateAuthError } from "@/lib/i18n-errors";
 import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 
 const search = z.object({ mode: z.enum(["login", "signup"]).optional() });
@@ -47,7 +48,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Conta criada! Você já pode entrar.");
+        toast.success("Conta criada! Verifique seu email para confirmar o cadastro e então entre.");
         setMode("login");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -58,7 +59,7 @@ function AuthPage() {
         setMode("login");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Ocorreu um erro");
+      toast.error(translateAuthError(err));
     } finally {
       setLoading(false);
     }

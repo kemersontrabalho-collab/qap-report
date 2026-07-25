@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { translateAuthError } from "@/lib/i18n-errors";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -25,7 +26,7 @@ function ResetPage() {
       toast.success("Senha atualizada com sucesso.");
       navigate({ to: "/dashboard" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Não foi possível atualizar");
+      toast.error(translateAuthError(err));
     } finally {
       setLoading(false);
     }

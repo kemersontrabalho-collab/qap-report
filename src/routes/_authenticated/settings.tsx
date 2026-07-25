@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2 } from "lucide-react";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
+import { TutorialModal } from "@/components/TutorialModal";
+import { useServerFn } from "@tanstack/react-start";
+import { sendSupportMessage } from "@/lib/support.functions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
@@ -30,6 +33,62 @@ function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [notifPerm, setNotifPerm] = useState<NotificationPermission | "unsupported">(
+    typeof window !== "undefined" && "Notification" in window
+      ? Notification.permission
+      : "unsupported",
+  );
+  const [supportSubject, setSupportSubject] = useState<"duvida" | "reclamacao" | "sugestao" | "outro">("duvida");
+  const [supportMsg, setSupportMsg] = useState("");
+  const [sendingSupport, setSendingSupport] = useState(false);
+  const sendSupportFn = useServerFn(sendSupportMessage);
+
+  async function requestNotifications() {
+    if (!("Notification" in window)) {
+      toast.error("Este dispositivo/navegador não suporta notificações.");
+      return;
+    }
+    try {
+      const perm = await Notification.requestPermission();
+      setNotifPerm(perm);
+      if (perm === "granted") {
+        toast.success("Notificações ativadas neste dispositivo.");
+        try {
+          new Notification("QAP Report", {
+            body: "Notificações ativadas com sucesso.",
+            icon: "/icon-192.png",
+          });
+        } catch {
+          /* alguns navegadores exigem SW para exibir */
+        }
+      } else if (perm === "denied") {
+        toast.error("Permissão negada. Ative manualmente nas configurações do navegador.");
+      } else {
+        toast.info("Permissão não concedida.");
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao solicitar permissão");
+    }
+  }
+
+  async function submitSupport(e: React.FormEvent) {
+    e.preventDefault();
+    if (supportMsg.trim().length < 5) {
+      toast.error("Escreva uma mensagem com pelo menos 5 caracteres.");
+      return;
+    }
+    setSendingSupport(true);
+    try {
+      await sendSupportFn({ data: { subject: supportSubject, message: supportMsg.trim() } });
+      toast.success("Mensagem enviada ao administrador. Obrigado!");
+      setSupportMsg("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não foi possível enviar");
+    } finally {
+      setSendingSupport(false);
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -189,6 +248,88 @@ function SettingsPage() {
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
+          <h2 className="flex items-center gap-2 font-semibold"><BookOpen className="h-4 w-4" /> Tutorial do aplicativo</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Um guia passo a passo mostrando como usar cada parte do QAP Report: painel, criação de boletins, IA, casos semelhantes, PDF e mais.
+          </p>
+          <button
+            onClick={() => setTutorialOpen(true)}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm hover:bg-accent"
+          >
+            <BookOpen className="h-4 w-4" /> Iniciar tutorial
+          </button>
+        </section>
+
+        <section className="rounded-2xl border bg-card p-5">
+          <h2 className="flex items-center gap-2 font-semibold"><BellRing className="h-4 w-4" /> Notificações do dispositivo</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Ative para receber alertas do administrador e atualizações do app diretamente no seu dispositivo, mesmo com o QAP Report fechado.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button
+              onClick={requestNotifications}
+              disabled={notifPerm === "granted" || notifPerm === "unsupported"}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              <BellRing className="h-4 w-4" />
+              {notifPerm === "granted" ? "Notificações ativadas" : "Ativar notificações"}
+            </button>
+            <span className="text-xs text-muted-foreground">
+              {notifPerm === "granted" && "Permissão concedida."}
+              {notifPerm === "denied" && "Permissão negada. Altere nas configurações do navegador."}
+              {notifPerm === "default" && "Aguardando sua permissão."}
+              {notifPerm === "unsupported" && "Não suportado neste dispositivo."}
+            </span>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border bg-card p-5">
+          <h2 className="flex items-center gap-2 font-semibold"><LifeBuoy className="h-4 w-4" /> Suporte</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Envie dúvidas, reclamações ou sugestões. Sua mensagem chega diretamente à caixa de notificações do administrador.
+          </p>
+          <form onSubmit={submitSupport} className="mt-4 space-y-3">
+            <div>
+              <label className="text-sm font-medium">Assunto</label>
+              <select
+                value={supportSubject}
+                onChange={(e) => setSupportSubject(e.target.value as any)}
+                className="input"
+              >
+                <option value="duvida">Dúvida</option>
+                <option value="reclamacao">Reclamação</option>
+                <option value="sugestao">Sugestão</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Mensagem</label>
+              <textarea
+                value={supportMsg}
+                onChange={(e) => setSupportMsg(e.target.value)}
+                rows={4}
+                maxLength={2000}
+                placeholder="Descreva sua dúvida, reclamação ou sugestão..."
+                className="input resize-y"
+              />
+              <div className="mt-1 text-right text-[11px] text-muted-foreground">
+                {supportMsg.length}/2000
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={sendingSupport}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              {sendingSupport ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              Enviar ao administrador
+            </button>
+          </form>
+        </section>
+
+
+
+        <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Instalar o aplicativo</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             O QAP Report funciona como app instalável (PWA). Sem download em loja — usa o próprio navegador do celular.
@@ -337,6 +478,7 @@ function SettingsPage() {
         <style>{`.input{margin-top:.25rem;width:100%;border-radius:.5rem;border:1px solid var(--color-border);background:var(--color-background);padding:.5rem .75rem;font-size:.875rem;outline:none}
         .input:focus{box-shadow:0 0 0 2px var(--color-ring)}`}</style>
       </div>
+      <TutorialModal open={tutorialOpen} onClose={() => setTutorialOpen(false)} />
     </AppShell>
   );
 }
