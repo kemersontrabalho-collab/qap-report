@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Feather, Search, WifiOff, Moon, Sparkles } from "lucide-react";
+import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
