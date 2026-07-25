@@ -147,3 +147,51 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export type AdminStats = {
+  perDay: Array<{ date: string; count: number }>;
+  topCategories: Array<{ category: string; count: number }>;
+  peakHours: Array<{ hour: number; count: number }>;
+};
+
+export const adminStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AdminStats> => {
+    await assertFounder(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const { data, error } = await supabaseAdmin
+      .from("bulletins")
+      .select("created_at, category")
+      .gte("created_at", since)
+      .is("deleted_at", null);
+    if (error) throw new Error(error.message);
+
+    const perDayMap = new Map<string, number>();
+    const catMap = new Map<string, number>();
+    const hourArr = new Array(24).fill(0);
+
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      perDayMap.set(d.toISOString().slice(0, 10), 0);
+    }
+
+    for (const row of data ?? []) {
+      const dt = new Date(row.created_at as string);
+      const key = dt.toISOString().slice(0, 10);
+      if (perDayMap.has(key)) perDayMap.set(key, (perDayMap.get(key) ?? 0) + 1);
+      hourArr[dt.getHours()]++;
+      const cat = ((row.category as string | null) ?? "").trim() || "Sem categoria";
+      catMap.set(cat, (catMap.get(cat) ?? 0) + 1);
+    }
+
+    return {
+      perDay: Array.from(perDayMap.entries()).map(([date, count]) => ({ date, count })),
+      topCategories: Array.from(catMap.entries())
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8),
+      peakHours: hourArr.map((count, hour) => ({ hour, count })),
+    };
+  });
+

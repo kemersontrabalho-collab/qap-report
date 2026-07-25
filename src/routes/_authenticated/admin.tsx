@@ -2,11 +2,22 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminListUsers, adminSetUserBlocked, adminDeleteUser, isFounder } from "@/lib/admin.functions";
+import { adminListUsers, adminSetUserBlocked, adminDeleteUser, isFounder, adminStats } from "@/lib/admin.functions";
 import { sendNotification } from "@/lib/notifications.functions";
-import { Loader2, Shield, Users, FileText, Activity, Ban, CheckCircle2, Trash2, Crown, Send, Bell } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Shield, Users, FileText, Activity, Ban, CheckCircle2, Trash2, Crown, Send, Bell, Search, BarChart3 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Administração · QAP Report" }] }),
@@ -26,11 +37,19 @@ function AdminPage() {
   const listFn = useServerFn(adminListUsers);
   const banFn = useServerFn(adminSetUserBlocked);
   const delFn = useServerFn(adminDeleteUser);
+  const statsFn = useServerFn(adminStats);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["admin-users"],
     queryFn: () => listFn(),
   });
+  const { data: stats } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: () => statsFn(),
+  });
+
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "blocked" | "inactive">("all");
 
   const banMut = useMutation({
     mutationFn: (v: { userId: string; block: boolean }) => banFn({ data: v }),
@@ -49,6 +68,25 @@ function AdminPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
   });
+
+  const filteredUsers = useMemo(() => {
+    if (!data) return [];
+    const q = query.trim().toLowerCase();
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    return data.users.filter((u) => {
+      if (q) {
+        const hay = `${u.email ?? ""} ${u.full_name ?? ""}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      const blocked = !!(u.banned_until && new Date(u.banned_until).getTime() > Date.now());
+      const last = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : 0;
+      const active = last >= cutoff;
+      if (statusFilter === "blocked" && !blocked) return false;
+      if (statusFilter === "active" && (!active || blocked)) return false;
+      if (statusFilter === "inactive" && (active || blocked)) return false;
+      return true;
+    });
+  }, [data, query, statusFilter]);
 
   if (isLoading) {
     return (
@@ -88,15 +126,39 @@ function AdminPage() {
         <Stat icon={FileText} label="Boletins criados" value={data.stats.totalBulletins} />
       </section>
 
+      {stats && <ChartsPanel stats={stats} />}
+
       <NotificationComposer users={data.users} />
 
       <section className="overflow-hidden rounded-2xl border bg-card">
-
-        <div className="border-b p-4">
-          <h2 className="font-semibold">Usuários</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {data.users.length} conta{data.users.length === 1 ? "" : "s"} no sistema.
-          </p>
+        <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Usuários</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {data.users.length} conta{data.users.length === 1 ? "" : "s"} no sistema.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar por email ou nome"
+                className="w-full rounded-lg border bg-background py-2 pl-8 pr-3 text-sm sm:w-64"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+              className="rounded-lg border bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">Todos</option>
+              <option value="active">Ativos (30d)</option>
+              <option value="blocked">Bloqueados</option>
+              <option value="inactive">Inativos (30d+)</option>
+            </select>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -111,7 +173,14 @@ function AdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {data.users.map((u) => {
+              {filteredUsers.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                    Nenhum usuário encontrado com esses filtros.
+                  </td>
+                </tr>
+              )}
+              {filteredUsers.map((u) => {
                 const blocked = u.banned_until && new Date(u.banned_until).getTime() > Date.now();
                 return (
                   <tr key={u.id} className="hover:bg-accent/30">
@@ -317,5 +386,93 @@ function NotificationComposer({ users }: { users: Array<{ id: string; email: str
         </div>
       </div>
     </section>
+  );
+}
+
+function ChartsPanel({ stats }: { stats: import("@/lib/admin.functions").AdminStats }) {
+  const fmtDay = (d: string) => {
+    const dt = new Date(d + "T00:00:00");
+    return dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  };
+  return (
+    <section className="mb-6 grid gap-3 lg:grid-cols-2">
+      <ChartCard title="Boletins por dia (30d)" icon={BarChart3}>
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={stats.perDay} margin={{ top: 8, right: 12, left: -18, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis
+              dataKey="date"
+              tickFormatter={fmtDay}
+              tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+              interval="preserveStartEnd"
+            />
+            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+            <Tooltip
+              labelFormatter={fmtDay}
+              contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+            />
+            <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard title="Horários de pico" icon={Activity}>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={stats.peakHours} margin={{ top: 8, right: 12, left: -18, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="hour" tickFormatter={(h) => `${h}h`} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+            <Tooltip
+              labelFormatter={(h) => `${h}:00`}
+              contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+            />
+            <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard title="Categorias mais usadas" icon={FileText} className="lg:col-span-2">
+        {stats.topCategories.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">Sem dados suficientes.</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={Math.max(160, stats.topCategories.length * 32)}>
+            <BarChart data={stats.topCategories} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+              <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis
+                type="category"
+                dataKey="category"
+                width={160}
+                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+              />
+              <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+              <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </ChartCard>
+    </section>
+  );
+}
+
+function ChartCard({
+  title,
+  icon: Icon,
+  children,
+  className = "",
+}: {
+  title: string;
+  icon: typeof Users;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`rounded-2xl border bg-card p-4 ${className}`}>
+      <div className="mb-3 flex items-center gap-2 text-sm font-medium">
+        <Icon className="h-4 w-4 text-muted-foreground" />
+        {title}
+      </div>
+      {children}
+    </div>
   );
 }
