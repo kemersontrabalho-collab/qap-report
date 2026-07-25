@@ -48,7 +48,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Conta criada! Você já pode entrar.");
+        toast.success("Conta criada! Verifique seu email para confirmar o cadastro e então entre.");
         setMode("login");
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -59,7 +59,7 @@ function AuthPage() {
         setMode("login");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Ocorreu um erro");
+      toast.error(translateAuthError(err));
     } finally {
       setLoading(false);
     }
