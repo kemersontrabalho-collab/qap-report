@@ -548,7 +548,7 @@ function MyPlanSection() {
         )}
       </div>
 
-      {isActive && !isExpired && sub?.status !== "canceled" && (
+      {!status?.isFounder && isActive && !isExpired && sub?.status !== "canceled" && (
         <div className="mt-4 flex flex-wrap gap-2">
           <Link
             to="/assinatura"
@@ -569,7 +569,7 @@ function MyPlanSection() {
         </div>
       )}
 
-      {!isActive && (
+      {!status?.isFounder && !isActive && (
         <div className="mt-4">
           <Link
             to="/assinatura"
