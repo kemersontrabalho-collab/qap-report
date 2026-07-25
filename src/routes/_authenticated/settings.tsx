@@ -6,6 +6,7 @@ import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
 import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { InstallAppButton } from "@/components/InstallAppButton";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · RedaPol" }] }),
@@ -192,6 +193,9 @@ function SettingsPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             O RedaPol funciona como app instalável (PWA). Sem download em loja — usa o próprio navegador do celular.
           </p>
+          <div className="mt-4">
+            <InstallAppButton />
+          </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <button
               onClick={() =>
@@ -226,6 +230,9 @@ function SettingsPage() {
               </div>
             </button>
           </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Após instalado, o app fica disponível offline: você pode criar e editar boletins mesmo sem internet, e a sincronização acontece automaticamente ao reconectar.
+          </p>
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
