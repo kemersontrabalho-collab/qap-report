@@ -280,15 +280,17 @@ function EditBulletin() {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     const metaLines: string[] = [];
-    metaLines.push(`Tipo: ${b.bulletin_type}${b.category ? ` — ${b.category}` : ""}`);
+    metaLines.push(`Título do Boletim: ${b.title || "—"}`);
+    metaLines.push(`Categoria: ${b.category ?? "—"}`);
+    metaLines.push(`Tipo: ${b.bulletin_type}`);
+    if (b.crew_composition) metaLines.push(`Composição da Guarnição: ${b.crew_composition}`);
+    if (b.vehicle_prefix) metaLines.push(`Prefixo da viatura: ${b.vehicle_prefix}`);
     if (b.occurrence_at)
       metaLines.push(
-        `Data/hora: ${new Date(b.occurrence_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}`,
+        `Data e Hora: ${new Date(b.occurrence_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}`,
       );
-    if (b.crew_composition) metaLines.push(`Guarnição: ${b.crew_composition}`);
-    if (b.vehicle_prefix) metaLines.push(`Viatura: ${b.vehicle_prefix}`);
-    if (b.crew_address) metaLines.push(`Endereço da guarnição: ${b.crew_address}`);
-    if (b.occurrence_address) metaLines.push(`Local da ocorrência: ${b.occurrence_address}`);
+    if (b.crew_address) metaLines.push(`LOCALIZAÇÃO DA GUARNIÇÃO: ${b.crew_address}`);
+    if (b.occurrence_address) metaLines.push(`Localização da Ocorrência: ${b.occurrence_address}`);
 
     let y = margin + 20;
     for (const line of metaLines) {
