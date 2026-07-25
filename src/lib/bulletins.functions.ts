@@ -49,10 +49,10 @@ async function callGateway(messages: { role: string; content: string }[]) {
     body: JSON.stringify({ model: "openai/gpt-5.4-mini", messages }),
   });
   if (!res.ok) {
-    const text = await res.text();
     if (res.status === 429) throw new Error("Limite de requisições atingido. Tente novamente em instantes.");
     if (res.status === 402) throw new Error("Créditos de IA esgotados. Adicione créditos no workspace.");
-    throw new Error(`Falha na IA: ${text.slice(0, 200)}`);
+    if (res.status >= 500) throw new Error("Serviço de IA indisponível no momento. Tente novamente em instantes.");
+    throw new Error("Não foi possível gerar o texto. Verifique os dados e tente novamente.");
   }
   const json = (await res.json()) as { choices: { message: { content: string } }[] };
   return json.choices[0]?.message?.content ?? "";
@@ -141,19 +141,31 @@ export const reverseGeocode = createServerFn({ method: "POST" })
     const lovableKey = process.env.LOVABLE_API_KEY;
     const mapsKey = process.env.GOOGLE_MAPS_API_KEY;
     if (!lovableKey || !mapsKey) throw new Error("Google Maps não configurado");
-    const res = await fetch(
-      `https://connector-gateway.lovable.dev/google_maps/maps/api/geocode/json?latlng=${data.lat},${data.lng}&language=pt-BR`,
-      {
-        headers: {
-          Authorization: `Bearer ${lovableKey}`,
-          "X-Connection-Api-Key": mapsKey,
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    try {
+      const res = await fetch(
+        `https://connector-gateway.lovable.dev/google_maps/maps/api/geocode/json?latlng=${data.lat},${data.lng}&language=pt-BR`,
+        {
+          headers: {
+            Authorization: `Bearer ${lovableKey}`,
+            "X-Connection-Api-Key": mapsKey,
+          },
+          signal: controller.signal,
         },
-      },
-    );
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(`Falha ao consultar Google Maps: ${res.status} ${body.slice(0, 120)}`);
+      );
+      if (!res.ok) {
+        throw new Error(`Falha ao consultar endereço (código ${res.status}).`);
+      }
+      const json = (await res.json()) as { results?: { formatted_address?: string }[] };
+      return { address: json.results?.[0]?.formatted_address ?? "" };
+    } catch (e) {
+      if ((e as { name?: string })?.name === "AbortError") {
+        throw new Error("Tempo esgotado ao consultar endereço. Tente novamente.");
+      }
+      throw e;
+    } finally {
+      clearTimeout(timer);
     }
-    const json = (await res.json()) as { results?: { formatted_address?: string }[] };
-    return { address: json.results?.[0]?.formatted_address ?? "" };
   });
+

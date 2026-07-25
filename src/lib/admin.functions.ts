@@ -136,11 +136,14 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
     await assertFounder(context);
     if (data.userId === context.userId) throw new Error("O Fundador não pode excluir a própria conta aqui.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // cascade cleanup (RLS bypass; auth.users cascades to profiles/bulletins/user_roles/knowledge)
+    // Atômico: apagar auth.users primeiro (dispara cascades por FK). Se falhar,
+    // nenhum dado de app é perdido. Depois faz limpeza best-effort para FKs
+    // que porventura não estejam com ON DELETE CASCADE.
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (error) throw new Error(error.message);
     await supabaseAdmin.from("bulletins").delete().eq("user_id", data.userId);
     await supabaseAdmin.from("profiles").delete().eq("id", data.userId);
     await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
-    if (error) throw new Error(error.message);
     return { ok: true };
   });
+
