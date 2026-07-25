@@ -70,7 +70,7 @@ export function addMonths(date: Date, months: number): Date {
   return d;
 }
 
-export function verifyWebhookSignature(body: string, signatureHeader: string | null): boolean {
+export async function verifyWebhookSignature(body: string, signatureHeader: string | null): Promise<boolean> {
   const secret = getWebhookSecret();
   if (!secret || !signatureHeader) return true;
   try {
@@ -84,29 +84,26 @@ export function verifyWebhookSignature(body: string, signatureHeader: string | n
     }
     if (!ts || !hash) return false;
     const payload = `${ts}.${body}`;
-    const expected = cryptoHmacHex(payload, secret);
+    const expected = await cryptoHmacHex(payload, secret);
     return timingSafeEqual(expected, hash);
   } catch {
     return false;
   }
 }
 
-function cryptoHmacHex(payload: string, secret: string): string {
+async function cryptoHmacHex(payload: string, secret: string): Promise<string> {
   if (typeof crypto !== "undefined" && "subtle" in crypto) {
-    const key = crypto.subtle.importKey(
+    const key = await crypto.subtle.importKey(
       "raw",
       new TextEncoder().encode(secret),
       { name: "HMAC", hash: "SHA-256" },
       false,
       ["sign"],
     );
-    return key.then((k) =>
-      crypto.subtle.sign("HMAC", k, new TextEncoder().encode(payload)).then((buf) =>
-        Array.from(new Uint8Array(buf))
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join(""),
-      ),
-    );
+    const buf = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
   }
   return "";
 }
