@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
-  head: () => ({ meta: [{ title: "Editar boletim · RedaPol" }] }),
+  head: () => ({ meta: [{ title: "Editar boletim · QAP Report" }] }),
   component: EditBulletin,
 });
 
