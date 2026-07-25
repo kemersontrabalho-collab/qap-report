@@ -37,11 +37,19 @@ function AdminPage() {
   const listFn = useServerFn(adminListUsers);
   const banFn = useServerFn(adminSetUserBlocked);
   const delFn = useServerFn(adminDeleteUser);
+  const statsFn = useServerFn(adminStats);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["admin-users"],
     queryFn: () => listFn(),
   });
+  const { data: stats } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: () => statsFn(),
+  });
+
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "blocked" | "inactive">("all");
 
   const banMut = useMutation({
     mutationFn: (v: { userId: string; block: boolean }) => banFn({ data: v }),
