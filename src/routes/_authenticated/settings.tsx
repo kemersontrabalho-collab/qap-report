@@ -248,6 +248,8 @@ function SettingsPage() {
           </button>
         </section>
 
+        <MyPlanSection />
+
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="flex items-center gap-2 font-semibold"><BookOpen className="h-4 w-4" /> Tutorial do aplicativo</h2>
           <p className="mt-1 text-sm text-muted-foreground">
