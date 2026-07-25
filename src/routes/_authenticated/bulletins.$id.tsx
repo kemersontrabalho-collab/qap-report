@@ -7,6 +7,7 @@ import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { toast } from "sonner";
 import { SimilarCases } from "@/components/SimilarCases";
+import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import {
   ArrowLeft,
   Sparkles,
@@ -21,6 +22,7 @@ import {
   ExternalLink,
   FileDown,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
   head: () => ({ meta: [{ title: "Editar boletim · QAP Report" }] }),
@@ -66,6 +68,15 @@ function stripBraces(text: string): string {
   return text.replace(/\{[^{}]*\}/g, "").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function EditBulletin() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
@@ -79,6 +90,8 @@ function EditBulletin() {
   const [b, setB] = useState<Bulletin | null>(null);
   const [online, setOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
   const dirtyRef = useRef(false);
+  const bRef = useRef<Bulletin | null>(null);
+  bRef.current = b;
 
   const typeInfo = useMemo(() => BULLETIN_TYPES.find((t) => t.code === b?.bulletin_type), [b]);
   const categories = useMemo(
@@ -86,6 +99,7 @@ function EditBulletin() {
     [b],
   );
   const cacheKey = `bulletin-cache:${id}`;
+  const dirtyKey = `bulletin-dirty:${id}`;
 
   useEffect(() => {
     const on = () => setOnline(true);
@@ -100,21 +114,35 @@ function EditBulletin() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("bulletins").select("*").eq("id", id).single();
-      if (error || !data) {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          setB(JSON.parse(cached));
-          toast.info("Carregado do cache local (offline).");
-        } else {
-          toast.error("Boletim não encontrado");
-          navigate({ to: "/dashboard" });
-        }
-      } else {
+      const { data, error } = await supabase.from("bulletins").select("*").eq("id", id).maybeSingle();
+      if (data) {
         const loaded = data as Bulletin;
-        // Auto-preenche data/hora se ainda estiver vazia
         if (!loaded.occurrence_at) loaded.occurrence_at = new Date().toISOString();
         setB(loaded);
+        // Se tinha alterações pendentes salvas localmente, mantém como dirty
+        // para o effect de "online" ressincronizar.
+        if (localStorage.getItem(dirtyKey) === "1") dirtyRef.current = true;
+      } else if (!error || error.code === "PGRST116") {
+        // 404 real (registro não existe / RLS). Não tentar cache — evita
+        // reviver boletins apagados por outro dispositivo.
+        toast.error("Boletim não encontrado");
+        navigate({ to: "/dashboard" });
+      } else {
+        // Erro de rede — tenta o cache local.
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          try {
+            setB(JSON.parse(cached));
+            toast.info("Carregado do cache local (offline).");
+            if (localStorage.getItem(dirtyKey) === "1") dirtyRef.current = true;
+          } catch {
+            toast.error(translateDbError(error));
+            navigate({ to: "/dashboard" });
+          }
+        } else {
+          toast.error(translateDbError(error));
+          navigate({ to: "/dashboard" });
+        }
       }
       setLoading(false);
     })();
@@ -124,10 +152,13 @@ function EditBulletin() {
   useEffect(() => {
     if (!b) return;
     localStorage.setItem(cacheKey, JSON.stringify(b));
-  }, [b, cacheKey]);
+    if (dirtyRef.current) localStorage.setItem(dirtyKey, "1");
+  }, [b, cacheKey, dirtyKey]);
 
   useEffect(() => {
-    if (!online || !b || !dirtyRef.current) return;
+    if (!online) return;
+    if (!bRef.current) return;
+    if (!dirtyRef.current) return;
     save();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [online]);
@@ -135,48 +166,54 @@ function EditBulletin() {
   function update<K extends keyof Bulletin>(key: K, value: Bulletin[K]) {
     if (!b) return;
     dirtyRef.current = true;
+    localStorage.setItem(dirtyKey, "1");
     setB({ ...b, [key]: value });
   }
 
+
   async function save(nextStatus?: "draft" | "done") {
-    if (!b) return;
+    const current = bRef.current;
+    if (!current) return;
     setSaving(true);
     try {
       if (!online) {
         toast.info("Salvo localmente. Sincroniza quando voltar online.");
         return;
       }
-      // Remove marcadores {…} automaticamente ao salvar
-      const cleanedContent = stripBraces(b.content);
+      // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
+      // o autosave enquanto o usuário ainda está digitando.
+      const finalContent = nextStatus === "done" ? stripBraces(current.content) : current.content;
       const patch: Partial<Bulletin> = {
-        title: b.title,
-        category: b.category,
-        keywords: b.keywords,
-        context: b.context,
-        content: cleanedContent,
-        is_favorite: b.is_favorite,
-        crew_composition: b.crew_composition,
-        vehicle_prefix: b.vehicle_prefix,
-        occurrence_at: b.occurrence_at,
-        crew_address: b.crew_address,
-        crew_lat: b.crew_lat,
-        crew_lng: b.crew_lng,
-        occurrence_address: b.occurrence_address,
-        occurrence_lat: b.occurrence_lat,
-        occurrence_lng: b.occurrence_lng,
+        title: current.title,
+        category: current.category,
+        keywords: current.keywords,
+        context: current.context,
+        content: finalContent,
+        is_favorite: current.is_favorite,
+        crew_composition: current.crew_composition,
+        vehicle_prefix: current.vehicle_prefix,
+        occurrence_at: current.occurrence_at,
+        crew_address: current.crew_address,
+        crew_lat: current.crew_lat,
+        crew_lng: current.crew_lng,
+        occurrence_address: current.occurrence_address,
+        occurrence_lat: current.occurrence_lat,
+        occurrence_lng: current.occurrence_lng,
       };
       if (nextStatus) patch.status = nextStatus;
-      const { error } = await supabase.from("bulletins").update(patch).eq("id", b.id);
+      const { error } = await supabase.from("bulletins").update(patch).eq("id", current.id);
       if (error) throw error;
       dirtyRef.current = false;
-      setB({ ...b, content: cleanedContent, ...(nextStatus ? { status: nextStatus } : {}) });
+      localStorage.removeItem(dirtyKey);
+      setB({ ...current, content: finalContent, ...(nextStatus ? { status: nextStatus } : {}) });
       toast.success(nextStatus === "done" ? "Boletim concluído" : "Salvo");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro ao salvar");
+      toast.error(translateDbError(e));
     } finally {
       setSaving(false);
     }
   }
+
 
   async function generate() {
     if (!b) return;
@@ -247,11 +284,12 @@ function EditBulletin() {
       },
       (err) => {
         setLocating(null);
-        toast.error(`Não foi possível obter localização: ${err.message}`);
+        toast.error(translateGeolocationError(err));
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
   }
+
 
   function openMap(lat: number | null, lng: number | null, address: string | null) {
     let url: string;
@@ -266,67 +304,79 @@ function EditBulletin() {
 
   async function exportPDF() {
     if (!b) return;
-    const { jsPDF } = await import("jspdf");
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
-    const margin = 48;
-    const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
-    const maxW = pageW - margin * 2;
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text(b.title || `${b.bulletin_type}`, margin, margin);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    const metaLines: string[] = [];
-    metaLines.push(`Título do Boletim: ${b.title || "—"}`);
-    metaLines.push(`Categoria: ${b.category ?? "—"}`);
-    metaLines.push(`Tipo: ${b.bulletin_type}`);
-    if (b.crew_composition) metaLines.push(`Composição da Guarnição: ${b.crew_composition}`);
-    if (b.vehicle_prefix) metaLines.push(`Prefixo da viatura: ${b.vehicle_prefix}`);
-    if (b.occurrence_at)
-      metaLines.push(
-        `Data e Hora: ${new Date(b.occurrence_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}`,
-      );
-    if (b.crew_address) metaLines.push(`LOCALIZAÇÃO DA GUARNIÇÃO: ${b.crew_address}`);
-    if (b.occurrence_address) metaLines.push(`Localização da Ocorrência: ${b.occurrence_address}`);
-
-    let y = margin + 20;
-    for (const line of metaLines) {
-      const wrapped = doc.splitTextToSize(line, maxW) as string[];
-      doc.text(wrapped, margin, y);
-      y += wrapped.length * 12;
+    // Usa a impressão nativa do navegador (Salvar como PDF) para preservar
+    // acentos e caracteres especiais em português. jsPDF puro usa Latin-1
+    // no core-font padrão e corrompe caracteres como "ç", "ã", "õ".
+    const w = window.open("", "_blank", "width=900,height=1100");
+    if (!w) {
+      toast.error("Permita popups para exportar o PDF.");
+      return;
     }
-
-    y += 8;
-    doc.setDrawColor(180);
-    doc.line(margin, y, pageW - margin, y);
-    y += 16;
-
-    doc.setFontSize(11);
-    const bodyText = stripBraces(b.content) || "(sem conteúdo)";
-    const wrapped = doc.splitTextToSize(bodyText, maxW) as string[];
-    for (const line of wrapped) {
-      if (y > pageH - margin) {
-        doc.addPage();
-        y = margin;
-      }
-      doc.text(line, margin, y);
-      y += 14;
-    }
-
-    const safeTitle = (b.title || b.bulletin_type).replace(/[^\w\-]+/g, "_").slice(0, 60);
-    doc.save(`${safeTitle}.pdf`);
+    const title = b.title || b.bulletin_type;
+    const meta: [string, string | null | undefined][] = [
+      ["Título do Boletim", b.title],
+      ["Categoria", b.category],
+      ["Tipo", b.bulletin_type],
+      ["Composição da Guarnição", b.crew_composition],
+      ["Prefixo da viatura", b.vehicle_prefix],
+      [
+        "Data e Hora",
+        b.occurrence_at
+          ? new Date(b.occurrence_at).toLocaleString("pt-BR", {
+              dateStyle: "short",
+              timeStyle: "short",
+            })
+          : null,
+      ],
+      ["LOCALIZAÇÃO DA GUARNIÇÃO", b.crew_address],
+      ["Localização da Ocorrência", b.occurrence_address],
+    ];
+    const metaHtml = meta
+      .filter(([, v]) => v)
+      .map(
+        ([k, v]) =>
+          `<div><span class="k">${escapeHtml(k)}:</span> <span>${escapeHtml(String(v))}</span></div>`,
+      )
+      .join("");
+    const body = escapeHtml(stripBraces(b.content) || "(sem conteúdo)");
+    w.document.write(`<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:Georgia,'Times New Roman',serif;color:#111;padding:40px;max-width:800px;margin:0 auto;line-height:1.5}
+  h1{font-size:20px;margin:0 0 12px}
+  .meta{font-size:12px;margin:8px 0 16px}
+  .meta div{margin:2px 0}
+  .k{font-weight:600}
+  hr{border:0;border-top:1px solid #ccc;margin:16px 0}
+  pre{white-space:pre-wrap;font-family:inherit;font-size:13px;margin:0}
+  @media print{@page{margin:20mm} body{padding:0}}
+</style></head><body>
+  <h1>${escapeHtml(title)}</h1>
+  <div class="meta">${metaHtml}</div>
+  <hr>
+  <pre>${body}</pre>
+  <script>window.onload=function(){setTimeout(function(){window.focus();window.print();},150);};<\/script>
+</body></html>`);
+    w.document.close();
   }
 
   async function trash() {
     if (!b) return;
     if (!confirm("Mover para a lixeira?")) return;
-    await supabase.from("bulletins").update({ deleted_at: new Date().toISOString() }).eq("id", b.id);
+    const { error } = await supabase
+      .from("bulletins")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", b.id);
+    if (error) {
+      toast.error(translateDbError(error));
+      return;
+    }
     localStorage.removeItem(cacheKey);
+    localStorage.removeItem(dirtyKey);
     navigate({ to: "/dashboard" });
   }
+
 
   if (loading || !b) {
     return (

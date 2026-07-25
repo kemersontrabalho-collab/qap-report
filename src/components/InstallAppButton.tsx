@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Download, Check } from "lucide-react";
-import { onInstallAvailable, promptInstall, isStandalone } from "@/lib/pwa";
+import { onInstallAvailable, onInstalled, promptInstall } from "@/lib/pwa";
 import { toast } from "sonner";
 
 export function InstallAppButton() {
@@ -8,8 +8,12 @@ export function InstallAppButton() {
   const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
-    setInstalled(isStandalone());
-    return onInstallAvailable(setAvailable);
+    const un1 = onInstallAvailable(setAvailable);
+    const un2 = onInstalled(setInstalled);
+    return () => {
+      un1();
+      un2();
+    };
   }, []);
 
   if (installed) {

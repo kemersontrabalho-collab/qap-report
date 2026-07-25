@@ -54,7 +54,9 @@ type BeforeInstallPromptEvent = Event & {
 };
 
 let deferredPrompt: BeforeInstallPromptEvent | null = null;
+let installedFlag = false;
 const listeners = new Set<(available: boolean) => void>();
+const installedListeners = new Set<(installed: boolean) => void>();
 
 export function initInstallPrompt() {
   if (typeof window === "undefined") return;
@@ -65,14 +67,26 @@ export function initInstallPrompt() {
   });
   window.addEventListener("appinstalled", () => {
     deferredPrompt = null;
+    installedFlag = true;
     listeners.forEach((cb) => cb(false));
+    installedListeners.forEach((cb) => cb(true));
   });
 }
 
 export function onInstallAvailable(cb: (available: boolean) => void): () => void {
   listeners.add(cb);
   cb(deferredPrompt !== null);
-  return () => listeners.delete(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+}
+
+export function onInstalled(cb: (installed: boolean) => void): () => void {
+  installedListeners.add(cb);
+  cb(installedFlag || isStandalone());
+  return () => {
+    installedListeners.delete(cb);
+  };
 }
 
 export async function promptInstall(): Promise<"accepted" | "dismissed" | "unavailable"> {
@@ -90,3 +104,4 @@ export function isStandalone(): boolean {
   const iosStandalone = (window.navigator as unknown as { standalone?: boolean }).standalone;
   return Boolean(mq || iosStandalone);
 }
+

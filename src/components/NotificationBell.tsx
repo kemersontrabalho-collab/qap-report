@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Bell, Check, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { listNotifications, markNotificationsRead } from "@/lib/notifications.functions";
+import { listNotifications, markNotificationsRead, type NotificationRow } from "@/lib/notifications.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export function NotificationBell() {
   const listFn = useServerFn(listNotifications);
@@ -15,12 +16,53 @@ export function NotificationBell() {
     queryKey: ["notifications"],
     queryFn: () => listFn(),
     refetchInterval: 60_000,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
+
+  // Realtime: revalida a lista quando uma nova notificação é inserida ou
+  // apagada, sem esperar o poll de 60s.
+  useEffect(() => {
+    const channel = supabase
+      .channel("notifications-bell")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "notifications" },
+        () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "notifications" },
+        () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [qc]);
 
   const markMut = useMutation({
     mutationFn: (ids?: string[]) => markFn({ data: { ids } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+    onMutate: async (ids) => {
+      // Optimistic: marca imediatamente como lida no cache para o clique não "piscar".
+      await qc.cancelQueries({ queryKey: ["notifications"] });
+      const prev = qc.getQueryData<{ items: NotificationRow[]; unread: number }>(["notifications"]);
+      if (prev) {
+        const target = new Set(ids ?? prev.items.map((i) => i.id));
+        const nextItems = prev.items.map((n) =>
+          target.has(n.id) ? { ...n, read: true } : n,
+        );
+        qc.setQueryData(["notifications"], {
+          items: nextItems,
+          unread: nextItems.filter((i) => !i.read).length,
+        });
+      }
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["notifications"], ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
   });
 
   useEffect(() => {
@@ -81,9 +123,19 @@ export function NotificationBell() {
                 {items.map((n) => (
                   <li
                     key={n.id}
-                    className={`px-3 py-2.5 ${!n.read ? "bg-accent/30" : ""}`}
+                    role="button"
+                    tabIndex={0}
+                    className={`cursor-pointer px-3 py-2.5 outline-none focus-visible:bg-accent/60 ${
+                      !n.read ? "bg-accent/30" : ""
+                    }`}
                     onClick={() => {
                       if (!n.read) markMut.mutate([n.id]);
+                    }}
+                    onKeyDown={(e) => {
+                      if ((e.key === "Enter" || e.key === " ") && !n.read) {
+                        e.preventDefault();
+                        markMut.mutate([n.id]);
+                      }
                     }}
                   >
                     <div className="flex items-start gap-2">

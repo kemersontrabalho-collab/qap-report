@@ -40,9 +40,19 @@ function AIChatPage() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  const MAX_MESSAGES = 20;
+
   async function send(text: string) {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
+    if (trimmed.length > 4000) {
+      toast.error("Mensagem muito longa. Reduza para até 4000 caracteres.");
+      return;
+    }
+    if (messages.length >= MAX_MESSAGES) {
+      toast.error(`Limite de ${MAX_MESSAGES} mensagens por sessão atingido. Limpe o chat para continuar.`);
+      return;
+    }
     const next: Msg[] = [...messages, { role: "user", content: trimmed }];
     setMessages(next);
     setInput("");
@@ -52,11 +62,14 @@ function AIChatPage() {
       setMessages([...next, { role: "assistant", content: res.content }]);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro na IA");
+      // Restaura o texto no input para o usuário poder tentar novamente sem reescrever.
       setMessages(messages);
+      setInput(trimmed);
     } finally {
       setLoading(false);
     }
   }
+
 
   return (
     <AppShell>

@@ -7,7 +7,11 @@ import { Loader2 } from "lucide-react";
 import { translateAuthError } from "@/lib/i18n-errors";
 import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 
-const search = z.object({ mode: z.enum(["login", "signup"]).optional() });
+const search = z.object({
+  mode: z.enum(["login", "signup"]).optional(),
+  redirect: z.string().optional(),
+});
+
 
 export const Route = createFileRoute("/auth")({
   validateSearch: search,
@@ -21,13 +25,20 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { mode: initialMode } = Route.useSearch();
+  const { mode: initialMode, redirect: redirectTo } = Route.useSearch();
   const [mode, setMode] = useState<"login" | "signup" | "forgot">(initialMode ?? "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Aceita somente caminhos internos (mesma origem) — evita open redirect.
+  function safeRedirect(): string {
+    if (!redirectTo) return "/dashboard";
+    if (redirectTo.startsWith("/") && !redirectTo.startsWith("//")) return redirectTo;
+    return "/dashboard";
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,13 +48,13 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Bem-vindo(a) de volta!");
-        navigate({ to: "/dashboard" });
+        navigate({ to: safeRedirect(), replace: true });
       } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}${safeRedirect()}`,
             data: { full_name: fullName },
           },
         });
@@ -64,6 +75,7 @@ function AuthPage() {
       setLoading(false);
     }
   }
+
 
   return (
     <div className="min-h-screen bg-background">
