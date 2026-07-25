@@ -69,9 +69,7 @@ function AuthPage() {
       <div className="mx-auto grid min-h-screen max-w-6xl grid-cols-1 md:grid-cols-2">
         <div className="hidden flex-col justify-between bg-primary p-10 text-primary-foreground md:flex">
           <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary-foreground/10">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
+            <img src={logoAsset.url} alt="QAP Report" className="h-10 w-10 object-contain" />
             <span className="text-lg font-semibold">QAP Report</span>
           </Link>
           <div>
