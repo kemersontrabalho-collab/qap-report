@@ -301,7 +301,6 @@ async function applyCouponAccess(userId: string, code: string, fallbackDuration 
   await supabaseAdmin.from("coupon_redemptions").insert({
     coupon_id: coupon.id,
     user_id: userId,
-    duration_months: durationMonths,
   });
   await supabaseAdmin.from("coupons").update({ used_count: coupon.used_count + 1 }).eq("id", coupon.id);
 
