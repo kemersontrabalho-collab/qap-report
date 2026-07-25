@@ -8,7 +8,7 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { isFounder } from "@/lib/admin.functions";
 import { NotificationBell } from "@/components/NotificationBell";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { theme, toggle } = useTheme();
@@ -16,12 +16,28 @@ export function AppShell({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const founderFn = useServerFn(isFounder);
+  const [hasSession, setHasSession] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setHasSession(!!data.session);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setHasSession(!!session);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
   const { data: founderData } = useQuery({
     queryKey: ["is-founder"],
     queryFn: () => founderFn(),
     staleTime: 5 * 60_000,
+    enabled: hasSession,
   });
   const founder = founderData?.founder === true;
+
 
   async function signOut() {
     await qc.cancelQueries();
