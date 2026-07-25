@@ -388,3 +388,91 @@ function NotificationComposer({ users }: { users: Array<{ id: string; email: str
     </section>
   );
 }
+
+function ChartsPanel({ stats }: { stats: import("@/lib/admin.functions").AdminStats }) {
+  const fmtDay = (d: string) => {
+    const dt = new Date(d + "T00:00:00");
+    return dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  };
+  return (
+    <section className="mb-6 grid gap-3 lg:grid-cols-2">
+      <ChartCard title="Boletins por dia (30d)" icon={BarChart3}>
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={stats.perDay} margin={{ top: 8, right: 12, left: -18, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis
+              dataKey="date"
+              tickFormatter={fmtDay}
+              tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+              interval="preserveStartEnd"
+            />
+            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+            <Tooltip
+              labelFormatter={fmtDay}
+              contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+            />
+            <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard title="Horários de pico" icon={Activity}>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={stats.peakHours} margin={{ top: 8, right: 12, left: -18, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="hour" tickFormatter={(h) => `${h}h`} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+            <Tooltip
+              labelFormatter={(h) => `${h}:00`}
+              contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+            />
+            <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard title="Categorias mais usadas" icon={FileText} className="lg:col-span-2">
+        {stats.topCategories.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">Sem dados suficientes.</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={Math.max(160, stats.topCategories.length * 32)}>
+            <BarChart data={stats.topCategories} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+              <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis
+                type="category"
+                dataKey="category"
+                width={160}
+                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+              />
+              <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+              <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </ChartCard>
+    </section>
+  );
+}
+
+function ChartCard({
+  title,
+  icon: Icon,
+  children,
+  className = "",
+}: {
+  title: string;
+  icon: typeof Users;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`rounded-2xl border bg-card p-4 ${className}`}>
+      <div className="mb-3 flex items-center gap-2 text-sm font-medium">
+        <Icon className="h-4 w-4 text-muted-foreground" />
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
