@@ -24,13 +24,28 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminPage() {
   const qc = useQueryClient();
+  const [tab, setTab] = useState<"users" | "coupons" | "pricing">("users");
   const listFn = useServerFn(adminListUsers);
   const banFn = useServerFn(adminSetUserBlocked);
   const delFn = useServerFn(adminDeleteUser);
+  const listCouponsFn = useServerFn(adminListCoupons);
+  const createCouponFn = useServerFn(adminCreateCoupon);
+  const updatePricesFn = useServerFn(adminUpdatePrices);
+  const billingFn = useServerFn(getBillingSettings);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["admin-users"],
     queryFn: () => listFn(),
+  });
+
+  const { data: couponsData } = useQuery({
+    queryKey: ["admin-coupons"],
+    queryFn: () => listCouponsFn(),
+  });
+
+  const { data: billing } = useQuery({
+    queryKey: ["billing-settings"],
+    queryFn: () => billingFn(),
   });
 
   const banMut = useMutation({
