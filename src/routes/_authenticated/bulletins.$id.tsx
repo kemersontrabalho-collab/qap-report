@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { toast } from "sonner";
+import { SimilarCases } from "@/components/SimilarCases";
 import {
   ArrowLeft,
   Sparkles,
@@ -539,6 +540,18 @@ function EditBulletin() {
               {generating ? "Gerando..." : b.content ? "Regerar texto" : "Gerar texto"}
             </button>
           </div>
+
+          <SimilarCases
+            bulletinType={b.bulletin_type}
+            keywords={b.keywords}
+            category={b.category}
+            context={b.context}
+            onUseReference={(text) => {
+              const prefix = b.context ? `${b.context}\n\n` : "";
+              update("context", `${prefix}[Referência de caso semelhante]\n${text.slice(0, 800)}`);
+              toast.success("Referência adicionada ao contexto");
+            }}
+          />
         </aside>
 
         <section className="rounded-2xl border bg-card">

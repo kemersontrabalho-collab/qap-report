@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2 } from "lucide-react";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 
@@ -232,6 +232,80 @@ function SettingsPage() {
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
             Após instalado, o app fica disponível offline: você pode criar e editar boletins mesmo sem internet, e a sincronização acontece automaticamente ao reconectar.
+          </p>
+        </section>
+
+        <section className="rounded-2xl border bg-card p-5">
+          <h2 className="font-semibold">Downloads seguros e atualizações</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Links oficiais do RedaPol. Sempre baixe apenas a partir daqui — não instale APKs de terceiros.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <a
+              href="https://qap-report.lovable.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent"
+            >
+              <Download className="mt-0.5 h-5 w-5 shrink-0" />
+              <div>
+                <div className="font-medium">Baixar / Abrir aplicativo (Web)</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  Versão sempre atualizada, funciona em Android, iOS e desktop.
+                </div>
+              </div>
+            </a>
+            <button
+              onClick={async () => {
+                try {
+                  if ("serviceWorker" in navigator) {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map((r) => r.update()));
+                    toast.success("Verificação concluída. Se houver nova versão, será aplicada.");
+                  } else {
+                    toast.info("Este navegador não suporta atualizações em segundo plano.");
+                  }
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : "Falha ao verificar atualizações");
+                }
+              }}
+              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent"
+            >
+              <RefreshCw className="mt-0.5 h-5 w-5 shrink-0" />
+              <div>
+                <div className="font-medium">Verificar atualizações</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  Busca a versão mais recente e reinstala em segundo plano.
+                </div>
+              </div>
+            </button>
+            <button
+              onClick={async () => {
+                const url = "https://qap-report.lovable.app/";
+                try {
+                  if (navigator.share) {
+                    await navigator.share({ title: "RedaPol", text: "Assistente de redação policial", url });
+                  } else {
+                    await navigator.clipboard.writeText(url);
+                    toast.success("Link copiado");
+                  }
+                } catch {
+                  /* usuário cancelou */
+                }
+              }}
+              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent sm:col-span-2"
+            >
+              <Link2 className="mt-0.5 h-5 w-5 shrink-0" />
+              <div>
+                <div className="font-medium">Compartilhar link oficial</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  Envie a URL segura para colegas de guarnição instalarem em seus aparelhos.
+                </div>
+              </div>
+            </button>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            O RedaPol é distribuído como Progressive Web App (PWA). Não há APK avulso: instalar direto do navegador garante origem verificada e atualização automática.
           </p>
         </section>
 

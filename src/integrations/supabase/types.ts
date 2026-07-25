@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      bulletin_knowledge: {
+        Row: {
+          bulletin_type: string
+          category: string | null
+          content: string
+          context: string | null
+          created_at: string
+          id: string
+          keywords: string | null
+          occurrence_address: string | null
+          owner_id: string
+          search_tsv: unknown
+          source_bulletin_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bulletin_type: string
+          category?: string | null
+          content: string
+          context?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          occurrence_address?: string | null
+          owner_id: string
+          search_tsv?: unknown
+          source_bulletin_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bulletin_type?: string
+          category?: string | null
+          content?: string
+          context?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          occurrence_address?: string | null
+          owner_id?: string
+          search_tsv?: unknown
+          source_bulletin_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulletin_knowledge_source_bulletin_id_fkey"
+            columns: ["source_bulletin_id"]
+            isOneToOne: true
+            referencedRelation: "bulletins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bulletins: {
         Row: {
           bulletin_type: string
@@ -125,15 +181,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      match_bulletin_knowledge: {
+        Args: { _bulletin_type?: string; _limit?: number; _query: string }
+        Returns: {
+          bulletin_type: string
+          category: string
+          content: string
+          id: string
+          occurrence_address: string
+          rank: number
+          title: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "fundador" | "admin" | "usuario"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -260,6 +355,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["fundador", "admin", "usuario"],
+    },
   },
 } as const

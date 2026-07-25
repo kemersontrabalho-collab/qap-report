@@ -1,9 +1,11 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ShieldCheck, LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { isFounder } from "@/lib/admin.functions";
 import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -11,6 +13,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const founderFn = useServerFn(isFounder);
+  const { data: founderData } = useQuery({
+    queryKey: ["is-founder"],
+    queryFn: () => founderFn(),
+    staleTime: 5 * 60_000,
+  });
+  const founder = founderData?.founder === true;
 
   async function signOut() {
     await qc.cancelQueries();
@@ -20,11 +29,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", replace: true });
   }
 
-  const navItems = [
+  const baseNav = [
     { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
     { to: "/ai-chat", label: "Dúvidas IA", icon: MessageCircle },
     { to: "/settings", label: "Configurações", icon: Settings },
   ] as const;
+  const navItems = founder
+    ? ([...baseNav.slice(0, 2), { to: "/admin", label: "Admin", icon: Shield }, baseNav[2]] as const)
+    : baseNav;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -86,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background/95 backdrop-blur md:hidden">
-        <div className="grid grid-cols-3">
+        <div className={`grid ${navItems.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
           {navItems.map((item) => {
             const active = pathname.startsWith(item.to);
             return (
