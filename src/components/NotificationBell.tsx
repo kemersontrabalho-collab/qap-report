@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Bell, Check, X } from "lucide-react";
+import { Bell, Check, X, Eraser, Eye, EyeOff } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { listNotifications, markNotificationsRead, type NotificationRow } from "@/lib/notifications.functions";
