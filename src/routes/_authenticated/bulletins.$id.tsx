@@ -7,6 +7,7 @@ import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { toast } from "sonner";
 import { SimilarCases } from "@/components/SimilarCases";
+import { VoiceDictateButton } from "@/components/VoiceDictateButton";
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import {
   ArrowLeft,
