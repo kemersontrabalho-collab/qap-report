@@ -16,12 +16,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const founderFn = useServerFn(isFounder);
+  const { data: sessionData } = useQuery({
+    queryKey: ["auth-session"],
+    queryFn: async () => (await supabase.auth.getSession()).data.session,
+    staleTime: 60_000,
+  });
+  const emailIsFounder =
+    sessionData?.user?.email?.toLowerCase() === "kemersontrabalho@gmail.com";
   const { data: founderData } = useQuery({
     queryKey: ["is-founder"],
     queryFn: () => founderFn(),
     staleTime: 5 * 60_000,
+    enabled: emailIsFounder,
   });
-  const founder = founderData?.founder === true;
+  const founder = emailIsFounder || founderData?.founder === true;
 
   async function signOut() {
     try {
