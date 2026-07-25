@@ -14,7 +14,11 @@ export const Route = createFileRoute("/_authenticated")({
     }
 
     try {
-      const status = await getSubscriptionStatus();
+      const [{ data: roleData }, status] = await Promise.all([
+        supabase.rpc("has_role", { _user_id: data.user.id, _role: "fundador" }),
+        getSubscriptionStatus(),
+      ]);
+      if (roleData) return { user: data.user };
       if (!status.active) {
         throw redirect({ to: "/assinatura" });
       }
