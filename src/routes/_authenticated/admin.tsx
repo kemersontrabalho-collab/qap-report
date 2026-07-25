@@ -3,7 +3,9 @@ import { AppShell } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminListUsers, adminSetUserBlocked, adminDeleteUser, isFounder } from "@/lib/admin.functions";
-import { Loader2, Shield, Users, FileText, Activity, Ban, CheckCircle2, Trash2, Crown } from "lucide-react";
+import { sendNotification } from "@/lib/notifications.functions";
+import { Loader2, Shield, Users, FileText, Activity, Ban, CheckCircle2, Trash2, Crown, Send, Bell } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -86,7 +88,10 @@ function AdminPage() {
         <Stat icon={FileText} label="Boletins criados" value={data.stats.totalBulletins} />
       </section>
 
+      <NotificationComposer users={data.users} />
+
       <section className="overflow-hidden rounded-2xl border bg-card">
+
         <div className="border-b p-4">
           <h2 className="font-semibold">Usuários</h2>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -199,5 +204,118 @@ function Stat({
       </div>
       <div className="mt-2 text-3xl font-bold">{value}</div>
     </div>
+  );
+}
+
+function NotificationComposer({ users }: { users: Array<{ id: string; email: string | null; full_name: string | null }> }) {
+  const qc = useQueryClient();
+  const sendFn = useServerFn(sendNotification);
+  const [audience, setAudience] = useState<"all" | "user">("all");
+  const [targetId, setTargetId] = useState<string>("");
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+
+  const mut = useMutation({
+    mutationFn: () =>
+      sendFn({
+        data: {
+          title: title.trim(),
+          body: body.trim(),
+          audience,
+          target_user_id: audience === "user" ? targetId : null,
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Notificação enviada");
+      setTitle("");
+      setBody("");
+      qc.invalidateQueries({ queryKey: ["notifications"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao enviar"),
+  });
+
+  const canSend =
+    title.trim().length > 0 &&
+    body.trim().length > 0 &&
+    (audience === "all" || targetId.length > 0);
+
+  return (
+    <section className="mb-6 overflow-hidden rounded-2xl border bg-card">
+      <div className="flex items-center gap-2 border-b p-4">
+        <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+          <Bell className="h-4 w-4" />
+        </div>
+        <div>
+          <h2 className="font-semibold">Enviar notificação</h2>
+          <p className="text-xs text-muted-foreground">
+            Publique um aviso para todos os usuários ou para um usuário específico.
+          </p>
+        </div>
+      </div>
+      <div className="grid gap-3 p-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="text-sm">
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">Destino</span>
+            <select
+              value={audience}
+              onChange={(e) => setAudience(e.target.value as "all" | "user")}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+            >
+              <option value="all">Todos os usuários</option>
+              <option value="user">Usuário específico</option>
+            </select>
+          </label>
+          {audience === "user" && (
+            <label className="text-sm">
+              <span className="mb-1 block text-xs font-medium text-muted-foreground">Usuário</span>
+              <select
+                value={targetId}
+                onChange={(e) => setTargetId(e.target.value)}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Selecione…</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.full_name ? `${u.full_name} — ` : ""}
+                    {u.email ?? u.id}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
+        <label className="text-sm">
+          <span className="mb-1 block text-xs font-medium text-muted-foreground">Título</span>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={140}
+            placeholder="Ex.: Atualização do aplicativo v1.2"
+            className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+        </label>
+        <label className="text-sm">
+          <span className="mb-1 block text-xs font-medium text-muted-foreground">Mensagem</span>
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            maxLength={2000}
+            rows={4}
+            placeholder="Descreva o que foi atualizado ou o aviso enviado aos operadores."
+            className="w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm"
+          />
+        </label>
+        <div className="flex justify-end">
+          <button
+            onClick={() => mut.mutate()}
+            disabled={!canSend || mut.isPending}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          >
+            {mut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            Enviar notificação
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }
