@@ -478,6 +478,7 @@ function SettingsPage() {
         <style>{`.input{margin-top:.25rem;width:100%;border-radius:.5rem;border:1px solid var(--color-border);background:var(--color-background);padding:.5rem .75rem;font-size:.875rem;outline:none}
         .input:focus{box-shadow:0 0 0 2px var(--color-ring)}`}</style>
       </div>
+      <TutorialModal open={tutorialOpen} onClose={() => setTutorialOpen(false)} />
     </AppShell>
   );
 }
