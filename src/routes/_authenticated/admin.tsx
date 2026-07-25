@@ -1,8 +1,8 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminListUsers, adminSetUserBlocked, adminDeleteUser, isFounder, adminStats } from "@/lib/admin.functions";
+import { adminListUsers, adminSetUserBlocked, adminDeleteUser, adminStats } from "@/lib/admin.functions";
 import { sendNotification } from "@/lib/notifications.functions";
 import { Loader2, Shield, Users, FileText, Activity, Ban, CheckCircle2, Trash2, Crown, Send, Bell, Search, BarChart3 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -21,14 +21,6 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Administração · QAP Report" }] }),
-  beforeLoad: async () => {
-    try {
-      const { founder } = await isFounder();
-      if (!founder) throw redirect({ to: "/dashboard" });
-    } catch (e) {
-      throw redirect({ to: "/dashboard" });
-    }
-  },
   component: AdminPage,
 });
 
