@@ -10,7 +10,7 @@ import ReactMarkdown from "react-markdown";
 export const Route = createFileRoute("/_authenticated/ai-chat")({
   head: () => ({
     meta: [
-      { title: "Dúvidas com IA · RedaPol" },
+      { title: "Dúvidas com IA · QAP Report" },
       {
         name: "description",
         content: "Tire dúvidas jurídico-policiais: enquadramento legal, penas e qual documento usar.",

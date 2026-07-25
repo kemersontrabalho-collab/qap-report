@@ -32,7 +32,7 @@ type Bulletin = {
 type Tab = "drafts" | "done" | "favorites" | "trash";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Painel · RedaPol" }] }),
+  head: () => ({ meta: [{ title: "Painel · QAP Report" }] }),
   component: Dashboard,
 });
 

@@ -46,7 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
               <ShieldCheck className="h-4 w-4" />
             </div>
-            <span className="font-semibold tracking-tight">RedaPol</span>
+            <span className="font-semibold tracking-tight">QAP Report</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">

@@ -9,7 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Configurações · RedaPol" }] }),
+  head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
   component: SettingsPage,
 });
 
@@ -191,7 +191,7 @@ function SettingsPage() {
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Instalar o aplicativo</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            O RedaPol funciona como app instalável (PWA). Sem download em loja — usa o próprio navegador do celular.
+            O QAP Report funciona como app instalável (PWA). Sem download em loja — usa o próprio navegador do celular.
           </p>
           <div className="mt-4">
             <InstallAppButton />
@@ -238,7 +238,7 @@ function SettingsPage() {
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Downloads seguros e atualizações</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Links oficiais do RedaPol. Sempre baixe apenas a partir daqui — não instale APKs de terceiros.
+            Links oficiais do QAP Report. Sempre baixe apenas a partir daqui — não instale APKs de terceiros.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <a
@@ -284,7 +284,7 @@ function SettingsPage() {
                 const url = "https://qap-report.lovable.app/";
                 try {
                   if (navigator.share) {
-                    await navigator.share({ title: "RedaPol", text: "Assistente de redação policial", url });
+                    await navigator.share({ title: "QAP Report", text: "Assistente de redação policial", url });
                   } else {
                     await navigator.clipboard.writeText(url);
                     toast.success("Link copiado");
@@ -305,7 +305,7 @@ function SettingsPage() {
             </button>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            O RedaPol é distribuído como Progressive Web App (PWA). Não há APK avulso: instalar direto do navegador garante origem verificada e atualização automática.
+            O QAP Report é distribuído como Progressive Web App (PWA). Não há APK avulso: instalar direto do navegador garante origem verificada e atualização automática.
           </p>
         </section>
 

@@ -1,6 +1,6 @@
 {
-  "name": "RedaPol — Assistente de Redação Policial",
-  "short_name": "RedaPol",
+  "name": "QAP Report — Assistente de Redação Policial",
+  "short_name": "QAP Report",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f1220",

@@ -48,7 +48,7 @@ function Landing() {
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">
             <ShieldCheck className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold tracking-tight">RedaPol</span>
+          <span className="text-lg font-semibold tracking-tight">QAP Report</span>
         </div>
         <nav className="flex items-center gap-3">
           <Link
@@ -78,7 +78,7 @@ function Landing() {
             </h1>
             <p className="mt-4 max-w-xl text-muted-foreground">
               Informe o tipo de ocorrência (BA, BO-COP, BO-TC ou BOAT) e as palavras-chave.
-              O RedaPol produz um texto formal, técnico e fiel aos fatos — pronto para revisão.
+              O QAP Report produz um texto formal, técnico e fiel aos fatos — pronto para revisão.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
@@ -149,7 +149,7 @@ function Landing() {
 
       <footer className="border-t">
         <div className="mx-auto max-w-6xl px-6 py-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} RedaPol · Ferramenta de apoio à redação policial
+          © {new Date().getFullYear()} QAP Report · Ferramenta de apoio à redação policial
         </div>
       </footer>
     </div>

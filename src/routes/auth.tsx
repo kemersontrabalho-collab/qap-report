@@ -11,8 +11,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: search,
   head: () => ({
     meta: [
-      { title: "Entrar · RedaPol" },
-      { name: "description", content: "Acesse sua conta RedaPol." },
+      { title: "Entrar · QAP Report" },
+      { name: "description", content: "Acesse sua conta QAP Report." },
     ],
   }),
   component: AuthPage,
@@ -71,7 +71,7 @@ function AuthPage() {
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary-foreground/10">
               <ShieldCheck className="h-5 w-5" />
             </div>
-            <span className="text-lg font-semibold">RedaPol</span>
+            <span className="text-lg font-semibold">QAP Report</span>
           </Link>
           <div>
             <h2 className="text-3xl font-bold leading-tight">
@@ -82,7 +82,7 @@ function AuthPage() {
               e fidelidade aos fatos.
             </p>
           </div>
-          <div className="text-xs opacity-70">© {new Date().getFullYear()} RedaPol</div>
+          <div className="text-xs opacity-70">© {new Date().getFullYear()} QAP Report</div>
         </div>
 
         <div className="flex items-center justify-center p-6 md:p-10">
@@ -90,7 +90,7 @@ function AuthPage() {
             <div className="mb-8 md:hidden">
               <Link to="/" className="flex items-center gap-2 text-foreground">
                 <ShieldCheck className="h-5 w-5" />
-                <span className="font-semibold">RedaPol</span>
+                <span className="font-semibold">QAP Report</span>
               </Link>
             </div>
             <h1 className="text-2xl font-bold">

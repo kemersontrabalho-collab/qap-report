@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica, offline e sincronização automática.",
       },
-      { name: "author", content: "RedaPol" },
+      { name: "author", content: "QAP Report" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "QAP REPORT" },
