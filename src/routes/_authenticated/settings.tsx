@@ -506,12 +506,15 @@ function MyPlanSection() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao cancelar"),
   });
 
+  if (status?.isFounder) return null;
+
   const sub = mySub?.subscription;
   const isActive = sub && (sub.status === "active" || sub.status === "trial");
   const isExpired = !isActive || (sub?.current_period_end && new Date(sub.current_period_end) < new Date());
   const daysLeft = sub?.current_period_end
     ? Math.max(0, Math.ceil((new Date(sub.current_period_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
+
 
   return (
     <section className="rounded-2xl border bg-card p-5">
