@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { isFounder } from "@/lib/admin.functions";
+import { NotificationBell } from "@/components/NotificationBell";
 import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
