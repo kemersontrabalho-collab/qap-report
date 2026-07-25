@@ -7,6 +7,7 @@ import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { toast } from "sonner";
 import { SimilarCases } from "@/components/SimilarCases";
+import { VoiceDictateButton } from "@/components/VoiceDictateButton";
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import {
   ArrowLeft,
@@ -562,7 +563,13 @@ function EditBulletin() {
 
           <div className="space-y-3 rounded-2xl border bg-card p-4">
             <div>
-              <label className="text-sm font-medium">Palavras-chave *</label>
+              <div className="flex items-center justify-between gap-2">
+                <label className="text-sm font-medium">Palavras-chave *</label>
+                <VoiceDictateButton
+                  value={b.keywords ?? ""}
+                  onChange={(v) => update("keywords", v)}
+                />
+              </div>
               <textarea
                 value={b.keywords ?? ""}
                 onChange={(e) => update("keywords", e.target.value)}
@@ -575,7 +582,13 @@ function EditBulletin() {
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium">Contexto adicional</label>
+              <div className="flex items-center justify-between gap-2">
+                <label className="text-sm font-medium">Contexto adicional</label>
+                <VoiceDictateButton
+                  value={b.context ?? ""}
+                  onChange={(v) => update("context", v)}
+                />
+              </div>
               <textarea
                 value={b.context ?? ""}
                 onChange={(e) => update("context", e.target.value)}
@@ -583,6 +596,7 @@ function EditBulletin() {
                 className="mt-1 w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
+
 
             <button
               onClick={generate}
