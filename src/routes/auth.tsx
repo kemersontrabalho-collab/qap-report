@@ -88,7 +88,7 @@ function AuthPage() {
           <div className="w-full max-w-sm">
             <div className="mb-8 md:hidden">
               <Link to="/" className="flex items-center gap-2 text-foreground">
-                <ShieldCheck className="h-5 w-5" />
+                <img src={logoAsset.url} alt="QAP Report" className="h-6 w-6 object-contain" />
                 <span className="font-semibold">QAP Report</span>
               </Link>
             </div>
