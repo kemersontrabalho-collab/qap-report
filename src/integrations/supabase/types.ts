@@ -14,24 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      app_settings: {
-        Row: {
-          key: string
-          updated_at: string
-          value: string
-        }
-        Insert: {
-          key: string
-          updated_at?: string
-          value: string
-        }
-        Update: {
-          key?: string
-          updated_at?: string
-          value?: string
-        }
-        Relationships: []
-      }
       bulletin_knowledge: {
         Row: {
           bulletin_type: string
@@ -163,84 +145,6 @@ export type Database = {
         }
         Relationships: []
       }
-      coupon_redemptions: {
-        Row: {
-          coupon_id: string
-          id: string
-          redeemed_at: string
-          subscription_id: string | null
-          user_id: string
-        }
-        Insert: {
-          coupon_id: string
-          id?: string
-          redeemed_at?: string
-          subscription_id?: string | null
-          user_id: string
-        }
-        Update: {
-          coupon_id?: string
-          id?: string
-          redeemed_at?: string
-          subscription_id?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
-            columns: ["coupon_id"]
-            isOneToOne: false
-            referencedRelation: "coupons"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "coupon_redemptions_subscription_id_fkey"
-            columns: ["subscription_id"]
-            isOneToOne: false
-            referencedRelation: "subscriptions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      coupons: {
-        Row: {
-          active: boolean
-          code: string
-          created_at: string
-          created_by: string
-          duration_months: number
-          expires_at: string | null
-          id: string
-          max_uses: number
-          updated_at: string
-          used_count: number
-        }
-        Insert: {
-          active?: boolean
-          code: string
-          created_at?: string
-          created_by: string
-          duration_months: number
-          expires_at?: string | null
-          id?: string
-          max_uses?: number
-          updated_at?: string
-          used_count?: number
-        }
-        Update: {
-          active?: boolean
-          code?: string
-          created_at?: string
-          created_by?: string
-          duration_months?: number
-          expires_at?: string | null
-          id?: string
-          max_uses?: number
-          updated_at?: string
-          used_count?: number
-        }
-        Relationships: []
-      }
       notification_reads: {
         Row: {
           notification_id: string
@@ -300,71 +204,6 @@ export type Database = {
         }
         Relationships: []
       }
-      payments: {
-        Row: {
-          amount: number
-          created_at: string
-          currency: string
-          external_id: string | null
-          external_payment_method_id: string | null
-          id: string
-          paid_at: string | null
-          payment_method: string | null
-          pix_copy_paste: string | null
-          pix_expiration: string | null
-          pix_qr_code: string | null
-          plan: string
-          status: string
-          subscription_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          currency?: string
-          external_id?: string | null
-          external_payment_method_id?: string | null
-          id?: string
-          paid_at?: string | null
-          payment_method?: string | null
-          pix_copy_paste?: string | null
-          pix_expiration?: string | null
-          pix_qr_code?: string | null
-          plan: string
-          status?: string
-          subscription_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          currency?: string
-          external_id?: string | null
-          external_payment_method_id?: string | null
-          id?: string
-          paid_at?: string | null
-          payment_method?: string | null
-          pix_copy_paste?: string | null
-          pix_expiration?: string | null
-          pix_qr_code?: string | null
-          plan?: string
-          status?: string
-          subscription_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payments_subscription_id_fkey"
-            columns: ["subscription_id"]
-            isOneToOne: false
-            referencedRelation: "subscriptions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -401,51 +240,6 @@ export type Database = {
         }
         Relationships: []
       }
-      subscriptions: {
-        Row: {
-          canceled_at: string | null
-          created_at: string
-          current_period_end: string
-          current_period_start: string
-          external_id: string | null
-          id: string
-          payment_method: string | null
-          plan: string
-          status: string
-          trial_ends_at: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          canceled_at?: string | null
-          created_at?: string
-          current_period_end?: string
-          current_period_start?: string
-          external_id?: string | null
-          id?: string
-          payment_method?: string | null
-          plan?: string
-          status?: string
-          trial_ends_at?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          canceled_at?: string | null
-          created_at?: string
-          current_period_end?: string
-          current_period_start?: string
-          external_id?: string | null
-          id?: string
-          payment_method?: string | null
-          plan?: string
-          status?: string
-          trial_ends_at?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_roles: {
         Row: {
           created_at: string
@@ -479,8 +273,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_coupon_valid: { Args: { _code: string }; Returns: boolean }
-      is_premium_user: { Args: { _user_id: string }; Returns: boolean }
       match_bulletin_knowledge: {
         Args: { _bulletin_type?: string; _limit?: number; _query: string }
         Returns: {

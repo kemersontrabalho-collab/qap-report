@@ -1,1 +1,0 @@
-DROP POLICY IF EXISTS "Users can read coupons they know the code" ON public.coupons;
