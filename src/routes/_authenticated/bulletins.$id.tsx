@@ -172,44 +172,48 @@ function EditBulletin() {
 
 
   async function save(nextStatus?: "draft" | "done") {
-    if (!b) return;
+    const current = bRef.current;
+    if (!current) return;
     setSaving(true);
     try {
       if (!online) {
         toast.info("Salvo localmente. Sincroniza quando voltar online.");
         return;
       }
-      // Remove marcadores {…} automaticamente ao salvar
-      const cleanedContent = stripBraces(b.content);
+      // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
+      // o autosave enquanto o usuário ainda está digitando.
+      const finalContent = nextStatus === "done" ? stripBraces(current.content) : current.content;
       const patch: Partial<Bulletin> = {
-        title: b.title,
-        category: b.category,
-        keywords: b.keywords,
-        context: b.context,
-        content: cleanedContent,
-        is_favorite: b.is_favorite,
-        crew_composition: b.crew_composition,
-        vehicle_prefix: b.vehicle_prefix,
-        occurrence_at: b.occurrence_at,
-        crew_address: b.crew_address,
-        crew_lat: b.crew_lat,
-        crew_lng: b.crew_lng,
-        occurrence_address: b.occurrence_address,
-        occurrence_lat: b.occurrence_lat,
-        occurrence_lng: b.occurrence_lng,
+        title: current.title,
+        category: current.category,
+        keywords: current.keywords,
+        context: current.context,
+        content: finalContent,
+        is_favorite: current.is_favorite,
+        crew_composition: current.crew_composition,
+        vehicle_prefix: current.vehicle_prefix,
+        occurrence_at: current.occurrence_at,
+        crew_address: current.crew_address,
+        crew_lat: current.crew_lat,
+        crew_lng: current.crew_lng,
+        occurrence_address: current.occurrence_address,
+        occurrence_lat: current.occurrence_lat,
+        occurrence_lng: current.occurrence_lng,
       };
       if (nextStatus) patch.status = nextStatus;
-      const { error } = await supabase.from("bulletins").update(patch).eq("id", b.id);
+      const { error } = await supabase.from("bulletins").update(patch).eq("id", current.id);
       if (error) throw error;
       dirtyRef.current = false;
-      setB({ ...b, content: cleanedContent, ...(nextStatus ? { status: nextStatus } : {}) });
+      localStorage.removeItem(dirtyKey);
+      setB({ ...current, content: finalContent, ...(nextStatus ? { status: nextStatus } : {}) });
       toast.success(nextStatus === "done" ? "Boletim concluído" : "Salvo");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro ao salvar");
+      toast.error(translateDbError(e));
     } finally {
       setSaving(false);
     }
   }
+
 
   async function generate() {
     if (!b) return;
@@ -280,11 +284,12 @@ function EditBulletin() {
       },
       (err) => {
         setLocating(null);
-        toast.error(`Não foi possível obter localização: ${err.message}`);
+        toast.error(translateGeolocationError(err));
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
   }
+
 
   function openMap(lat: number | null, lng: number | null, address: string | null) {
     let url: string;
