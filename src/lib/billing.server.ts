@@ -218,7 +218,7 @@ async function activateSubscription(userId: string, plan: "monthly" | "yearly", 
   const supabaseAdmin = (await import("@/integrations/supabase/client.server")).supabaseAdmin;
   const { data: sub } = await supabaseAdmin
     .from("subscriptions")
-    .select("id, status, current_period_end, plan")
+    .select("id, status, current_period_start, current_period_end, plan")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -227,13 +227,15 @@ async function activateSubscription(userId: string, plan: "monthly" | "yearly", 
   let periodStart = now;
   let periodEnd = addMonths(now, durationMonths);
 
-  if (sub && sub.status === "active" && sub.plan === plan && new Date(sub.current_period_end) > now) {
+  const currentPlan = sub?.plan as "monthly" | "yearly" | undefined;
+
+  if (sub && sub.status === "active" && currentPlan === plan && new Date(sub.current_period_end) > now) {
     periodStart = new Date(sub.current_period_end);
     periodEnd = addMonths(periodStart, durationMonths);
-  } else if (sub && sub.status === "active" && sub.plan !== plan && new Date(sub.current_period_end) > now) {
+  } else if (sub && sub.status === "active" && currentPlan && currentPlan !== plan && new Date(sub.current_period_end) > now) {
     const credit = computeProratedCredit(
-      sub.plan,
-      sub.plan === "yearly" ? 90 : 10,
+      currentPlan,
+      currentPlan === "yearly" ? 90 : 10,
       new Date(sub.current_period_start),
       new Date(sub.current_period_end),
       now,
