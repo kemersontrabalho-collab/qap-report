@@ -3,7 +3,8 @@ import { useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 
 const search = z.object({ mode: z.enum(["login", "signup"]).optional() });
 
