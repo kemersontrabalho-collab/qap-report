@@ -14,15 +14,21 @@ export type NotificationRow = {
   read: boolean;
 };
 
+const LIST_LIMIT = 50;
+
 export const listNotifications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ items: NotificationRow[]; unread: number }> => {
     const { supabase, userId } = context;
+    // FIX crítico: filtrar por audiência (broadcast) OU destinatário específico.
+    // Antes retornava as últimas 50 notificações do sistema inteiro, vazando
+    // mensagens de suporte e notificações direcionadas para todos os usuários.
     const { data: notifs, error } = await supabase
       .from("notifications")
       .select("id, title, body, audience, target_user_id, category, created_by, created_at")
+      .or(`audience.eq.all,target_user_id.eq.${userId}`)
       .order("created_at", { ascending: false })
-      .limit(50);
+      .limit(LIST_LIMIT);
     if (error) throw new Error(error.message);
     const ids = (notifs ?? []).map((n: any) => n.id);
     let readSet = new Set<string>();
@@ -50,11 +56,13 @@ export const markNotificationsRead = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     let ids = data.ids;
     if (!ids || ids.length === 0) {
+      // "Marcar todas" deve escopar exatamente na mesma consulta do listNotifications.
       const { data: notifs } = await supabase
         .from("notifications")
         .select("id")
+        .or(`audience.eq.all,target_user_id.eq.${userId}`)
         .order("created_at", { ascending: false })
-        .limit(200);
+        .limit(LIST_LIMIT);
       ids = (notifs ?? []).map((n: any) => n.id);
     }
     if (!ids.length) return { ok: true };
@@ -78,7 +86,6 @@ export const sendNotification = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => sendInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    // has_role check via RLS (only fundador can insert)
     if (data.audience === "user" && !data.target_user_id) {
       throw new Error("Selecione um usuário-alvo.");
     }

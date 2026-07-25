@@ -2,24 +2,29 @@ import { useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
+function readInitialTheme(): Theme {
+  if (typeof window === "undefined") return "light";
+  try {
+    const stored = localStorage.getItem("theme") as Theme | null;
+    if (stored === "dark" || stored === "light") return stored;
+    return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
 function apply(theme: Theme) {
   if (typeof document === "undefined") return;
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>("light");
-  const [ready, setReady] = useState(false);
+  // Inicialização lazy: evita flash de tema claro em quem tem dark salvo.
+  const [theme, setThemeState] = useState<Theme>(readInitialTheme);
 
   useEffect(() => {
-    const stored = (typeof localStorage !== "undefined" && localStorage.getItem("theme")) as Theme | null;
-    const prefersDark =
-      typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initial: Theme = stored ?? (prefersDark ? "dark" : "light");
-    setThemeState(initial);
-    apply(initial);
-    setReady(true);
-  }, []);
+    apply(theme);
+  }, [theme]);
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
@@ -31,5 +36,5 @@ export function useTheme() {
 
   const toggle = () => setTheme(theme === "dark" ? "light" : "dark");
 
-  return { theme, setTheme, toggle, ready };
+  return { theme, setTheme, toggle, ready: true };
 }
