@@ -24,8 +24,9 @@ export type AdminUserRow = {
 
 export const isFounder = createServerFn({ method: "GET" }).handler(async () => {
   try {
-    const { getRequestHeader } = await import("@tanstack/react-start/server");
-    const auth = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const req = getRequest();
+    const auth = req.headers.get("authorization");
     if (!auth) return { founder: false };
     const { createClient } = await import("@supabase/supabase-js");
     const supabase = createClient(
