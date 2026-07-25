@@ -22,15 +22,26 @@ export type AdminUserRow = {
   is_founder: boolean;
 };
 
-export const isFounder = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "fundador",
-    });
+export const isFounder = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const req = getRequest();
+    const auth = req.headers.get("authorization");
+    if (!auth) return { founder: false };
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      { global: { headers: { Authorization: auth } }, auth: { persistSession: false, autoRefreshToken: false } },
+    );
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData?.user) return { founder: false };
+    const { data } = await supabase.rpc("has_role", { _user_id: userData.user.id, _role: "fundador" });
     return { founder: Boolean(data) };
-  });
+  } catch {
+    return { founder: false };
+  }
+});
 
 export const adminListUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
