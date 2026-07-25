@@ -69,6 +69,25 @@ function AdminPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
   });
 
+  const filteredUsers = useMemo(() => {
+    if (!data) return [];
+    const q = query.trim().toLowerCase();
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    return data.users.filter((u) => {
+      if (q) {
+        const hay = `${u.email ?? ""} ${u.full_name ?? ""}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      const blocked = !!(u.banned_until && new Date(u.banned_until).getTime() > Date.now());
+      const last = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : 0;
+      const active = last >= cutoff;
+      if (statusFilter === "blocked" && !blocked) return false;
+      if (statusFilter === "active" && (!active || blocked)) return false;
+      if (statusFilter === "inactive" && (active || blocked)) return false;
+      return true;
+    });
+  }, [data, query, statusFilter]);
+
   if (isLoading) {
     return (
       <AppShell>
