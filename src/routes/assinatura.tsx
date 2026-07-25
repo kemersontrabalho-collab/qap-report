@@ -14,6 +14,8 @@ export const Route = createFileRoute("/assinatura")({
     const { supabase } = await import("@/integrations/supabase/client");
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
+    const { data: isFounder } = await supabase.rpc("has_role", { _user_id: data.user.id, _role: "fundador" });
+    if (isFounder) throw redirect({ to: "/dashboard" });
     return { user: data.user };
   },
   component: SubscriptionPage,
