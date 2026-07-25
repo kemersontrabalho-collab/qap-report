@@ -44,7 +44,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/settings", label: "Configurações", icon: Settings },
   ] as const;
   const navItems = founder
-    ? ([...baseNav.slice(0, 2), { to: "/admin", label: "Admin", icon: Shield }, baseNav[2]] as const)
+    ? ([...baseNav.slice(0, 2), { to: "/admin", label: "Criador", icon: Shield }, baseNav[2]] as const)
     : baseNav;
 
   return (
