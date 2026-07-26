@@ -172,12 +172,11 @@ function EditBulletin() {
         toast.error("Boletim não encontrado");
         navigate({ to: "/dashboard" });
       } else {
-        // Erro de rede — tenta o cache local.
+        // Erro de rede — tenta o cache local silenciosamente.
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
           try {
             setB(JSON.parse(cached));
-            toast.info("Carregado do cache local (offline).");
             if (localStorage.getItem(dirtyKey) === "1") dirtyRef.current = true;
           } catch {
             toast.error(translateDbError(error));
@@ -221,7 +220,7 @@ function EditBulletin() {
     setSaving(true);
     try {
       if (!online) {
-        toast.info("Salvo localmente. Sincroniza quando voltar online.");
+        toast.error("Sem conexão. Verifique sua internet e tente novamente.");
         return;
       }
       // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
@@ -386,7 +385,7 @@ function EditBulletin() {
         <div className="flex items-center gap-2">
           {!online && (
             <span className="inline-flex items-center gap-1 rounded-md bg-warning/15 px-2 py-1 text-xs text-warning-foreground">
-              <WifiOff className="h-3 w-3" /> Offline
+              <WifiOff className="h-3 w-3" /> Sem conexão
             </span>
           )}
           <button
