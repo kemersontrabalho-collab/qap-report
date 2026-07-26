@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { registerPWA, initInstallPrompt } from "@/lib/pwa";
+import { enforceSessionLifetime, clearSessionLifetime } from "@/lib/session-lifetime";
 import { Toaster } from "sonner";
 
 function NotFoundComponent() {
@@ -140,12 +141,23 @@ function RootComponent() {
   useEffect(() => {
     initInstallPrompt();
     void registerPWA();
+    void enforceSessionLifetime();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void enforceSessionLifetime();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    const interval = window.setInterval(() => void enforceSessionLifetime(), 5 * 60 * 1000);
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") clearSessionLifetime();
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      sub.subscription.unsubscribe();
+      document.removeEventListener("visibilitychange", onVisible);
+      window.clearInterval(interval);
+    };
   }, [router, queryClient]);
 
   return (
