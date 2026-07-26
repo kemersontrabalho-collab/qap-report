@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, Download, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { TutorialModal } from "@/components/TutorialModal";
@@ -389,20 +389,6 @@ function SettingsPage() {
             Links oficiais do QAP Report. Sempre baixe apenas a partir daqui — não instale APKs de terceiros.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <a
-              href="https://qap-report.lovable.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent"
-            >
-              <Download className="mt-0.5 h-5 w-5 shrink-0" />
-              <div>
-                <div className="font-medium">Baixar / Abrir aplicativo (Web)</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">
-                  Versão sempre atualizada, funciona em Android, iOS e desktop.
-                </div>
-              </div>
-            </a>
             <button
               onClick={async () => {
                 try {
@@ -441,7 +427,7 @@ function SettingsPage() {
                   /* usuário cancelou */
                 }
               }}
-              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent sm:col-span-2"
+              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent"
             >
               <Link2 className="mt-0.5 h-5 w-5 shrink-0" />
               <div>
