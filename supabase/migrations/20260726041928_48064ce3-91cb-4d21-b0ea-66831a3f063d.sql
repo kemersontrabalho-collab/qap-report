@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.redeem_coupon(text) FROM PUBLIC, anon, authenticated;
