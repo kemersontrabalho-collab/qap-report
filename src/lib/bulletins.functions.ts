@@ -31,8 +31,8 @@ TIPOS DE BOLETIM:
 - BOAT: acidente/infração de trânsito.
 
 FORMATO DE SAÍDA:
-- Título do documento
-- HISTÓRICO / VERSÃO POLICIAL (texto corrido, técnico, cronológico e coeso)
+- Título do documento (uma linha, ex.: "**Título do Boletim:** <categoria>")
+- HISTÓRICO / VERSÃO POLICIAL: texto corrido, técnico, cronológico e coeso. TODAS as informações estruturadas (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) DEVEM estar incorporadas naturalmente ao longo da narrativa — jamais listadas em cabeçalho, bullets ou bloco separado acima do histórico.
 - (Se aplicável) GARANTIAS LEGAIS
 - (Se aplicável) TIPIFICAÇÃO LEGAL (artigos e leis pertinentes)
 - (Se necessário) PERGUNTAS COMPLEMENTARES`;
@@ -79,15 +79,13 @@ export const generateBulletin = createServerFn({ method: "POST" })
       ? new Date(data.occurrenceAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
       : undefined;
 
-    // Nomenclatura padronizada (Requisito 04). Estes rótulos DEVEM aparecer
-    // literalmente no documento final para alimentar corretamente a base de
-    // conhecimento e a exportação em PDF.
+    // Nomenclatura padronizada: os rótulos devem aparecer literalmente
+    // dentro da narrativa (não em cabeçalho acima do histórico).
     const structured = [
-      `- Título do Boletim: ${data.category ? `${data.category}` : "{TÍTULO}"}`,
       data.category && `- Categoria: ${data.category}`,
       data.crewComposition && `- Composição da Guarnição: ${data.crewComposition}`,
       data.vehiclePrefix && `- Prefixo da viatura: ${data.vehiclePrefix}`,
-      `- Data e Hora: ${fmtDate ?? "{DATA E HORA}"}`,
+      fmtDate && `- Data e Hora: ${fmtDate}`,
       data.crewAddress && `- LOCALIZAÇÃO DA GUARNIÇÃO: ${data.crewAddress}`,
       data.occurrenceAddress && `- Localização da Ocorrência: ${data.occurrenceAddress}`,
     ]
@@ -98,14 +96,17 @@ export const generateBulletin = createServerFn({ method: "POST" })
       data.category ? ` (${data.category})` : ""
     }
 
-Campos padronizados do boletim (use EXATAMENTE estes rótulos no cabeçalho do documento gerado):
+Dados padronizados do boletim (use EXATAMENTE estes rótulos ao mencioná-los DENTRO do texto do histórico):
 ${structured}
 
 Palavras-chave:
 ${data.keywords}
 ${data.context ? `\nContexto adicional:\n${data.context}` : ""}
 
-Produza o boletim seguindo rigorosamente as regras. O documento final deve iniciar com um cabeçalho contendo, nesta ordem: Título do Boletim, Categoria, Composição da Guarnição, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora. Em seguida, o HISTÓRICO/VERSÃO POLICIAL. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — jamais invente informação.`;
+Produza o boletim seguindo rigorosamente as regras. Estrutura obrigatória:
+1) Uma única linha de título no formato "**Título do Boletim:** <categoria ou descrição curta>".
+2) Em seguida, "## HISTÓRICO / VERSÃO POLICIAL" e o texto corrido.
+Todos os dados padronizados acima (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) devem estar EMBASADOS/EMBUTIDOS na narrativa do histórico — NÃO crie cabeçalho, lista ou bloco de campos acima do histórico. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — jamais invente informação.`;
 
     const content = await callGateway([
       { role: "system", content: SYSTEM_PROMPT },
