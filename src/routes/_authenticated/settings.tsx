@@ -443,6 +443,177 @@ function SettingsPage() {
           </form>
         </section>
 
+        {/* ============ RESGATE DE CÓDIGO (todos os usuários) ============ */}
+        <section className="rounded-2xl border bg-card p-5">
+          <h2 className="flex items-center gap-2 font-semibold"><Ticket className="h-4 w-4" /> Resgatar código de assinatura</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Recebeu um código do criador do QAP Report? Insira abaixo para ativar sua assinatura.
+          </p>
+          <form onSubmit={submitRedeem} className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <input
+              value={redeemCode}
+              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+              placeholder="Ex.: QAP-XXXXX-XXXXX"
+              className="input flex-1 font-mono uppercase tracking-wider"
+              maxLength={40}
+            />
+            <button
+              type="submit"
+              disabled={redeeming}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              {redeeming ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+              Resgatar
+            </button>
+          </form>
+        </section>
+
+        {/* ============ SÓ CRIADOR: gerar códigos vitalícios ============ */}
+        {isFounder && (
+          <section className="rounded-2xl border border-primary/40 bg-primary/5 p-5">
+            <h2 className="flex items-center gap-2 font-semibold">
+              <Crown className="h-4 w-4 text-primary" /> Códigos vitalícios (Criador)
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Gere códigos para conceder assinatura vitalícia a usuários específicos. Cada código pode ser usado uma vez por usuário, até o limite total definido.
+            </p>
+
+            <form onSubmit={submitCreateCode} className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Field label="Anotação (opcional)">
+                <input
+                  value={newCodeNote}
+                  onChange={(e) => setNewCodeNote(e.target.value)}
+                  className="input"
+                  placeholder="Ex.: Cap. Silva, 3º BPM"
+                  maxLength={120}
+                />
+              </Field>
+              <Field label="Código personalizado (opcional)">
+                <input
+                  value={newCodeCustom}
+                  onChange={(e) => setNewCodeCustom(e.target.value.toUpperCase())}
+                  className="input font-mono uppercase"
+                  placeholder="Deixe em branco para gerar automaticamente"
+                  maxLength={32}
+                />
+              </Field>
+              <Field label="Nº máximo de usos">
+                <input
+                  type="number"
+                  min={1}
+                  max={1000}
+                  value={newCodeMaxUses}
+                  onChange={(e) => setNewCodeMaxUses(Number(e.target.value))}
+                  className="input"
+                />
+              </Field>
+              <Field label="Expira em (dias, opcional)">
+                <input
+                  type="number"
+                  min={1}
+                  max={3650}
+                  value={newCodeExpiresDays}
+                  onChange={(e) => setNewCodeExpiresDays(e.target.value === "" ? "" : Number(e.target.value))}
+                  className="input"
+                  placeholder="Sem expiração"
+                />
+              </Field>
+              <div className="sm:col-span-2">
+                <button
+                  type="submit"
+                  disabled={creatingCode}
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+                >
+                  {creatingCode ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ticket className="h-4 w-4" />}
+                  Gerar código vitalício
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold">Códigos gerados</h3>
+              {couponsQ.isLoading ? (
+                <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Carregando...
+                </div>
+              ) : !couponsQ.data || couponsQ.data.length === 0 ? (
+                <p className="mt-3 text-sm text-muted-foreground">Nenhum código gerado ainda.</p>
+              ) : (
+                <ul className="mt-3 divide-y rounded-lg border bg-background">
+                  {couponsQ.data.map((c: any) => {
+                    const expired = c.expires_at && new Date(c.expires_at) <= new Date();
+                    const exhausted = c.used_count >= c.max_uses;
+                    return (
+                      <li key={c.id} className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <code className="rounded bg-muted px-2 py-0.5 font-mono text-sm">{c.code}</code>
+                            {c.grants_lifetime && (
+                              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                VITALÍCIO
+                              </span>
+                            )}
+                            {!c.active && (
+                              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                                DESATIVADO
+                              </span>
+                            )}
+                            {expired && (
+                              <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold text-destructive">
+                                EXPIRADO
+                              </span>
+                            )}
+                            {exhausted && (
+                              <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold text-destructive">
+                                ESGOTADO
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            {c.note ? <span>{c.note} · </span> : null}
+                            {c.used_count}/{c.max_uses} usos
+                            {c.expires_at
+                              ? ` · expira ${new Date(c.expires_at).toLocaleDateString("pt-BR")}`
+                              : " · sem expiração"}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => copyCode(c.code)}
+                            className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"
+                            title="Copiar código"
+                          >
+                            <Copy className="h-3.5 w-3.5" /> Copiar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleCoupon(c.id, !c.active)}
+                            className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent"
+                            title={c.active ? "Desativar" : "Reativar"}
+                          >
+                            <Power className="h-3.5 w-3.5" /> {c.active ? "Desativar" : "Reativar"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeCoupon(c.id)}
+                            className="inline-flex items-center gap-1 rounded-md border border-destructive/40 px-2 py-1 text-xs text-destructive hover:bg-destructive/10"
+                            title="Excluir"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" /> Excluir
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </section>
+        )}
+
+
+
 
 
         <section className="rounded-2xl border bg-card p-5">
