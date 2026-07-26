@@ -120,7 +120,7 @@ function LoginView() {
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
               <Label htmlFor="u">Usuário</Label>
-              <Input id="u" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" required />
+              <Input id="u" type="email" placeholder="seu-email@exemplo.com" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" required />
             </div>
             <div>
               <Label htmlFor="p">Senha</Label>
