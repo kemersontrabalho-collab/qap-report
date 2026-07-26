@@ -69,6 +69,43 @@ function stripBraces(text: string): string {
   return text.replace(/\{[^{}]*\}/g, "").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+// Extrai a seção "PERGUNTAS COMPLEMENTARES" e os marcadores {DADO AUSENTE}
+// do conteúdo gerado, transformando-os em uma lista de sugestões de melhoria.
+function extractImprovementSuggestions(content: string | null | undefined): string[] {
+  if (!content) return [];
+  const suggestions: string[] = [];
+  const seen = new Set<string>();
+  const push = (s: string) => {
+    const t = s.trim().replace(/^[-•*\d.\)\s]+/, "").trim();
+    if (t.length < 2) return;
+    const key = t.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    suggestions.push(t);
+  };
+
+  // 1) Seção "PERGUNTAS COMPLEMENTARES:" até o fim ou próxima seção em caixa alta
+  const m = content.match(/PERGUNTAS\s+COMPLEMENTARES\s*:?\s*([\s\S]*?)(?:\n\s*[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-ZÁÉÍÓÚÂÊÔÃÕÇ\s/]{3,}:|\s*$)/i);
+  if (m && m[1]) {
+    m[1]
+      .split(/\n+/)
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .forEach(push);
+  }
+
+  // 2) Marcadores {DADO AUSENTE} espalhados no texto
+  const braces = content.match(/\{[^{}]+\}/g) ?? [];
+  braces.forEach((b) => {
+    const label = b.replace(/[{}]/g, "").trim();
+    if (label) push(`Informar: ${label}`);
+  });
+
+  return suggestions;
+}
+
+
+
 
 function EditBulletin() {
   const { id } = Route.useParams();
