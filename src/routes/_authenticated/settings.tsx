@@ -443,30 +443,32 @@ function SettingsPage() {
           </form>
         </section>
 
-        {/* ============ RESGATE DE CÓDIGO (todos os usuários) ============ */}
-        <section className="rounded-2xl border bg-card p-5">
-          <h2 className="flex items-center gap-2 font-semibold"><Ticket className="h-4 w-4" /> Resgatar código de assinatura</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Recebeu um código do criador do QAP Report? Insira abaixo para ativar sua assinatura.
-          </p>
-          <form onSubmit={submitRedeem} className="mt-4 flex flex-col gap-2 sm:flex-row">
-            <input
-              value={redeemCode}
-              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
-              placeholder="Ex.: QAP-XXXXX-XXXXX"
-              className="input flex-1 font-mono uppercase tracking-wider"
-              maxLength={40}
-            />
-            <button
-              type="submit"
-              disabled={redeeming}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
-            >
-              {redeeming ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
-              Resgatar
-            </button>
-          </form>
-        </section>
+        {/* ============ RESGATE DE CÓDIGO (oculto para o criador) ============ */}
+        {!isFounder && (
+          <section className="rounded-2xl border bg-card p-5">
+            <h2 className="flex items-center gap-2 font-semibold"><Ticket className="h-4 w-4" /> Resgatar código de assinatura</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Recebeu um código do criador do QAP Report? Insira abaixo para ativar sua assinatura.
+            </p>
+            <form onSubmit={submitRedeem} className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <input
+                value={redeemCode}
+                onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+                placeholder="Ex.: QAP-XXXXX-XXXXX"
+                className="input flex-1 font-mono uppercase tracking-wider"
+                maxLength={40}
+              />
+              <button
+                type="submit"
+                disabled={redeeming}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+              >
+                {redeeming ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+                Resgatar
+              </button>
+            </form>
+          </section>
+        )}
 
         {/* ============ SÓ CRIADOR: gerar códigos vitalícios ============ */}
         {isFounder && (
