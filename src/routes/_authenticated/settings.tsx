@@ -260,7 +260,7 @@ function SettingsPage() {
             Um guia passo a passo mostrando como usar cada parte do QAP Report: painel, criação de boletins, IA, casos semelhantes, PDF e mais.
           </p>
           <button
-            onClick={() => setTutorialOpen(true)}
+            onClick={() => tutorialStore.open()}
             className="mt-4 inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm hover:bg-accent"
           >
             <BookOpen className="h-4 w-4" /> Iniciar tutorial
