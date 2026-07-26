@@ -52,6 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={item.to}
                   to={item.to}
+                  data-tour={`nav-${item.to.slice(1)}`}
                   className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm ${
                     active
                       ? "bg-accent text-accent-foreground"
@@ -68,12 +69,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2">
             <Link
               to="/bulletins/new"
+              data-tour="new-bulletin"
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Novo</span>
             </Link>
-            <NotificationBell />
+            <div data-tour="notifications"><NotificationBell /></div>
+
             <button
               onClick={toggle}
               className="grid h-9 w-9 place-items-center rounded-lg border hover:bg-accent"
