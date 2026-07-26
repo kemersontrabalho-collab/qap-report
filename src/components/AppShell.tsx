@@ -95,7 +95,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t bg-background/95 backdrop-blur md:hidden">
-        <div className={`grid ${navItems.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}>
+        <div className="grid grid-cols-3">
           {navItems.map((item) => {
             const active = pathname.startsWith(item.to);
             return (
