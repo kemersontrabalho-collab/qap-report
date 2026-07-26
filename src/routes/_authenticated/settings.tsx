@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
-import { TutorialModal } from "@/components/TutorialModal";
+import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
 
