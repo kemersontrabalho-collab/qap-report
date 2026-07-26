@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldCheck, Feather, Search, WifiOff, Moon, Sparkles } from "lucide-react";
+import { ShieldCheck, Feather, Search, Moon, Sparkles } from "lucide-react";
 import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -9,12 +9,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica, offline e sincronização automática.",
+          "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA.",
       },
       { property: "og:title", content: "QAP REPORT" },
       {
         property: "og:description",
-        content: "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica, offline e sincronização automática.",
+        content: "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA.",
       },
     ],
   }),
@@ -124,9 +124,9 @@ function Landing() {
             desc="Rascunhos, favoritos e busca por palavra-chave ou data."
           />
           <Feature
-            icon={WifiOff}
-            title="Funciona offline"
-            desc="Crie e edite sem conexão. Sincroniza automaticamente ao voltar online."
+            icon={Sparkles}
+            title="Agilidade no plantão"
+            desc="Modelos prontos e sugestões da IA para acelerar a redação do boletim."
           />
           <Feature
             icon={ShieldCheck}
