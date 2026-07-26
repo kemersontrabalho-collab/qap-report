@@ -252,8 +252,10 @@ export type Database = {
           created_by: string
           duration_months: number
           expires_at: string | null
+          grants_lifetime: boolean
           id: string
           max_uses: number
+          note: string | null
           updated_at: string
           used_count: number
         }
@@ -264,8 +266,10 @@ export type Database = {
           created_by: string
           duration_months: number
           expires_at?: string | null
+          grants_lifetime?: boolean
           id?: string
           max_uses?: number
+          note?: string | null
           updated_at?: string
           used_count?: number
         }
@@ -276,8 +280,10 @@ export type Database = {
           created_by?: string
           duration_months?: number
           expires_at?: string | null
+          grants_lifetime?: boolean
           id?: string
           max_uses?: number
+          note?: string | null
           updated_at?: string
           used_count?: number
         }
@@ -547,6 +553,7 @@ export type Database = {
           title: string
         }[]
       }
+      redeem_coupon: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
       app_role: "fundador" | "admin" | "usuario"
