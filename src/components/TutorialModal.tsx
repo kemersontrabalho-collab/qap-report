@@ -85,30 +85,61 @@ function useElementRect(selector: string | undefined, deps: unknown[]) {
     let timer = 0;
     let tries = 0;
     let cancelled = false;
+    let currentEl: HTMLElement | null = null;
+    let ro: ResizeObserver | null = null;
+    let rafId = 0;
+    let lastKey = "";
+
+    const measure = () => {
+      if (!currentEl || cancelled) return;
+      const r = currentEl.getBoundingClientRect();
+      const key = `${r.x}|${r.y}|${r.width}|${r.height}`;
+      if (key !== lastKey) {
+        lastKey = key;
+        setRect(r);
+      }
+    };
+
+    const trackFrames = (frames: number) => {
+      if (cancelled || frames <= 0) return;
+      rafId = requestAnimationFrame(() => {
+        measure();
+        trackFrames(frames - 1);
+      });
+    };
+
     const find = () => {
       if (cancelled) return;
       const el = pickVisible(selector);
       if (el) {
+        currentEl = el;
         try {
           el.scrollIntoView({ block: "center", behavior: "smooth" });
         } catch {
           /* ignore */
         }
-        setRect(el.getBoundingClientRect());
+        measure();
+        // Re-measure across ~500ms to catch layout settling and smooth-scroll.
+        trackFrames(30);
+        if (typeof ResizeObserver !== "undefined") {
+          ro = new ResizeObserver(measure);
+          ro.observe(el);
+          ro.observe(document.documentElement);
+        }
       } else if (tries++ < 40) {
         timer = window.setTimeout(find, 100);
       }
     };
     find();
-    const onResize = () => {
-      const el = pickVisible(selector);
-      if (el) setRect(el.getBoundingClientRect());
-    };
+
+    const onResize = () => measure();
     window.addEventListener("resize", onResize);
     window.addEventListener("scroll", onResize, true);
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
+      cancelAnimationFrame(rafId);
+      ro?.disconnect();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize, true);
     };
@@ -116,6 +147,7 @@ function useElementRect(selector: string | undefined, deps: unknown[]) {
   }, deps);
   return rect;
 }
+
 
 
 export function TutorialModal({ open, onClose }: { open: boolean; onClose: () => void }) {
