@@ -64,9 +64,23 @@ function fromLocalInput(v: string): string | null {
   return new Date(v).toISOString();
 }
 
-// Remove textos entre chaves como {DADO AUSENTE}
+// Remove textos entre chaves como {DADO AUSENTE} e limpa marcações
+// markdown (# de títulos e * de negrito/itálico/listas) que não pertencem
+// ao histórico final do boletim.
 function stripBraces(text: string): string {
-  return text.replace(/\{[^{}]*\}/g, "").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  return text
+    .replace(/\{[^{}]*\}/g, "")
+    // Remove marcadores de título markdown no início de linha (# até ######)
+    .replace(/^\s{0,3}#{1,6}\s*/gm, "")
+    // Remove ênfase markdown: **negrito**, __negrito__, *itálico*, _itálico_
+    .replace(/(\*\*|__)(.*?)\1/g, "$2")
+    .replace(/(\*|_)(?=\S)(.+?)(?<=\S)\1/g, "$2")
+    // Remove asteriscos remanescentes (bullets soltos, ênfases mal formadas)
+    .replace(/\*+/g, "")
+    // Limpa espaços/linhas em excesso
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 // Extrai a seção "PERGUNTAS COMPLEMENTARES" e os marcadores {DADO AUSENTE}
