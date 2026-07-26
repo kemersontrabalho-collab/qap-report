@@ -303,64 +303,6 @@ function EditBulletin() {
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
-  async function exportPDF() {
-    if (!b) return;
-    // Usa a impressão nativa do navegador (Salvar como PDF) para preservar
-    // acentos e caracteres especiais em português. jsPDF puro usa Latin-1
-    // no core-font padrão e corrompe caracteres como "ç", "ã", "õ".
-    const w = window.open("", "_blank", "width=900,height=1100");
-    if (!w) {
-      toast.error("Permita popups para exportar o PDF.");
-      return;
-    }
-    const title = b.title || b.bulletin_type;
-    const meta: [string, string | null | undefined][] = [
-      ["Título do Boletim", b.title],
-      ["Categoria", b.category],
-      ["Tipo", b.bulletin_type],
-      ["Composição da Guarnição", b.crew_composition],
-      ["Prefixo da viatura", b.vehicle_prefix],
-      [
-        "Data e Hora",
-        b.occurrence_at
-          ? new Date(b.occurrence_at).toLocaleString("pt-BR", {
-              dateStyle: "short",
-              timeStyle: "short",
-            })
-          : null,
-      ],
-      ["LOCALIZAÇÃO DA GUARNIÇÃO", b.crew_address],
-      ["Localização da Ocorrência", b.occurrence_address],
-    ];
-    const metaHtml = meta
-      .filter(([, v]) => v)
-      .map(
-        ([k, v]) =>
-          `<div><span class="k">${escapeHtml(k)}:</span> <span>${escapeHtml(String(v))}</span></div>`,
-      )
-      .join("");
-    const body = escapeHtml(stripBraces(b.content) || "(sem conteúdo)");
-    w.document.write(`<!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title>
-<style>
-  *{box-sizing:border-box}
-  body{font-family:Georgia,'Times New Roman',serif;color:#111;padding:40px;max-width:800px;margin:0 auto;line-height:1.5}
-  h1{font-size:20px;margin:0 0 12px}
-  .meta{font-size:12px;margin:8px 0 16px}
-  .meta div{margin:2px 0}
-  .k{font-weight:600}
-  hr{border:0;border-top:1px solid #ccc;margin:16px 0}
-  pre{white-space:pre-wrap;font-family:inherit;font-size:13px;margin:0}
-  @media print{@page{margin:20mm} body{padding:0}}
-</style></head><body>
-  <h1>${escapeHtml(title)}</h1>
-  <div class="meta">${metaHtml}</div>
-  <hr>
-  <pre>${body}</pre>
-  <script>window.onload=function(){setTimeout(function(){window.focus();window.print();},150);};<\/script>
-</body></html>`);
-    w.document.close();
-  }
 
   async function trash() {
     if (!b) return;
