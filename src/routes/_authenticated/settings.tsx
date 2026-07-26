@@ -427,7 +427,7 @@ function SettingsPage() {
                   /* usuário cancelou */
                 }
               }}
-              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent sm:col-span-2"
+              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent"
             >
               <Link2 className="mt-0.5 h-5 w-5 shrink-0" />
               <div>
