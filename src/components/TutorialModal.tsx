@@ -177,7 +177,7 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
       <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
       {spot ? (
         <div
-          className="pointer-events-none absolute rounded-xl transition-all duration-300"
+          className="pointer-events-none absolute rounded-xl"
           style={{
             top: spot.top,
             left: spot.left,
@@ -191,6 +191,7 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
       ) : (
         <div className="pointer-events-none absolute inset-0 bg-black/65" />
       )}
+
 
 
 
