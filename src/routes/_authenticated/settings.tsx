@@ -443,8 +443,8 @@ function SettingsPage() {
           </form>
         </section>
 
-        {/* ============ RESGATE DE CÓDIGO (oculto para o criador) ============ */}
-        {!isFounder && (
+        {/* ============ RESGATE DE CÓDIGO (apenas usuários comuns) ============ */}
+        {founderQ.isSuccess && !isFounder && (
           <section className="rounded-2xl border bg-card p-5">
             <h2 className="flex items-center gap-2 font-semibold"><Ticket className="h-4 w-4" /> Resgatar código de assinatura</h2>
             <p className="mt-1 text-sm text-muted-foreground">
