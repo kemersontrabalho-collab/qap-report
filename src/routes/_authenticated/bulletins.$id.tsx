@@ -632,12 +632,6 @@ function EditBulletin() {
                 <Copy className="h-3.5 w-3.5" /> Copiar
               </button>
               <button
-                onClick={exportPDF}
-                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent"
-              >
-                <FileDown className="h-3.5 w-3.5" /> Exportar PDF
-              </button>
-              <button
                 onClick={() => save()}
                 disabled={saving}
                 className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent disabled:opacity-60"
