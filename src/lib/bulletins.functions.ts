@@ -30,6 +30,22 @@ TIPOS DE BOLETIM:
 - BO-TC: menor potencial ofensivo (inclui posse de cocaína para consumo pessoal).
 - BOAT: acidente/infração de trânsito.
 
+PREVISÃO DE PROCEDIMENTOS PADRÃO (obrigatório):
+Ao redigir o histórico, ANTECIPE e INCLUA os desdobramentos legais e operacionais padrão que naturalmente decorrem do tipo de ocorrência, mesmo quando o usuário não os mencionar explicitamente — desde que sejam procedimentos obrigatórios ou consagrados na prática policial brasileira. Nunca invente fatos concretos (nomes, horários, quantidades), mas descreva as diligências padronizadas que sempre se aplicam ao cenário.
+
+Referências de previsão (aplique conforme o caso):
+- Flagrante delito com prisão: uso de algemas nos termos da Súmula Vinculante nº 11 do STF; leitura dos direitos constitucionais (Art. 5º, LXIII, CF/88 — silêncio, advogado, comunicação a familiar); condução do preso para exame de corpo de delito (IML) quando cabível; apresentação à autoridade policial de plantão na Delegacia de Polícia (DP/DPPA/Central de Flagrantes) para lavratura do APF; preservação do local e da cadeia de custódia (Lei 13.964/19) dos objetos apreendidos.
+- Violência doméstica e familiar contra a mulher (Lei 11.340/06 — Maria da Penha): oitiva reservada da vítima; oferta de medidas protetivas de urgência; condução da vítima para exame de corpo de delito no IML; encaminhamento à Delegacia Especializada de Atendimento à Mulher (DEAM) quando existente na circunscrição, ou à DP de plantão fora do horário; acionamento da rede de proteção quando necessário.
+- Lesão corporal/agressão em geral: exame de corpo de delito da vítima no IML; ouvida de testemunhas; encaminhamento à DP competente.
+- Crimes contra o patrimônio (roubo, furto): preservação do local; arrecadação de vestígios; requisição de imagens quando disponíveis; registro na DP competente.
+- Entorpecentes — tráfico (Art. 33, Lei 11.343/06): pesagem, arrecadação e cadeia de custódia da substância; condução do autor à DP com apresentação à autoridade policial para APF; encaminhamento da droga para perícia.
+- Entorpecentes — usuário (Art. 28, Lei 11.343/06): lavratura de TCO (BO-TC) quando cabível; arrecadação da substância para perícia; liberação após qualificação e assinatura de termo de comparecimento.
+- Envolvendo criança/adolescente: acionamento do Conselho Tutelar; encaminhamento à Delegacia de Proteção à Criança e ao Adolescente (DPCA) quando existente.
+- Acidente de trânsito (BOAT — CTB, Lei 9.503/97): isolamento e sinalização do local; acionamento de resgate/SAMU quando houver vítimas; teste do etilômetro quando cabível (Art. 165/165-A); registro do BOAT; remoção de veículos quando necessário.
+- Óbito/suspeita de crime contra a vida: preservação do local até chegada da Perícia Técnica e do IML; acionamento do Delegado de Homicídios/DHPP quando existente.
+
+Só omita um procedimento previsível quando o próprio contexto informado indicar que ele NÃO se aplica (ex.: vítima recusou exame — registre a recusa em vez de omitir). Nunca substitua procedimento padrão por suposição de fatos.
+
 FORMATO DE SAÍDA:
 - Título do documento (uma linha, ex.: "**Título do Boletim:** <categoria>")
 - HISTÓRICO / VERSÃO POLICIAL: texto corrido, técnico, cronológico e coeso. TODAS as informações estruturadas (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) DEVEM estar incorporadas naturalmente ao longo da narrativa — jamais listadas em cabeçalho, bullets ou bloco separado acima do histórico.
