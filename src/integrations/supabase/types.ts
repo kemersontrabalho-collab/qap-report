@@ -88,6 +88,48 @@ export type Database = {
           },
         ]
       }
+      bulletin_templates: {
+        Row: {
+          bulletin_type: string
+          category: string | null
+          content: string
+          context: string | null
+          created_at: string
+          id: string
+          keywords: string | null
+          occurrence_address: string | null
+          search_tsv: unknown
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bulletin_type: string
+          category?: string | null
+          content: string
+          context?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          occurrence_address?: string | null
+          search_tsv?: unknown
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bulletin_type?: string
+          category?: string | null
+          content?: string
+          context?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          occurrence_address?: string | null
+          search_tsv?: unknown
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bulletins: {
         Row: {
           bulletin_type: string
@@ -482,6 +524,18 @@ export type Database = {
       is_coupon_valid: { Args: { _code: string }; Returns: boolean }
       is_premium_user: { Args: { _user_id: string }; Returns: boolean }
       match_bulletin_knowledge: {
+        Args: { _bulletin_type?: string; _limit?: number; _query: string }
+        Returns: {
+          bulletin_type: string
+          category: string
+          content: string
+          id: string
+          occurrence_address: string
+          rank: number
+          title: string
+        }[]
+      }
+      match_bulletin_templates: {
         Args: { _bulletin_type?: string; _limit?: number; _query: string }
         Returns: {
           bulletin_type: string
