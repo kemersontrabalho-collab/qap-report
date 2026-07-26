@@ -389,20 +389,6 @@ function SettingsPage() {
             Links oficiais do QAP Report. Sempre baixe apenas a partir daqui — não instale APKs de terceiros.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <a
-              href="https://qap-report.lovable.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-start gap-3 rounded-lg border p-3 text-left text-sm hover:bg-accent"
-            >
-              <Download className="mt-0.5 h-5 w-5 shrink-0" />
-              <div>
-                <div className="font-medium">Baixar / Abrir aplicativo (Web)</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">
-                  Versão sempre atualizada, funciona em Android, iOS e desktop.
-                </div>
-              </div>
-            </a>
             <button
               onClick={async () => {
                 try {
