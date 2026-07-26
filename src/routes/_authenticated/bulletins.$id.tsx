@@ -69,6 +69,43 @@ function stripBraces(text: string): string {
   return text.replace(/\{[^{}]*\}/g, "").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+// Extrai a seção "PERGUNTAS COMPLEMENTARES" e os marcadores {DADO AUSENTE}
+// do conteúdo gerado, transformando-os em uma lista de sugestões de melhoria.
+function extractImprovementSuggestions(content: string | null | undefined): string[] {
+  if (!content) return [];
+  const suggestions: string[] = [];
+  const seen = new Set<string>();
+  const push = (s: string) => {
+    const t = s.trim().replace(/^[-•*\d.\)\s]+/, "").trim();
+    if (t.length < 2) return;
+    const key = t.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    suggestions.push(t);
+  };
+
+  // 1) Seção "PERGUNTAS COMPLEMENTARES:" até o fim ou próxima seção em caixa alta
+  const m = content.match(/PERGUNTAS\s+COMPLEMENTARES\s*:?\s*([\s\S]*?)(?:\n\s*[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-ZÁÉÍÓÚÂÊÔÃÕÇ\s/]{3,}:|\s*$)/i);
+  if (m && m[1]) {
+    m[1]
+      .split(/\n+/)
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .forEach(push);
+  }
+
+  // 2) Marcadores {DADO AUSENTE} espalhados no texto
+  const braces = content.match(/\{[^{}]+\}/g) ?? [];
+  braces.forEach((b) => {
+    const label = b.replace(/[{}]/g, "").trim();
+    if (label) push(`Informar: ${label}`);
+  });
+
+  return suggestions;
+}
+
+
+
 
 function EditBulletin() {
   const { id } = Route.useParams();
@@ -516,20 +553,36 @@ function EditBulletin() {
               </p>
             </div>
             <div>
-              <div className="flex items-center justify-between gap-2">
-                <label className="text-sm font-medium">Contexto adicional</label>
-                <VoiceDictateButton
-                  value={b.context ?? ""}
-                  onChange={(v) => update("context", v)}
-                />
-              </div>
-              <textarea
-                value={b.context ?? ""}
-                onChange={(e) => update("context", e.target.value)}
-                rows={3}
-                className="mt-1 w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-              />
+              <label className="text-sm font-medium">Sugestões de melhoria</label>
+              {(() => {
+                const suggestions = extractImprovementSuggestions(b.content);
+                if (!b.content) {
+                  return (
+                    <p className="mt-1 rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                      Gere o texto para ver aqui as perguntas complementares e dados faltantes identificados pela IA.
+                    </p>
+                  );
+                }
+                if (suggestions.length === 0) {
+                  return (
+                    <p className="mt-1 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                      Nenhuma sugestão pendente — o histórico está completo.
+                    </p>
+                  );
+                }
+                return (
+                  <ul className="mt-1 space-y-1 rounded-lg border bg-muted/30 px-3 py-2 text-xs">
+                    {suggestions.map((s, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="text-primary">•</span>
+                        <span>{s}</span>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
             </div>
+
 
 
             <button
