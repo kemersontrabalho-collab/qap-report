@@ -1,12 +1,10 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle, Shield } from "lucide-react";
+import { LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle } from "lucide-react";
 import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { isFounder } from "@/lib/admin.functions";
+import { useQueryClient } from "@tanstack/react-query";
 import { NotificationBell } from "@/components/NotificationBell";
 import type { ReactNode } from "react";
 
@@ -15,21 +13,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const founderFn = useServerFn(isFounder);
-  const { data: sessionData } = useQuery({
-    queryKey: ["auth-session"],
-    queryFn: async () => (await supabase.auth.getSession()).data.session,
-    staleTime: 60_000,
-  });
-  const emailIsFounder =
-    sessionData?.user?.email?.toLowerCase() === "kemersontrabalho@gmail.com";
-  const { data: founderData } = useQuery({
-    queryKey: ["is-founder"],
-    queryFn: () => founderFn(),
-    staleTime: 5 * 60_000,
-    enabled: emailIsFounder,
-  });
-  const founder = emailIsFounder || founderData?.founder === true;
 
   async function signOut() {
     try {
@@ -46,14 +29,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
 
-  const baseNav = [
+  const navItems = [
     { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
     { to: "/ai-chat", label: "Dúvidas IA", icon: MessageCircle },
     { to: "/settings", label: "Configurações", icon: Settings },
   ] as const;
-  const navItems = founder
-    ? ([...baseNav.slice(0, 2), { to: "/admin", label: "Criador", icon: Shield }, baseNav[2]] as const)
-    : baseNav;
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
