@@ -53,6 +53,107 @@ function SettingsPage() {
   const [sendingSupport, setSendingSupport] = useState(false);
   const sendSupportFn = useServerFn(sendSupportMessage);
 
+  // ----- Códigos de assinatura -----
+  const amIFounderFn = useServerFn(amIFounder);
+  const listCouponsFn = useServerFn(listMyCoupons);
+  const createCodeFn = useServerFn(createLifetimeCode);
+  const toggleCouponFn = useServerFn(setCouponActive);
+  const deleteCouponFn = useServerFn(deleteCoupon);
+  const redeemFn = useServerFn(redeemCoupon);
+
+  const founderQ = useQuery({ queryKey: ["me", "founder"], queryFn: () => amIFounderFn() });
+  const isFounder = founderQ.data === true;
+  const couponsQ = useQuery({
+    queryKey: ["coupons", "mine"],
+    queryFn: () => listCouponsFn(),
+    enabled: isFounder,
+  });
+
+  const [redeemCode, setRedeemCode] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
+
+  async function submitRedeem(e: React.FormEvent) {
+    e.preventDefault();
+    const code = redeemCode.trim();
+    if (code.length < 3) {
+      toast.error("Informe um código válido.");
+      return;
+    }
+    setRedeeming(true);
+    try {
+      const res = await redeemFn({ data: { code } });
+      toast.success(
+        res.grants_lifetime
+          ? "Código resgatado! Assinatura vitalícia ativada."
+          : `Código resgatado! Assinatura estendida em ${res.duration_months} mês(es).`,
+      );
+      setRedeemCode("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não foi possível resgatar o código.");
+    } finally {
+      setRedeeming(false);
+    }
+  }
+
+  const [newCodeNote, setNewCodeNote] = useState("");
+  const [newCodeMaxUses, setNewCodeMaxUses] = useState(1);
+  const [newCodeExpiresDays, setNewCodeExpiresDays] = useState<number | "">("");
+  const [newCodeCustom, setNewCodeCustom] = useState("");
+  const [creatingCode, setCreatingCode] = useState(false);
+
+  async function submitCreateCode(e: React.FormEvent) {
+    e.preventDefault();
+    setCreatingCode(true);
+    try {
+      await createCodeFn({
+        data: {
+          note: newCodeNote.trim(),
+          maxUses: Math.max(1, Number(newCodeMaxUses) || 1),
+          expiresInDays: newCodeExpiresDays === "" ? null : Number(newCodeExpiresDays),
+          customCode: newCodeCustom.trim().toUpperCase(),
+        },
+      });
+      toast.success("Código vitalício criado.");
+      setNewCodeNote("");
+      setNewCodeMaxUses(1);
+      setNewCodeExpiresDays("");
+      setNewCodeCustom("");
+      couponsQ.refetch();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não foi possível criar o código.");
+    } finally {
+      setCreatingCode(false);
+    }
+  }
+
+  async function copyCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code);
+      toast.success("Código copiado.");
+    } catch {
+      toast.error("Não foi possível copiar.");
+    }
+  }
+
+  async function toggleCoupon(id: string, active: boolean) {
+    try {
+      await toggleCouponFn({ data: { id, active } });
+      couponsQ.refetch();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao atualizar código.");
+    }
+  }
+
+  async function removeCoupon(id: string) {
+    if (!confirm("Excluir este código definitivamente? Resgates anteriores serão perdidos.")) return;
+    try {
+      await deleteCouponFn({ data: { id } });
+      couponsQ.refetch();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao excluir.");
+    }
+  }
+
 
 
   async function requestNotifications() {
