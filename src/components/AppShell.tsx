@@ -105,6 +105,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 key={item.to}
                 to={item.to}
+                data-tour-mobile={`nav-${item.to.slice(1)}`}
                 className={`flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] leading-tight ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
@@ -117,6 +118,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </nav>
       <div className="h-16 md:hidden" />
+
     </div>
   );
 }
