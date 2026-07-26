@@ -11,13 +11,29 @@ export function NotificationBell() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [showRead, setShowRead] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setSignedIn(!!data.session);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setSignedIn(!!session);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   const { data } = useQuery({
     queryKey: ["notifications"],
     queryFn: () => listFn(),
-    refetchInterval: 60_000,
-    refetchOnWindowFocus: true,
+    enabled: signedIn,
+    refetchInterval: signedIn ? 60_000 : false,
+    refetchOnWindowFocus: signedIn,
     staleTime: 15_000,
   });
 
