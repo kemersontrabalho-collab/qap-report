@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
-import { TutorialModal } from "@/components/TutorialModal";
+import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
 
@@ -34,7 +34,7 @@ function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
+  
   const [notifPerm, setNotifPerm] = useState<NotificationPermission | "unsupported">(
     typeof window !== "undefined" && "Notification" in window
       ? Notification.permission
@@ -260,7 +260,7 @@ function SettingsPage() {
             Um guia passo a passo mostrando como usar cada parte do QAP Report: painel, criação de boletins, IA, casos semelhantes, PDF e mais.
           </p>
           <button
-            onClick={() => setTutorialOpen(true)}
+            onClick={() => tutorialStore.open()}
             className="mt-4 inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm hover:bg-accent"
           >
             <BookOpen className="h-4 w-4" /> Iniciar tutorial
@@ -471,7 +471,7 @@ function SettingsPage() {
         <style>{`.input{margin-top:.25rem;width:100%;border-radius:.5rem;border:1px solid var(--color-border);background:var(--color-background);padding:.5rem .75rem;font-size:.875rem;outline:none}
         .input:focus{box-shadow:0 0 0 2px var(--color-ring)}`}</style>
       </div>
-      <TutorialModal open={tutorialOpen} onClose={() => setTutorialOpen(false)} />
+      
     </AppShell>
   );
 }

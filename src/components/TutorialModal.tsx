@@ -82,40 +82,42 @@ function useElementRect(selector: string | undefined, deps: unknown[]) {
   useLayoutEffect(() => {
     setRect(null);
     if (!selector) return;
-    let timer = 0;
-    let tries = 0;
     let cancelled = false;
-    const find = () => {
+    let rafId = 0;
+    let scrolled = false;
+    let lastKey = "";
+    const tick = () => {
       if (cancelled) return;
       const el = pickVisible(selector);
       if (el) {
-        try {
-          el.scrollIntoView({ block: "center", behavior: "smooth" });
-        } catch {
-          /* ignore */
+        if (!scrolled) {
+          scrolled = true;
+          try {
+            el.scrollIntoView({ block: "center", behavior: "smooth" });
+          } catch {
+            /* ignore */
+          }
         }
-        setRect(el.getBoundingClientRect());
-      } else if (tries++ < 40) {
-        timer = window.setTimeout(find, 100);
+        const r = el.getBoundingClientRect();
+        const key = `${r.x}|${r.y}|${r.width}|${r.height}`;
+        if (key !== lastKey) {
+          lastKey = key;
+          setRect(r);
+        }
       }
+      rafId = requestAnimationFrame(tick);
     };
-    find();
-    const onResize = () => {
-      const el = pickVisible(selector);
-      if (el) setRect(el.getBoundingClientRect());
-    };
-    window.addEventListener("resize", onResize);
-    window.addEventListener("scroll", onResize, true);
+    rafId = requestAnimationFrame(tick);
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", onResize, true);
+      cancelAnimationFrame(rafId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return rect;
 }
+
+
 
 
 export function TutorialModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -175,7 +177,7 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
       <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
       {spot ? (
         <div
-          className="pointer-events-none absolute rounded-xl transition-all duration-300"
+          className="pointer-events-none absolute rounded-xl"
           style={{
             top: spot.top,
             left: spot.left,
@@ -189,6 +191,7 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
       ) : (
         <div className="pointer-events-none absolute inset-0 bg-black/65" />
       )}
+
 
 
 
