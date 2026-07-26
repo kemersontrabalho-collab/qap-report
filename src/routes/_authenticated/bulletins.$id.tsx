@@ -553,20 +553,36 @@ function EditBulletin() {
               </p>
             </div>
             <div>
-              <div className="flex items-center justify-between gap-2">
-                <label className="text-sm font-medium">Contexto adicional</label>
-                <VoiceDictateButton
-                  value={b.context ?? ""}
-                  onChange={(v) => update("context", v)}
-                />
-              </div>
-              <textarea
-                value={b.context ?? ""}
-                onChange={(e) => update("context", e.target.value)}
-                rows={3}
-                className="mt-1 w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-              />
+              <label className="text-sm font-medium">Sugestões de melhoria</label>
+              {(() => {
+                const suggestions = extractImprovementSuggestions(b.content);
+                if (!b.content) {
+                  return (
+                    <p className="mt-1 rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                      Gere o texto para ver aqui as perguntas complementares e dados faltantes identificados pela IA.
+                    </p>
+                  );
+                }
+                if (suggestions.length === 0) {
+                  return (
+                    <p className="mt-1 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                      Nenhuma sugestão pendente — o histórico está completo.
+                    </p>
+                  );
+                }
+                return (
+                  <ul className="mt-1 space-y-1 rounded-lg border bg-muted/30 px-3 py-2 text-xs">
+                    {suggestions.map((s, i) => (
+                      <li key={i} className="flex gap-2">
+                        <span className="text-primary">•</span>
+                        <span>{s}</span>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
             </div>
+
 
 
             <button
