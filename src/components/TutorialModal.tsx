@@ -171,10 +171,12 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
 
   return (
     <div className="fixed inset-0 z-[100]" aria-modal role="dialog">
-      {/* Dim overlay with spotlight cut-out via box-shadow */}
-      {spot ? (
+      {/* Backdrop always covers full screen and captures close clicks */}
+      <div className="absolute inset-0 bg-black/65 pointer-events-auto" onClick={onClose} />
+      {/* Spotlight cut-out: transparent hole via box-shadow, non-interactive so clicks fall through to backdrop */}
+      {spot && (
         <div
-          className="pointer-events-auto absolute rounded-xl transition-all duration-300"
+          className="pointer-events-none absolute rounded-xl transition-all duration-300"
           style={{
             top: spot.top,
             left: spot.left,
@@ -183,12 +185,11 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
             boxShadow: "0 0 0 9999px rgba(0,0,0,0.65)",
             outline: "2px solid hsl(var(--primary))",
             outlineOffset: 2,
+            background: "transparent",
           }}
-          onClick={onClose}
         />
-      ) : (
-        <div className="absolute inset-0 bg-black/65" onClick={onClose} />
       )}
+
 
       {/* Floating card */}
       <div
