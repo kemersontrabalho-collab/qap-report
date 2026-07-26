@@ -44,13 +44,7 @@ function SettingsPage() {
   const [supportMsg, setSupportMsg] = useState("");
   const [sendingSupport, setSendingSupport] = useState(false);
   const sendSupportFn = useServerFn(sendSupportMessage);
-  const founderFn = useServerFn(isFounder);
-  const { data: founderData } = useQuery({
-    queryKey: ["is-founder"],
-    queryFn: () => founderFn(),
-    staleTime: 5 * 60_000,
-  });
-  const founder = founderData?.founder === true;
+
 
 
   async function requestNotifications() {
