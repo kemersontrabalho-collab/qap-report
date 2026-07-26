@@ -384,9 +384,9 @@ function SettingsPage() {
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
-          <h2 className="font-semibold">Downloads seguros e atualizações</h2>
+          <h2 className="font-semibold">Atualizações e link oficial</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Links oficiais do QAP Report. Sempre baixe apenas a partir daqui — não instale APKs de terceiros.
+            Verifique novas versões do QAP Report e compartilhe o link oficial com colegas de guarnição. Não instale APKs de terceiros.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <button
