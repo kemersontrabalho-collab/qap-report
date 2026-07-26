@@ -148,10 +148,18 @@ export const adminSendNotification = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdminSession();
     const sb = await admin();
+    const { data: founder } = await sb
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "fundador")
+      .limit(1)
+      .maybeSingle();
     const { error } = await sb.from("notifications").insert({
       title: data.title,
       body: data.body,
-      type: data.type ?? "info",
+      category: data.type ?? "info",
+      audience: "all",
+      created_by: founder?.user_id ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true as const };
