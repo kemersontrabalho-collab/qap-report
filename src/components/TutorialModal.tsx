@@ -82,71 +82,41 @@ function useElementRect(selector: string | undefined, deps: unknown[]) {
   useLayoutEffect(() => {
     setRect(null);
     if (!selector) return;
-    let timer = 0;
-    let tries = 0;
     let cancelled = false;
-    let currentEl: HTMLElement | null = null;
-    let ro: ResizeObserver | null = null;
     let rafId = 0;
+    let scrolled = false;
     let lastKey = "";
-
-    const measure = () => {
-      if (!currentEl || cancelled) return;
-      const r = currentEl.getBoundingClientRect();
-      const key = `${r.x}|${r.y}|${r.width}|${r.height}`;
-      if (key !== lastKey) {
-        lastKey = key;
-        setRect(r);
-      }
-    };
-
-    const trackFrames = (frames: number) => {
-      if (cancelled || frames <= 0) return;
-      rafId = requestAnimationFrame(() => {
-        measure();
-        trackFrames(frames - 1);
-      });
-    };
-
-    const find = () => {
+    const tick = () => {
       if (cancelled) return;
       const el = pickVisible(selector);
       if (el) {
-        currentEl = el;
-        try {
-          el.scrollIntoView({ block: "center", behavior: "smooth" });
-        } catch {
-          /* ignore */
+        if (!scrolled) {
+          scrolled = true;
+          try {
+            el.scrollIntoView({ block: "center", behavior: "smooth" });
+          } catch {
+            /* ignore */
+          }
         }
-        measure();
-        // Re-measure across ~500ms to catch layout settling and smooth-scroll.
-        trackFrames(30);
-        if (typeof ResizeObserver !== "undefined") {
-          ro = new ResizeObserver(measure);
-          ro.observe(el);
-          ro.observe(document.documentElement);
+        const r = el.getBoundingClientRect();
+        const key = `${r.x}|${r.y}|${r.width}|${r.height}`;
+        if (key !== lastKey) {
+          lastKey = key;
+          setRect(r);
         }
-      } else if (tries++ < 40) {
-        timer = window.setTimeout(find, 100);
       }
+      rafId = requestAnimationFrame(tick);
     };
-    find();
-
-    const onResize = () => measure();
-    window.addEventListener("resize", onResize);
-    window.addEventListener("scroll", onResize, true);
+    rafId = requestAnimationFrame(tick);
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
       cancelAnimationFrame(rafId);
-      ro?.disconnect();
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", onResize, true);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return rect;
 }
+
 
 
 
