@@ -52,8 +52,8 @@ const STEPS: Step[] = [
     target: '[data-tour="nav-settings"], [data-tour-mobile="nav-settings"]',
   },
   {
-    title: "Modo offline & instalação",
-    body: "O app funciona sem internet e sincroniza ao reconectar. Instale-o na tela inicial para acesso rápido como um app nativo.",
+    title: "Instalação",
+    body: "Instale o QAP Report na tela inicial para acesso rápido como um app nativo, em tela cheia.",
     route: "/settings",
   },
   {

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { translateAuthError } from "@/lib/i18n-errors";
+import { setSessionLifetime } from "@/lib/session-lifetime";
 import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 
 const search = z.object({
@@ -30,6 +31,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -47,6 +49,7 @@ function AuthPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        setSessionLifetime(keepSignedIn);
         toast.success("Bem-vindo(a) de volta!");
         navigate({ to: safeRedirect(), replace: true });
       } else if (mode === "signup") {
@@ -153,6 +156,17 @@ function AuthPage() {
                     placeholder="Mínimo 6 caracteres"
                   />
                 </div>
+              )}
+              {mode === "login" && (
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={keepSignedIn}
+                    onChange={(e) => setKeepSignedIn(e.target.checked)}
+                    className="h-4 w-4 rounded border-input accent-primary"
+                  />
+                  Manter conectado por 8 horas
+                </label>
               )}
               <button
                 type="submit"

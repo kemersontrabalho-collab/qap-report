@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { registerPWA, initInstallPrompt } from "@/lib/pwa";
+import { enforceSessionLifetime, clearSessionLifetime } from "@/lib/session-lifetime";
 import { Toaster } from "sonner";
 
 function NotFoundComponent() {
@@ -83,15 +84,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica, offline e sincronização automática.",
+          "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA.",
       },
       { name: "author", content: "QAP Report" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "QAP REPORT" },
       { name: "twitter:title", content: "QAP REPORT" },
-      { property: "og:description", content: "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica, offline e sincronização automática." },
-      { name: "twitter:description", content: "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica, offline e sincronização automática." },
+      { property: "og:description", content: "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA." },
+      { name: "twitter:description", content: "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6369f9bf-252b-423f-9150-9587d3accd35/id-preview-c7994b66--483e5855-54d3-4735-b11e-9a2d8b9c3665.lovable.app-1784774470412.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6369f9bf-252b-423f-9150-9587d3accd35/id-preview-c7994b66--483e5855-54d3-4735-b11e-9a2d8b9c3665.lovable.app-1784774470412.png" },
     ],
@@ -140,12 +141,23 @@ function RootComponent() {
   useEffect(() => {
     initInstallPrompt();
     void registerPWA();
+    void enforceSessionLifetime();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void enforceSessionLifetime();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    const interval = window.setInterval(() => void enforceSessionLifetime(), 5 * 60 * 1000);
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") clearSessionLifetime();
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      sub.subscription.unsubscribe();
+      document.removeEventListener("visibilitychange", onVisible);
+      window.clearInterval(interval);
+    };
   }, [router, queryClient]);
 
   return (

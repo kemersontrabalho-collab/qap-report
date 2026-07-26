@@ -379,7 +379,7 @@ function SettingsPage() {
             </button>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            Após instalado, o app fica disponível offline: você pode criar e editar boletins mesmo sem internet, e a sincronização acontece automaticamente ao reconectar.
+            Após instalado, o QAP Report abre como um app nativo, com atalho na tela inicial e experiência em tela cheia.
           </p>
         </section>
 
