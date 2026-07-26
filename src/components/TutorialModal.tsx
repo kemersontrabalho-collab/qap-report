@@ -1,99 +1,221 @@
-import { useEffect, useState } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { X, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
-type Step = { title: string; body: string };
+type Step = {
+  title: string;
+  body: string;
+  route?: string;
+  /** CSS selector, tries in order. Falls back to centered card. */
+  target?: string;
+};
 
 const STEPS: Step[] = [
   {
-    title: "Painel",
-    body: "A tela inicial após o login. Aqui você vê todos os seus boletins organizados por status (Rascunhos, Feitos, Favoritos, Lixeira) e pode filtrar ou buscar rapidamente.",
+    title: "Bem-vindo ao QAP Report",
+    body: "Vamos fazer um tour rápido pelo app. A cada passo o tutorial vai te levar até a tela real e destacar o que importa.",
+    route: "/dashboard",
   },
   {
-    title: "Botão 'Novo'",
-    body: "No canto superior direito, use o botão 'Novo' para criar um boletim. Escolha o tipo (BA, BO-COP, BO-TC ou BOAT) conforme a ocorrência.",
+    title: "Painel principal",
+    body: "Esta é sua tela inicial. Todos os boletins ficam organizados por status: Rascunhos, Feitos, Favoritos e Lixeira.",
+    route: "/dashboard",
+    target: '[data-tour="nav-dashboard"], [data-tour-mobile="nav-dashboard"]',
   },
   {
-    title: "Editor de boletim",
-    body: "Preencha Título, Categoria, Composição da Guarnição, Prefixo da viatura, Data/Hora (automática), LOCALIZAÇÃO DA GUARNIÇÃO e Localização da Ocorrência. Use o botão de GPS ou o Google Maps para marcar o endereço.",
+    title: "Criar um novo boletim",
+    body: "Toque no botão 'Novo' (canto superior direito) para iniciar um BA, BO-COP, BO-TC ou BOAT.",
+    route: "/dashboard",
+    target: '[data-tour="new-bulletin"]',
   },
   {
-    title: "Geração por IA",
-    body: "Após preencher os dados e palavras-chave, toque em 'Gerar texto' para que a IA produza o relatório em linguagem técnica e formal. Revise, edite e salve.",
-  },
-  {
-    title: "Casos semelhantes",
-    body: "Durante a redação, o app sugere boletins anteriores parecidos com a ocorrência atual para apoio à tomada de decisão.",
-  },
-  {
-    title: "Exportar em PDF",
-    body: "Concluído o boletim, use 'Exportar PDF' para baixar o documento pronto para impressão ou compartilhamento.",
-  },
-  {
-    title: "Dúvidas com IA",
-    body: "A aba 'Dúvidas IA' permite perguntar sobre leis, penas, qual documento se aplica a cada situação e tirar dúvidas técnicas em linguagem policial.",
+    title: "Escolha o tipo",
+    body: "Cada tipo de boletim tem uma finalidade. Selecione o mais adequado à ocorrência para começar a redigir.",
+    route: "/bulletins/new",
   },
   {
     title: "Notificações",
-    body: "O sino no topo mostra avisos do administrador e atualizações do app. Ative as notificações do dispositivo em Configurações para receber alertas mesmo com o app fechado.",
+    body: "O sino mostra avisos e atualizações do app em tempo real. Você pode limpar, ocultar e reativar quando quiser.",
+    route: "/dashboard",
+    target: '[data-tour="notifications"]',
   },
   {
-    title: "Suporte",
-    body: "Em Configurações → Suporte, envie dúvidas, reclamações ou sugestões diretamente ao administrador do sistema.",
+    title: "Dúvidas com IA",
+    body: "Precisa consultar uma lei, pena ou o documento correto para uma situação? A aba 'Dúvidas IA' é seu apoio jurídico.",
+    route: "/ai-chat",
+    target: '[data-tour="nav-ai-chat"], [data-tour-mobile="nav-ai-chat"]',
   },
   {
-    title: "Modo offline",
-    body: "O QAP Report funciona sem internet: crie e edite boletins offline, e a sincronização acontece automaticamente ao reconectar.",
+    title: "Configurações",
+    body: "Ative notificações do dispositivo, envie suporte ao administrador, verifique atualizações e compartilhe o link oficial do QAP Report.",
+    route: "/settings",
+    target: '[data-tour="nav-settings"], [data-tour-mobile="nav-settings"]',
   },
   {
-    title: "Instalar como app",
-    body: "Instale o QAP Report na tela inicial do celular (PWA). Em Configurações há instruções para iOS e Android e um botão de instalação direta.",
+    title: "Modo offline & instalação",
+    body: "O app funciona sem internet e sincroniza ao reconectar. Instale-o na tela inicial para acesso rápido como um app nativo.",
+    route: "/settings",
+  },
+  {
+    title: "Tudo pronto!",
+    body: "Você já pode começar. Crie seu primeiro boletim ou explore o app à vontade — o tutorial pode ser reaberto a qualquer momento em Configurações.",
+    route: "/dashboard",
   },
 ];
 
+const PADDING = 8;
+const CARD_W = 320;
+const CARD_H_APPROX = 220;
+
+function useElementRect(selector: string | undefined, deps: unknown[]) {
+  const [rect, setRect] = useState<DOMRect | null>(null);
+  useLayoutEffect(() => {
+    if (!selector) {
+      setRect(null);
+      return;
+    }
+    let raf = 0;
+    let tries = 0;
+    const find = () => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ block: "center", behavior: "smooth" });
+        setRect(el.getBoundingClientRect());
+      } else if (tries++ < 30) {
+        raf = window.setTimeout(find, 80) as unknown as number;
+      } else {
+        setRect(null);
+      }
+    };
+    find();
+    const onResize = () => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      if (el) setRect(el.getBoundingClientRect());
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", onResize, true);
+    return () => {
+      window.clearTimeout(raf);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", onResize, true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  return rect;
+}
+
 export function TutorialModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [i, setI] = useState(0);
+  const navigate = useNavigate();
+  const lastRoute = useRef<string | undefined>(undefined);
+
   useEffect(() => {
     if (open) setI(0);
   }, [open]);
-  if (!open) return null;
+
   const step = STEPS[i];
+
+  useEffect(() => {
+    if (!open || !step?.route) return;
+    if (lastRoute.current !== step.route) {
+      lastRoute.current = step.route;
+      navigate({ to: step.route }).catch(() => {});
+    }
+  }, [open, step, navigate]);
+
+  const rect = useElementRect(open ? step?.target : undefined, [open, i, step?.target, step?.route]);
+
+  if (!open || !step) return null;
   const last = i === STEPS.length - 1;
+
+  // Compute spotlight box
+  const spot = rect
+    ? {
+        top: Math.max(rect.top - PADDING, 4),
+        left: Math.max(rect.left - PADDING, 4),
+        width: rect.width + PADDING * 2,
+        height: rect.height + PADDING * 2,
+      }
+    : null;
+
+  // Card position: below the target if room, else above; else centered
+  let cardStyle: React.CSSProperties = {
+    left: "50%",
+    top: "50%",
+    transform: "translate(-50%, -50%)",
+  };
+  if (spot) {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const below = spot.top + spot.height + 12;
+    const above = spot.top - CARD_H_APPROX - 12;
+    const useBelow = below + CARD_H_APPROX < vh - 12 || above < 12;
+    const top = useBelow ? below : Math.max(above, 12);
+    const left = Math.min(Math.max(spot.left + spot.width / 2 - CARD_W / 2, 12), vw - CARD_W - 12);
+    cardStyle = { top, left, transform: "none" };
+  }
+
   return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[100]" aria-modal role="dialog">
+      {/* Dim overlay with spotlight cut-out via box-shadow */}
+      {spot ? (
+        <div
+          className="pointer-events-auto absolute rounded-xl transition-all duration-300"
+          style={{
+            top: spot.top,
+            left: spot.left,
+            width: spot.width,
+            height: spot.height,
+            boxShadow: "0 0 0 9999px rgba(0,0,0,0.65)",
+            outline: "2px solid hsl(var(--primary))",
+            outlineOffset: 2,
+          }}
+          onClick={onClose}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-black/65" onClick={onClose} />
+      )}
+
+      {/* Floating card */}
       <div
-        className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-xl"
+        className="pointer-events-auto absolute w-[320px] max-w-[calc(100vw-24px)] animate-fade-in rounded-2xl border bg-card p-5 shadow-2xl"
+        style={cardStyle}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
             Passo {i + 1} de {STEPS.length}
           </span>
           <button
             onClick={onClose}
             className="grid h-8 w-8 place-items-center rounded-md hover:bg-accent"
-            aria-label="Fechar"
+            aria-label="Fechar tour"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <h3 className="mt-3 text-lg font-semibold">{step.title}</h3>
-        <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{step.body}</p>
+        <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-accent">
           <div
-            className="h-full bg-primary transition-all"
+            className="h-full bg-primary transition-all duration-300"
             style={{ width: `${((i + 1) / STEPS.length) * 100}%` }}
           />
         </div>
-        <div className="mt-5 flex items-center justify-between gap-2">
+        <div className="mt-4 flex items-center justify-between gap-2">
           <button
             onClick={() => setI((v) => Math.max(0, v - 1))}
             disabled={i === 0}
             className="inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm hover:bg-accent disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" /> Anterior
+          </button>
+          <button
+            onClick={onClose}
+            className="text-xs text-muted-foreground hover:underline"
+          >
+            Pular
           </button>
           {last ? (
             <button
