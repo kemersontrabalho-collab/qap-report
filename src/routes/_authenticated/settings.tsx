@@ -4,12 +4,20 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send, Ticket, KeyRound, Copy, Power, Crown } from "lucide-react";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
+import {
+  amIFounder,
+  createLifetimeCode,
+  deleteCoupon,
+  listMyCoupons,
+  redeemCoupon,
+  setCouponActive,
+} from "@/lib/coupons.functions";
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
