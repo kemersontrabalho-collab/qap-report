@@ -67,35 +67,48 @@ const PADDING = 8;
 const CARD_W = 320;
 const CARD_H_APPROX = 220;
 
+function pickVisible(selector: string): HTMLElement | null {
+  const nodes = Array.from(document.querySelectorAll(selector)) as HTMLElement[];
+  for (const el of nodes) {
+    const r = el.getBoundingClientRect();
+    // Skip elements hidden via display:none / zero-size (e.g. desktop nav on mobile)
+    if (r.width > 0 && r.height > 0 && el.offsetParent !== null) return el;
+  }
+  return nodes[0] ?? null;
+}
+
 function useElementRect(selector: string | undefined, deps: unknown[]) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   useLayoutEffect(() => {
-    if (!selector) {
-      setRect(null);
-      return;
-    }
-    let raf = 0;
+    setRect(null);
+    if (!selector) return;
+    let timer = 0;
     let tries = 0;
+    let cancelled = false;
     const find = () => {
-      const el = document.querySelector(selector) as HTMLElement | null;
+      if (cancelled) return;
+      const el = pickVisible(selector);
       if (el) {
-        el.scrollIntoView({ block: "center", behavior: "smooth" });
+        try {
+          el.scrollIntoView({ block: "center", behavior: "smooth" });
+        } catch {
+          /* ignore */
+        }
         setRect(el.getBoundingClientRect());
-      } else if (tries++ < 30) {
-        raf = window.setTimeout(find, 80) as unknown as number;
-      } else {
-        setRect(null);
+      } else if (tries++ < 40) {
+        timer = window.setTimeout(find, 100);
       }
     };
     find();
     const onResize = () => {
-      const el = document.querySelector(selector) as HTMLElement | null;
+      const el = pickVisible(selector);
       if (el) setRect(el.getBoundingClientRect());
     };
     window.addEventListener("resize", onResize);
     window.addEventListener("scroll", onResize, true);
     return () => {
-      window.clearTimeout(raf);
+      cancelled = true;
+      window.clearTimeout(timer);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize, true);
     };
@@ -103,6 +116,7 @@ function useElementRect(selector: string | undefined, deps: unknown[]) {
   }, deps);
   return rect;
 }
+
 
 export function TutorialModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [i, setI] = useState(0);
@@ -157,10 +171,11 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
 
   return (
     <div className="fixed inset-0 z-[100]" aria-modal role="dialog">
-      {/* Dim overlay with spotlight cut-out via box-shadow */}
+      {/* Transparent click-catcher for closing */}
+      <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
       {spot ? (
         <div
-          className="pointer-events-auto absolute rounded-xl transition-all duration-300"
+          className="pointer-events-none absolute rounded-xl transition-all duration-300"
           style={{
             top: spot.top,
             left: spot.left,
@@ -170,11 +185,12 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
             outline: "2px solid hsl(var(--primary))",
             outlineOffset: 2,
           }}
-          onClick={onClose}
         />
       ) : (
-        <div className="absolute inset-0 bg-black/65" onClick={onClose} />
+        <div className="pointer-events-none absolute inset-0 bg-black/65" />
       )}
+
+
 
       {/* Floating card */}
       <div
