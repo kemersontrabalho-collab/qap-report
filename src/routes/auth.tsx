@@ -54,6 +54,17 @@ function AuthPage() {
         toast.success("Bem-vindo(a) de volta!");
         navigate({ to: safeRedirect(), replace: true });
       } else if (mode === "signup") {
+        const failed = passwordRules.find((r) => !r.test(password));
+        if (failed) {
+          toast.error(`Senha inválida: ${failed.label.toLowerCase()}.`);
+          setLoading(false);
+          return;
+        }
+        if (!/^[A-Za-z0-9!@#$%&*?._-]+$/.test(password)) {
+          toast.error("Sua senha contém caracteres não permitidos.");
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
