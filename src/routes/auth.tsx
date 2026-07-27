@@ -4,7 +4,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check, X } from "lucide-react";
 import { translateAuthError } from "@/lib/i18n-errors";
 import { setSessionLifetime } from "@/lib/session-lifetime";
 import logoAsset from "@/assets/qap-report-logo.png.asset.json";
@@ -54,6 +54,17 @@ function AuthPage() {
         toast.success("Bem-vindo(a) de volta!");
         navigate({ to: safeRedirect(), replace: true });
       } else if (mode === "signup") {
+        const failed = passwordRules.find((r) => !r.test(password));
+        if (failed) {
+          toast.error(`Senha inválida: ${failed.label.toLowerCase()}.`);
+          setLoading(false);
+          return;
+        }
+        if (!/^[A-Za-z0-9!@#$%&*?._-]+$/.test(password)) {
+          toast.error("Sua senha contém caracteres não permitidos.");
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -186,13 +197,14 @@ function AuthPage() {
                   <label className="text-sm font-medium">Senha</label>
                   <input
                     required
-                    minLength={6}
+                    minLength={mode === "signup" ? 8 : 6}
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder={mode === "signup" ? "Mínimo 8 caracteres" : "Sua senha"}
                   />
+                  {mode === "signup" && <PasswordRequirements password={password} />}
                 </div>
               )}
               {mode === "login" && (
@@ -296,5 +308,38 @@ function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+const passwordRules = [
+  { label: "Pelo menos 8 caracteres", test: (p: string) => p.length >= 8 },
+  { label: "Uma letra maiúscula (A-Z)", test: (p: string) => /[A-Z]/.test(p) },
+  { label: "Uma letra minúscula (a-z)", test: (p: string) => /[a-z]/.test(p) },
+  { label: "Um número (0-9)", test: (p: string) => /\d/.test(p) },
+  { label: "Um caractere especial (!@#$%&*?)", test: (p: string) => /[!@#$%&*?._-]/.test(p) },
+];
+
+function PasswordRequirements({ password }: { password: string }) {
+  return (
+    <ul className="mt-2 space-y-1 rounded-md border bg-muted/40 p-2 text-xs">
+      <li className="mb-1 font-medium text-muted-foreground">
+        Sua senha deve conter:
+      </li>
+      {passwordRules.map((rule) => {
+        const ok = rule.test(password);
+        return (
+          <li
+            key={rule.label}
+            className={`flex items-center gap-2 ${ok ? "text-green-600 dark:text-green-500" : "text-muted-foreground"}`}
+          >
+            {ok ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+            {rule.label}
+          </li>
+        );
+      })}
+      <li className="pt-1 text-[11px] text-muted-foreground">
+        Caracteres permitidos: letras, números e <code>! @ # $ % &amp; * ? . _ -</code>
+      </li>
+    </ul>
   );
 }
