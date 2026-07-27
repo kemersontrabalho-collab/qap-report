@@ -98,6 +98,24 @@ function AuthPage() {
     }
   }
 
+  async function handleApple() {
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("apple", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (result.redirected) return;
+      setSessionLifetime(keepSignedIn);
+      toast.success("Bem-vindo(a)!");
+      navigate({ to: safeRedirect(), replace: true });
+    } catch (err) {
+      toast.error(translateAuthError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
 
 
   return (
@@ -220,6 +238,17 @@ function AuthPage() {
                     <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C41.4 35.8 44 30.3 44 24c0-1.2-.1-2.3-.4-3.5z"/>
                   </svg>
                   Continuar com Google
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApple}
+                  disabled={loading}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border bg-black px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M16.365 1.43c0 1.14-.42 2.22-1.24 3.02-.83.82-2.13 1.44-3.18 1.35-.14-1.09.44-2.22 1.2-2.97.85-.82 2.28-1.4 3.22-1.4zM20.5 17.36c-.55 1.28-.81 1.85-1.53 2.99-.99 1.57-2.39 3.53-4.13 3.55-1.54.02-1.94-1-4.03-.99-2.09.01-2.53 1.01-4.07.99-1.74-.02-3.06-1.79-4.05-3.36C0.09 16.51-.21 11.29 1.61 8.5c1.28-1.96 3.29-3.11 5.19-3.11 1.93 0 3.14 1.06 4.74 1.06 1.55 0 2.5-1.06 4.73-1.06 1.68 0 3.46.92 4.73 2.5-4.15 2.28-3.48 8.22.5 9.47z"/>
+                  </svg>
+                  Continuar com Apple
                 </button>
               </>
             )}
