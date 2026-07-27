@@ -299,3 +299,36 @@ function AuthPage() {
     </div>
   );
 }
+
+const passwordRules = [
+  { label: "Pelo menos 8 caracteres", test: (p: string) => p.length >= 8 },
+  { label: "Uma letra maiúscula (A-Z)", test: (p: string) => /[A-Z]/.test(p) },
+  { label: "Uma letra minúscula (a-z)", test: (p: string) => /[a-z]/.test(p) },
+  { label: "Um número (0-9)", test: (p: string) => /\d/.test(p) },
+  { label: "Um caractere especial (!@#$%&*?)", test: (p: string) => /[!@#$%&*?._-]/.test(p) },
+];
+
+function PasswordRequirements({ password }: { password: string }) {
+  return (
+    <ul className="mt-2 space-y-1 rounded-md border bg-muted/40 p-2 text-xs">
+      <li className="mb-1 font-medium text-muted-foreground">
+        Sua senha deve conter:
+      </li>
+      {passwordRules.map((rule) => {
+        const ok = rule.test(password);
+        return (
+          <li
+            key={rule.label}
+            className={`flex items-center gap-2 ${ok ? "text-green-600 dark:text-green-500" : "text-muted-foreground"}`}
+          >
+            {ok ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+            {rule.label}
+          </li>
+        );
+      })}
+      <li className="pt-1 text-[11px] text-muted-foreground">
+        Caracteres permitidos: letras, números e <code>! @ # $ % &amp; * ? . _ -</code>
+      </li>
+    </ul>
+  );
+}
