@@ -4,7 +4,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check, X } from "lucide-react";
 import { translateAuthError } from "@/lib/i18n-errors";
 import { setSessionLifetime } from "@/lib/session-lifetime";
 import logoAsset from "@/assets/qap-report-logo.png.asset.json";
