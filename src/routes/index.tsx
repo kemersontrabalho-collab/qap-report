@@ -5,16 +5,42 @@ import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "QAP REPORT" },
+      { title: "QAP Report — Assistente de Redação Policial com IA" },
       {
         name: "description",
         content:
-          "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA.",
+          "Plataforma QAP Report: redija boletins BA, BO-COP, BO-TC e BOAT com terminologia técnica, base de conhecimento jurídica e apoio de IA em segundos.",
       },
-      { property: "og:title", content: "QAP REPORT" },
+      { property: "og:title", content: "QAP Report — Assistente de Redação Policial com IA" },
       {
         property: "og:description",
-        content: "Gere boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA.",
+        content: "Redija boletins BA, BO-COP, BO-TC e BOAT com apoio de IA e terminologia técnica policial.",
+      },
+      { property: "og:url", content: "https://qap-report.lovable.app/" },
+    ],
+    links: [{ rel: "canonical", href: "https://qap-report.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "QAP Report",
+          url: "https://qap-report.lovable.app/",
+          description:
+            "Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT.",
+          inLanguage: "pt-BR",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "QAP Report",
+          url: "https://qap-report.lovable.app/",
+          logo: "https://qap-report.lovable.app/favicon.ico",
+        }),
       },
     ],
   }),
