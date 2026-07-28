@@ -26,7 +26,7 @@ import {
 
 
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
-  head: () => ({ meta: [{ title: "Editar boletim · QAP Report" }] }),
+  head: () => ({ meta: [{ title: "Editar boletim · QAP Report" }, { name: "robots", content: "noindex" }] }),
   component: EditBulletin,
 });
 
@@ -404,6 +404,9 @@ function EditBulletin() {
           </button>
         </div>
       </div>
+
+      <h1 className="sr-only">{b.title || `Editar ${b.bulletin_type}`}</h1>
+
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <aside className="space-y-4">

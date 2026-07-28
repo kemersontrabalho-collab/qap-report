@@ -20,8 +20,19 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Entrar · QAP Report" },
-      { name: "description", content: "Acesse sua conta QAP Report." },
+      {
+        name: "description",
+        content: "Acesse a QAP Report para redigir boletins policiais com apoio de IA.",
+      },
+      { property: "og:title", content: "Entrar · QAP Report" },
+      {
+        property: "og:description",
+        content: "Acesse a QAP Report para redigir boletins policiais com apoio de IA.",
+      },
+      { property: "og:url", content: "https://qap-report.lovable.app/auth" },
+      { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://qap-report.lovable.app/auth" }],
   }),
   component: AuthPage,
 });
@@ -138,9 +149,9 @@ function AuthPage() {
             <span className="text-lg font-semibold">QAP Report</span>
           </Link>
           <div>
-            <h2 className="text-3xl font-bold leading-tight">
+            <p className="text-3xl font-bold leading-tight">
               Redação policial assistida por IA.
-            </h2>
+            </p>
             <p className="mt-3 text-sm opacity-80">
               Gere boletins BA, BO-COP, BO-TC e BOAT com terminologia técnica adequada
               e fidelidade aos fatos.
