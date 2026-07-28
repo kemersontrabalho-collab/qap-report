@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as GuiaRedacaoTecnicaRouteImport } from './routes/guia-redacao-tecnica'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -21,6 +22,11 @@ import { Route as AuthenticatedAiChatRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedBulletinsNewRouteImport } from './routes/_authenticated/bulletins.new'
 import { Route as AuthenticatedBulletinsIdRouteImport } from './routes/_authenticated/bulletins.$id'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/ai-chat': typeof AuthenticatedAiChatRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/guia-redacao-tecnica'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/ai-chat'
     | '/dashboard'
     | '/settings'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/guia-redacao-tecnica'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/ai-chat'
     | '/dashboard'
     | '/settings'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/guia-redacao-tecnica'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/_authenticated/ai-chat'
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
@@ -163,10 +175,18 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   GuiaRedacaoTecnicaRoute: typeof GuiaRedacaoTecnicaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -273,7 +293,18 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   GuiaRedacaoTecnicaRoute: GuiaRedacaoTecnicaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
