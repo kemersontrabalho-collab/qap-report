@@ -51,6 +51,12 @@ function Landing() {
         </div>
         <nav className="flex items-center gap-3">
           <Link
+            to="/guia-redacao-tecnica"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Guia
+          </Link>
+          <Link
             to="/auth"
             className="text-sm text-muted-foreground hover:text-foreground"
           >

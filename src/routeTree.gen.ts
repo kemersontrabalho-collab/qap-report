@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as GuiaRedacaoTecnicaRouteImport } from './routes/guia-redacao-tecnica'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -23,6 +24,11 @@ import { Route as AuthenticatedBulletinsIdRouteImport } from './routes/_authenti
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaRedacaoTecnicaRoute = GuiaRedacaoTecnicaRouteImport.update({
+  id: '/guia-redacao-tecnica',
+  path: '/guia-redacao-tecnica',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/ai-chat': typeof AuthenticatedAiChatRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/guia-redacao-tecnica'
     | '/reset-password'
     | '/ai-chat'
     | '/dashboard'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/guia-redacao-tecnica'
     | '/reset-password'
     | '/ai-chat'
     | '/dashboard'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/admin'
     | '/auth'
+    | '/guia-redacao-tecnica'
     | '/reset-password'
     | '/_authenticated/ai-chat'
     | '/_authenticated/dashboard'
@@ -149,6 +161,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  GuiaRedacaoTecnicaRoute: typeof GuiaRedacaoTecnicaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
@@ -159,6 +172,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia-redacao-tecnica': {
+      id: '/guia-redacao-tecnica'
+      path: '/guia-redacao-tecnica'
+      fullPath: '/guia-redacao-tecnica'
+      preLoaderRoute: typeof GuiaRedacaoTecnicaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -251,18 +271,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  GuiaRedacaoTecnicaRoute: GuiaRedacaoTecnicaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
