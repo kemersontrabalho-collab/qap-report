@@ -20,6 +20,19 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Entrar · QAP Report" },
+      {
+        name: "description",
+        content: "Acesse a QAP Report para redigir boletins policiais com apoio de IA.",
+      },
+      { property: "og:title", content: "Entrar · QAP Report" },
+      {
+        property: "og:description",
+        content: "Acesse a QAP Report para redigir boletins policiais com apoio de IA.",
+      },
+      { property: "og:url", content: "https://qap-report.lovable.app/auth" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://qap-report.lovable.app/auth" }],
       { name: "description", content: "Acesse sua conta QAP Report." },
     ],
   }),
