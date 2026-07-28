@@ -153,8 +153,18 @@ function Landing() {
       </main>
 
       <footer className="border-t">
-        <div className="mx-auto max-w-6xl px-6 py-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} QAP Report · Ferramenta de apoio à redação policial
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-6 sm:flex-row">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} QAP Report · Ferramenta de apoio à redação policial
+          </p>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <Link to="/guia-redacao-tecnica" className="hover:text-foreground">
+              Guia de redação técnica
+            </Link>
+            <Link to="/auth" className="hover:text-foreground">
+              Entrar
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
