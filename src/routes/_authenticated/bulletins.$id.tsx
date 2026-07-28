@@ -26,7 +26,7 @@ import {
 
 
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
-  head: () => ({ meta: [{ title: "Editar boletim · QAP Report" }] }),
+  head: () => ({ meta: [{ title: "Editar boletim · QAP Report" }, { name: "robots", content: "noindex" }] }),
   component: EditBulletin,
 });
 
