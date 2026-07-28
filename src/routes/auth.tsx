@@ -33,8 +33,6 @@ export const Route = createFileRoute("/auth")({
       { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "https://qap-report.lovable.app/auth" }],
-      { name: "description", content: "Acesse sua conta QAP Report." },
-    ],
   }),
   component: AuthPage,
 });
