@@ -682,7 +682,7 @@ function MonitoringPanel() {
               <CardContent className="space-y-2 p-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className={`rounded px-2 py-0.5 text-xs font-medium ${severityColor(row.severity)}`}>
-                    {row.severity.toUpperCase()}
+                    {severityLabel(row.severity)}
                   </span>
                   <Badge variant="outline">{categoryLabel(row.category)}</Badge>
                   {row.resolved && <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">Resolvido</Badge>}
@@ -694,16 +694,17 @@ function MonitoringPanel() {
                 {row.route && <p className="text-xs text-muted-foreground">Rota: {row.route}</p>}
                 {row.stack && (
                   <details className="text-xs">
-                    <summary className="cursor-pointer text-muted-foreground">Stack trace</summary>
+                    <summary className="cursor-pointer text-muted-foreground">Rastreamento técnico</summary>
                     <pre className="mt-2 max-h-64 overflow-auto rounded bg-muted p-2 text-[11px]">{row.stack}</pre>
                   </details>
                 )}
                 {row.metadata && Object.keys(row.metadata as object).length > 0 && (
                   <details className="text-xs">
-                    <summary className="cursor-pointer text-muted-foreground">Metadata</summary>
+                    <summary className="cursor-pointer text-muted-foreground">Dados adicionais</summary>
                     <pre className="mt-2 overflow-auto rounded bg-muted p-2 text-[11px]">{JSON.stringify(row.metadata, null, 2)}</pre>
                   </details>
                 )}
+
                 <div className="flex justify-end">
                   <Button
                     size="sm"
