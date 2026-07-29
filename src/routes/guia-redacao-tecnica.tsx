@@ -303,6 +303,19 @@ function GuidePage() {
                 </ul>
               </div>
 
+              <div className="rounded-2xl border bg-card p-5 shadow-sm">
+                <h3 className="font-semibold">Modelos prontos para usar</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Baixe ou copie textos-modelo para roubo, furto, perda, acidente de trânsito, lesão corporal e dano.
+                </p>
+                <Link
+                  to="/modelos-boletim-ocorrencia"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+                >
+                  Ver modelos <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+
               <div className="rounded-2xl border bg-primary p-5 text-primary-foreground shadow-sm">
                 <h3 className="font-semibold">Experimente a QAP Report</h3>
                 <p className="mt-2 text-sm opacity-90">
