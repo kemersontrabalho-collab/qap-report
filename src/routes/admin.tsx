@@ -30,6 +30,7 @@ import {
   adminListCoupons,
   adminCreateCoupon,
   adminToggleCoupon,
+  adminDeleteCoupon,
   adminGrantSubscription,
   adminListPixRequests,
   adminApprovePixRequest,
@@ -442,6 +443,7 @@ function CouponsPanel() {
   const listFn = useServerFn(adminListCoupons);
   const createFn = useServerFn(adminCreateCoupon);
   const toggleFn = useServerFn(adminToggleCoupon);
+  const deleteFn = useServerFn(adminDeleteCoupon);
   const { data, isLoading } = useQuery({ queryKey: ["admin-coupons"], queryFn: () => listFn() });
 
   const [code, setCode] = useState("");
@@ -472,6 +474,15 @@ function CouponsPanel() {
   const toggle = useMutation({
     mutationFn: (v: { id: string; active: boolean }) => toggleFn({ data: v }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-coupons"] }),
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Cupom excluído");
+      qc.invalidateQueries({ queryKey: ["admin-coupons"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   return (
@@ -526,7 +537,22 @@ function CouponsPanel() {
                     {c.expires_at && ` · expira ${new Date(c.expires_at).toLocaleDateString("pt-BR")}`}
                   </p>
                 </div>
-                <Switch checked={c.active} onCheckedChange={(v) => toggle.mutate({ id: c.id, active: v })} />
+                <div className="flex items-center gap-3">
+                  <Switch checked={c.active} onCheckedChange={(v) => toggle.mutate({ id: c.id, active: v })} />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Excluir cupom"
+                    disabled={remove.isPending}
+                    onClick={() => {
+                      if (confirm(`Excluir o cupom "${c.code}"? Esta ação não pode ser desfeita e removerá também o histórico de resgates.`)) {
+                        remove.mutate(c.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

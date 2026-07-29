@@ -220,6 +220,19 @@ export const adminToggleCoupon = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+export const adminDeleteCoupon = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string }) => d)
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    // Remove resgates associados primeiro para não violar a FK
+    const { error: redErr } = await sb.from("coupon_redemptions").delete().eq("coupon_id", data.id);
+    if (redErr) throw new Error(redErr.message);
+    const { error } = await sb.from("coupons").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
 export const adminGrantSubscription = createServerFn({ method: "POST" })
   .inputValidator((d: { userId: string; plan: "premium" | "vitalicio"; months?: number }) => d)
   .handler(async ({ data }) => {
