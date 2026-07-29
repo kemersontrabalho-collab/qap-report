@@ -571,12 +571,21 @@ function severityColor(sev: string): string {
 }
 
 function categoryLabel(cat: string): string {
-  if (cat === "frontend") return "Frontend";
-  if (cat === "server_function") return "Backend";
+  if (cat === "frontend") return "Interface";
+  if (cat === "server_function") return "Servidor";
   if (cat === "security") return "Segurança";
-  if (cat === "performance") return "Performance";
+  if (cat === "performance") return "Desempenho";
   return cat;
 }
+
+function severityLabel(sev: string): string {
+  if (sev === "critical") return "CRÍTICO";
+  if (sev === "error") return "ERRO";
+  if (sev === "warning") return "ALERTA";
+  if (sev === "info") return "INFO";
+  return sev.toUpperCase();
+}
+
 
 function MonitoringPanel() {
   const qc = useQueryClient();
