@@ -443,6 +443,7 @@ function CouponsPanel() {
   const listFn = useServerFn(adminListCoupons);
   const createFn = useServerFn(adminCreateCoupon);
   const toggleFn = useServerFn(adminToggleCoupon);
+  const deleteFn = useServerFn(adminDeleteCoupon);
   const { data, isLoading } = useQuery({ queryKey: ["admin-coupons"], queryFn: () => listFn() });
 
   const [code, setCode] = useState("");
