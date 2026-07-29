@@ -22,6 +22,7 @@ import {
   ArrowLeft,
   Clock,
   Crown,
+  AlertTriangle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/assinar")({
@@ -98,6 +99,36 @@ function AssinarPage() {
             Libere todas as funcionalidades do assistente de redação policial.
           </p>
         </div>
+
+        {(() => {
+          // Aviso destacado quando o trial acabou e ainda não há plano ativo.
+          const endMs = sub?.current_period_end ? new Date(sub.current_period_end).getTime() : null;
+          const trialExpired =
+            !activePlan &&
+            (!sub || sub.plan === "free" || sub.status === "trial") &&
+            endMs !== null &&
+            endMs <= Date.now();
+          if (!trialExpired) return null;
+          return (
+            <section className="rounded-2xl border border-destructive/40 bg-destructive/10 p-5">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+                <div>
+                  <h2 className="text-base font-bold uppercase tracking-wide text-destructive">
+                    Seu tempo de teste ACABOU
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    A criação de boletins e o chat de dúvidas estão bloqueados.
+                    Escolha um plano abaixo ou resgate um código promocional para
+                    reativar todas as funções do QAP Report.
+                  </p>
+                </div>
+              </div>
+            </section>
+          );
+        })()}
+
+
 
 
         {activePlan && (
