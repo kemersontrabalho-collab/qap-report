@@ -235,10 +235,10 @@ function HasCouponStep({
           onClick={onNo}
           className="flex items-center gap-2 rounded-lg border p-4 text-left hover:bg-accent"
         >
-          <CreditCard className="h-5 w-5 text-primary" />
+          <QrCode className="h-5 w-5 text-primary" />
           <div>
-            <p className="font-medium">Não, quero pagar</p>
-            <p className="text-xs text-muted-foreground">Escolha Pix ou cartão</p>
+            <p className="font-medium">Não, quero pagar com Pix</p>
+            <p className="text-xs text-muted-foreground">Liberação após confirmação do comprovante</p>
           </div>
         </button>
       </div>
