@@ -615,10 +615,13 @@ export type Database = {
         Returns: Json
       }
       cancel_pix_payment_request: {
-        Args: { _request_id: string }
+        Args: { _request_id: string; _user_id: string }
         Returns: Json
       }
-      create_pix_payment_request: { Args: { _plan: string }; Returns: Json }
+      create_pix_payment_request: {
+        Args: { _plan: string; _user_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -652,7 +655,10 @@ export type Database = {
           title: string
         }[]
       }
-      redeem_coupon: { Args: { _code: string }; Returns: Json }
+      redeem_coupon: {
+        Args: { _code: string; _user_id: string }
+        Returns: Json
+      }
       reject_pix_payment_request: {
         Args: { _reason?: string; _request_id: string }
         Returns: Json
