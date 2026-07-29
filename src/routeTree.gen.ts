@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ModelosBoletimOcorrenciaRouteImport } from './routes/modelos-boletim-ocorrencia'
 import { Route as GuiaRedacaoTecnicaRouteImport } from './routes/guia-redacao-tecnica'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -33,6 +34,12 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ModelosBoletimOcorrenciaRoute =
+  ModelosBoletimOcorrenciaRouteImport.update({
+    id: '/modelos-boletim-ocorrencia',
+    path: '/modelos-boletim-ocorrencia',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const GuiaRedacaoTecnicaRoute = GuiaRedacaoTecnicaRouteImport.update({
   id: '/guia-redacao-tecnica',
   path: '/guia-redacao-tecnica',
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
+  '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
@@ -109,6 +117,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
+  '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
@@ -125,6 +134,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
+  '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/ai-chat': typeof AuthenticatedAiChatRoute
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/guia-redacao-tecnica'
+    | '/modelos-boletim-ocorrencia'
     | '/reset-password'
     | '/sitemap.xml'
     | '/ai-chat'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/guia-redacao-tecnica'
+    | '/modelos-boletim-ocorrencia'
     | '/reset-password'
     | '/sitemap.xml'
     | '/ai-chat'
@@ -170,6 +182,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/guia-redacao-tecnica'
+    | '/modelos-boletim-ocorrencia'
     | '/reset-password'
     | '/sitemap.xml'
     | '/_authenticated/ai-chat'
@@ -186,6 +199,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   GuiaRedacaoTecnicaRoute: typeof GuiaRedacaoTecnicaRoute
+  ModelosBoletimOcorrenciaRoute: typeof ModelosBoletimOcorrenciaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicLogErrorRoute: typeof ApiPublicLogErrorRoute
@@ -205,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/modelos-boletim-ocorrencia': {
+      id: '/modelos-boletim-ocorrencia'
+      path: '/modelos-boletim-ocorrencia'
+      fullPath: '/modelos-boletim-ocorrencia'
+      preLoaderRoute: typeof ModelosBoletimOcorrenciaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guia-redacao-tecnica': {
@@ -312,6 +333,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   GuiaRedacaoTecnicaRoute: GuiaRedacaoTecnicaRoute,
+  ModelosBoletimOcorrenciaRoute: ModelosBoletimOcorrenciaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicLogErrorRoute: ApiPublicLogErrorRoute,
@@ -319,13 +341,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
