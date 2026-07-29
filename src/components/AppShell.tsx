@@ -41,7 +41,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <img src={logoAsset.url} alt="QAP Report" className="h-8 w-8 object-contain" />
+            <img src={logoAsset.url} alt="QAP Report" width={32} height={32} decoding="async" loading="eager" className="h-8 w-8 object-contain" />
             <span className="font-semibold tracking-tight">QAP Report</span>
           </Link>
 
