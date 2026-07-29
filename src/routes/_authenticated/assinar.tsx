@@ -11,6 +11,9 @@ import {
   redeemCoupon,
 } from "@/lib/subscription.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+
 import {
   Loader2,
   CheckCircle2,
