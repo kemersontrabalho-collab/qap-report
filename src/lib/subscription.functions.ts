@@ -13,7 +13,7 @@ export const getMySubscriptionStatus = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const [subRes, pendingRes] = await Promise.all([
+    const [subRes, pendingRes, premiumRes] = await Promise.all([
       supabase
         .from("subscriptions")
         .select("status, plan, current_period_end, trial_ends_at, payment_method")
@@ -25,11 +25,13 @@ export const getMySubscriptionStatus = createServerFn({ method: "GET" })
         .eq("user_id", userId)
         .eq("status", "aguardando_aprovacao")
         .maybeSingle(),
+      supabase.rpc("is_premium_user", { _user_id: userId }),
     ]);
 
     return {
       subscription: subRes.data ?? null,
       pendingPix: pendingRes.data ?? null,
+      isPremium: !!premiumRes.data,
     };
   });
 
