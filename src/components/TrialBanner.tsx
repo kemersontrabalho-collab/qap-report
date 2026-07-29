@@ -37,14 +37,48 @@ export function TrialBanner() {
   if (!sub) return null;
 
   const endMs = sub.current_period_end ? new Date(sub.current_period_end).getTime() : null;
+  const isPaidPlan = sub.plan !== "free" && sub.plan !== null;
+  const isLifetime = sub.plan === "vitalicio";
+  const hasFutureEnd = !endMs || endMs > now;
 
-  // Plano pago vigente — nada a exibir.
-  if (
-    (sub.status === "active" || sub.plan === "vitalicio") &&
-    sub.plan !== "free" &&
-    (!endMs || endMs > now)
-  ) {
-    return null;
+  // Vitalício: nunca importunar.
+  if (isLifetime) return null;
+
+  // Plano pago vigente (mensal/anual/premium) — só avisar quando estiver perto de vencer (<=7 dias).
+  const isActivePaid =
+    isPaidPlan &&
+    (sub.status === "active" || sub.status === "trialing" || sub.status === "past_due" || sub.status === "canceled") &&
+    hasFutureEnd;
+
+  if (isActivePaid) {
+    const msLeft = endMs ? endMs - now : Infinity;
+    const daysLeft = Math.ceil(msLeft / 86_400_000);
+    // Longe do vencimento → nada a exibir.
+    if (msLeft === Infinity || daysLeft > 7) return null;
+
+    // Perto do vencimento → aviso de renovação (amarelo).
+    return (
+      <div className="mb-4 flex flex-col gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              Seu plano vence em breve
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Restam <span className="font-medium text-foreground">{daysLeft} {daysLeft === 1 ? "dia" : "dias"}</span>. Renove para não perder o acesso.
+            </p>
+          </div>
+        </div>
+        <Link
+          to="/assinar"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          <Crown className="h-4 w-4" />
+          Renovar plano
+        </Link>
+      </div>
+    );
   }
 
   // Trial ainda válido.
@@ -73,18 +107,20 @@ export function TrialBanner() {
     );
   }
 
-  // Trial acabou (ou plano expirado) e ainda não há plano ativo.
+  // Trial acabou (plano free sem período vigente) OU plano pago expirado.
+  const wasPaid = isPaidPlan;
   return (
     <div className="mb-4 flex flex-col gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-start gap-3">
         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-destructive">
-            Seu tempo de teste ACABOU
+            {wasPaid ? "Seu plano expirou" : "Seu tempo de teste ACABOU"}
           </p>
           <p className="text-xs text-muted-foreground">
-            Criação de boletins e chat de dúvidas foram bloqueados. Assine um plano
-            ou resgate um código promocional em Configurações para reativar.
+            {wasPaid
+              ? "Renove seu plano para voltar a criar boletins e usar o chat de dúvidas."
+              : "Criação de boletins e chat de dúvidas foram bloqueados. Assine um plano ou resgate um código promocional em Configurações para reativar."}
           </p>
         </div>
       </div>
@@ -93,7 +129,7 @@ export function TrialBanner() {
         className="inline-flex items-center justify-center gap-2 rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground transition hover:opacity-90"
       >
         <Crown className="h-4 w-4" />
-        Assinar / Cupom
+        {wasPaid ? "Renovar agora" : "Assinar / Cupom"}
       </Link>
     </div>
   );
