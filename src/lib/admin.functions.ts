@@ -90,26 +90,35 @@ export const adminListUsers = createServerFn({ method: "POST" })
         end: (s.current_period_end as string) ?? null,
       });
 
-    let rows = (profiles ?? []).map((p) => {
-      const au = authMap.get(p.id);
-      const banned = !!(au?.banned_until && new Date(au.banned_until).getTime() > Date.now());
-      const sub = subByUser.get(p.id);
-      const lastSignIn = au?.last_sign_in_at ?? null;
-      const inactiveDays = lastSignIn
-        ? Math.floor((Date.now() - new Date(lastSignIn).getTime()) / 86400000)
-        : null;
-      return {
-        id: p.id,
-        email: p.email ?? au?.email ?? "",
-        full_name: p.full_name ?? "",
-        created_at: p.created_at,
-        last_sign_in_at: lastSignIn,
-        blocked: banned,
-        bulletins: countByUser.get(p.id) ?? 0,
-        subscription: sub ?? null,
-        inactive_days: inactiveDays,
-      };
-    });
+    // Purge orphan profiles (users who deleted their auth account) so they
+    // don't linger on the admin list.
+    const orphanIds = (profiles ?? []).filter((p) => !authMap.has(p.id)).map((p) => p.id);
+    if (orphanIds.length > 0) {
+      await sb.from("profiles").delete().in("id", orphanIds);
+    }
+
+    let rows = (profiles ?? [])
+      .filter((p) => authMap.has(p.id))
+      .map((p) => {
+        const au = authMap.get(p.id)!;
+        const banned = !!(au?.banned_until && new Date(au.banned_until).getTime() > Date.now());
+        const sub = subByUser.get(p.id);
+        const lastSignIn = au?.last_sign_in_at ?? null;
+        const inactiveDays = lastSignIn
+          ? Math.floor((Date.now() - new Date(lastSignIn).getTime()) / 86400000)
+          : null;
+        return {
+          id: p.id,
+          email: p.email ?? au?.email ?? "",
+          full_name: p.full_name ?? "",
+          created_at: p.created_at,
+          last_sign_in_at: lastSignIn,
+          blocked: banned,
+          bulletins: countByUser.get(p.id) ?? 0,
+          subscription: sub ?? null,
+          inactive_days: inactiveDays,
+        };
+      });
 
     const q = (data.search ?? "").trim().toLowerCase();
     if (q) rows = rows.filter((r) => r.email.toLowerCase().includes(q) || r.full_name.toLowerCase().includes(q));
