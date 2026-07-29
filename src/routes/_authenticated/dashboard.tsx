@@ -320,6 +320,7 @@ function Dashboard() {
             )}
             <DropdownMenu>
               <DropdownMenuTrigger
+                data-tour="tabs-menu"
                 aria-label="Abrir menu de abas"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-lg border bg-background text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
               >
