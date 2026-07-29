@@ -10,6 +10,7 @@ import { InstallAppButton } from "@/components/InstallAppButton";
 import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
+import { deleteMyAccount } from "@/lib/account.functions";
 
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -44,6 +45,8 @@ function SettingsPage() {
   const [supportMsg, setSupportMsg] = useState("");
   const [sendingSupport, setSendingSupport] = useState(false);
   const sendSupportFn = useServerFn(sendSupportMessage);
+  const deleteAccountFn = useServerFn(deleteMyAccount);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
 
 
@@ -146,14 +149,19 @@ function SettingsPage() {
   async function deleteAccount() {
     if (!confirm("Tem certeza que deseja excluir sua conta? Esta ação é irreversível.")) return;
     if (!confirm("Confirme novamente: todos os seus dados serão apagados.")) return;
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) return;
-    // remove bulletins first (RLS + cascade also handles auth removal on server-side manually)
-    await supabase.from("bulletins").delete().eq("user_id", userData.user.id);
-    await supabase.from("profiles").delete().eq("id", userData.user.id);
-    await supabase.auth.signOut();
-    toast.success("Conta e dados removidos.");
-    navigate({ to: "/", replace: true });
+    setDeletingAccount(true);
+    try {
+      await deleteAccountFn();
+      await qc.cancelQueries();
+      qc.clear();
+      await supabase.auth.signOut();
+      toast.success("Conta e dados removidos.");
+      navigate({ to: "/", replace: true });
+    } catch (err) {
+      toast.error((err as Error).message ?? "Não foi possível excluir a conta.");
+    } finally {
+      setDeletingAccount(false);
+    }
   }
 
   if (loading || !profile) {
@@ -477,9 +485,11 @@ function SettingsPage() {
           </p>
           <button
             onClick={deleteAccount}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:opacity-90"
+            disabled={deletingAccount}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:opacity-90 disabled:opacity-60"
           >
-            <Trash2 className="h-4 w-4" /> Excluir minha conta
+            {deletingAccount ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            {deletingAccount ? "Excluindo..." : "Excluir minha conta"}
           </button>
         </section>
 
