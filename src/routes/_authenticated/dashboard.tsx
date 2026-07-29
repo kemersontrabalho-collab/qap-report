@@ -229,12 +229,14 @@ function Dashboard() {
 
   return (
     <AppShell>
+      <TrialBanner />
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Painel</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Selecione um tipo de boletim para criar, ou gerencie os existentes.
         </p>
       </div>
+
 
       <section className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {BULLETIN_TYPES.map((t) => (
