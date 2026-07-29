@@ -32,6 +32,12 @@ import {
   adminToggleCoupon,
   adminGrantSubscription,
 } from "@/lib/admin.functions";
+import {
+  adminListErrorLogs,
+  adminGetErrorStats,
+  adminResolveErrorLog,
+  adminClearResolvedLogs,
+} from "@/lib/monitoring.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,7 +55,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift } from "lucide-react";
+import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift, AlertTriangle, CheckCircle2, RefreshCcw } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -162,13 +168,15 @@ function DashboardView() {
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Tabs defaultValue="stats">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="stats">Dashboard</TabsTrigger>
+            <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
             <TabsTrigger value="users">Usuários</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="coupons">Cupons</TabsTrigger>
           </TabsList>
           <TabsContent value="stats" className="mt-6"><StatsPanel /></TabsContent>
+          <TabsContent value="monitoring" className="mt-6"><MonitoringPanel /></TabsContent>
           <TabsContent value="users" className="mt-6"><UsersPanel /></TabsContent>
           <TabsContent value="notifications" className="mt-6"><NotifPanel /></TabsContent>
           <TabsContent value="coupons" className="mt-6"><CouponsPanel /></TabsContent>
@@ -177,6 +185,7 @@ function DashboardView() {
     </div>
   );
 }
+
 
 function StatsPanel() {
   const fn = useServerFn(adminGetStats);
