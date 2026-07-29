@@ -14,7 +14,17 @@ import {
   Plus,
   StarOff,
   RotateCcw,
+  Menu,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 
 type Bulletin = {
   id: string;
