@@ -644,10 +644,10 @@ function MonitoringPanel() {
           <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas categorias</SelectItem>
-            <SelectItem value="frontend">Frontend</SelectItem>
-            <SelectItem value="server_function">Backend</SelectItem>
+            <SelectItem value="frontend">Interface</SelectItem>
+            <SelectItem value="server_function">Servidor</SelectItem>
             <SelectItem value="security">Segurança</SelectItem>
-            <SelectItem value="performance">Performance</SelectItem>
+            <SelectItem value="performance">Desempenho</SelectItem>
           </SelectContent>
         </Select>
         <Select value={severity} onValueChange={(v) => setSeverity(v as typeof severity)}>
@@ -657,7 +657,8 @@ function MonitoringPanel() {
             <SelectItem value="critical">Crítico</SelectItem>
             <SelectItem value="error">Erro</SelectItem>
             <SelectItem value="warning">Alerta</SelectItem>
-            <SelectItem value="info">Info</SelectItem>
+            <SelectItem value="info">Informação</SelectItem>
+
           </SelectContent>
         </Select>
         <div className="flex items-center gap-2 rounded-md border px-3 py-2">
