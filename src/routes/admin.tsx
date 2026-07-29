@@ -537,7 +537,22 @@ function CouponsPanel() {
                     {c.expires_at && ` · expira ${new Date(c.expires_at).toLocaleDateString("pt-BR")}`}
                   </p>
                 </div>
-                <Switch checked={c.active} onCheckedChange={(v) => toggle.mutate({ id: c.id, active: v })} />
+                <div className="flex items-center gap-3">
+                  <Switch checked={c.active} onCheckedChange={(v) => toggle.mutate({ id: c.id, active: v })} />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Excluir cupom"
+                    disabled={remove.isPending}
+                    onClick={() => {
+                      if (confirm(`Excluir o cupom "${c.code}"? Esta ação não pode ser desfeita e removerá também o histórico de resgates.`)) {
+                        remove.mutate(c.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
