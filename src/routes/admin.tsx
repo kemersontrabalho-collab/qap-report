@@ -171,16 +171,18 @@ function DashboardView() {
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Tabs defaultValue="stats">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6">
             <TabsTrigger value="stats">Dashboard</TabsTrigger>
             <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
             <TabsTrigger value="users">Usuários</TabsTrigger>
+            <TabsTrigger value="pix">Pagamentos Pix</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="coupons">Cupons</TabsTrigger>
           </TabsList>
           <TabsContent value="stats" className="mt-6"><StatsPanel /></TabsContent>
           <TabsContent value="monitoring" className="mt-6"><MonitoringPanel /></TabsContent>
           <TabsContent value="users" className="mt-6"><UsersPanel /></TabsContent>
+          <TabsContent value="pix" className="mt-6"><PixPanel /></TabsContent>
           <TabsContent value="notifications" className="mt-6"><NotifPanel /></TabsContent>
           <TabsContent value="coupons" className="mt-6"><CouponsPanel /></TabsContent>
         </Tabs>
