@@ -282,8 +282,7 @@ Diante do exposto, lavrou-se o presente Boletim de Acidente de Trânsito (BOAT) 
       "Ocorrência de violência doméstica, briga ou acidente de trabalho fora da empresa.",
     ],
     dados: [
-      "Identificação da vítima e do suposto autor, quando conhecido.
-",
+      "Identificação da vítima e do suposto autor, quando conhecido.",
       "Descrição das lesões e parte do corpo atingida.",
       "Circunstâncias da agressão ou acidente.",
       "Uso de arma branca ou arma de fogo, se houver.",
