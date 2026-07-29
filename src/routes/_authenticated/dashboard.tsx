@@ -351,10 +351,7 @@ function Dashboard() {
 
 
         <ul className="divide-y">
-          {isLoading && (
-            <li className="p-8 text-center text-sm text-muted-foreground">Carregando...</li>
-          )}
-          {!isLoading && filtered.length === 0 && (
+          {filtered.length === 0 && (
             <li className="p-10 text-center">
               <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
               <p className="mt-3 text-sm text-muted-foreground">Nenhum boletim aqui ainda.</p>
