@@ -42,6 +42,18 @@ type Bulletin = {
 
 type Tab = "drafts" | "done" | "favorites" | "trash";
 
+const bulletinsQueryOptions = queryOptions({
+  queryKey: ["bulletins"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("bulletins")
+      .select("*")
+      .order("updated_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as Bulletin[];
+  },
+});
+
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
@@ -58,27 +70,44 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(bulletinsQueryOptions),
+  pendingComponent: DashboardSkeleton,
+  errorComponent: ({ error, reset }) => (
+    <AppShell>
+      <div role="alert" className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6">
+        <h2 className="text-lg font-semibold text-destructive">Não foi possível carregar seus boletins</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{error instanceof Error ? error.message : "Erro desconhecido"}</p>
+        <button onClick={reset} className="mt-4 rounded-lg border px-3 py-1.5 text-sm hover:bg-accent">
+          Tentar novamente
+        </button>
+      </div>
+    </AppShell>
+  ),
   component: Dashboard,
 });
 
-function useBulletins() {
-  return useQuery({
-    queryKey: ["bulletins"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bulletins")
-        .select("*")
-        .order("updated_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as Bulletin[];
-    },
-  });
+function DashboardSkeleton() {
+  return (
+    <AppShell>
+      <div className="mb-6 space-y-2">
+        <div className="h-8 w-40 animate-pulse rounded bg-muted" />
+        <div className="h-4 w-72 animate-pulse rounded bg-muted" />
+      </div>
+      <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-28 animate-pulse rounded-2xl border bg-card" />
+        ))}
+      </div>
+      <div className="h-96 animate-pulse rounded-2xl border bg-card" />
+    </AppShell>
+  );
 }
 
 function Dashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { data: bulletins = [], isLoading } = useBulletins();
+  const { data: bulletins } = useSuspenseQuery(bulletinsQueryOptions);
+
   const [tab, setTab] = useState<Tab>("drafts");
   const [search, setSearch] = useState("");
   const [creatingType, setCreatingType] = useState<string | null>(null);
