@@ -15,9 +15,29 @@ const bodySchema = z.object({
   message: z.string().min(1).max(4000),
   stack: z.string().max(8000).optional(),
   route: z.string().max(512).optional(),
-  userId: z.string().uuid().optional().nullable(),
   metadata: z.record(z.unknown()).optional(),
 });
+
+async function resolveUserIdFromBearer(request: Request): Promise<string | null> {
+  const auth = request.headers.get("authorization") ?? request.headers.get("Authorization");
+  if (!auth || !auth.toLowerCase().startsWith("bearer ")) return null;
+  const token = auth.slice(7).trim();
+  if (!token) return null;
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (!url || !key) return null;
+    const client = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
+    });
+    const { data, error } = await client.auth.getUser(token);
+    if (error || !data.user) return null;
+    return data.user.id;
+  } catch {
+    return null;
+  }
+}
 
 export const Route = createFileRoute("/api/public/log-error")({
   server: {
@@ -33,17 +53,21 @@ export const Route = createFileRoute("/api/public/log-error")({
               headers: { "Content-Type": "application/json", ...CORS },
             });
           }
+          // Nunca confiar em userId enviado pelo cliente. Só grava o dono
+          // quando a requisição carrega um bearer Supabase válido.
+          const userId = await resolveUserIdFromBearer(request);
           await logError({
             category: parsed.data.category,
             severity: parsed.data.severity,
             message: parsed.data.message,
             stack: parsed.data.stack ?? null,
             route: parsed.data.route ?? null,
-            userId: parsed.data.userId ?? null,
+            userId,
             metadata: parsed.data.metadata ?? {},
             userAgent: getRequestHeader("user-agent") ?? null,
             ip: getRequestIP({ xForwardedFor: true }) ?? null,
           });
+
           return new Response(JSON.stringify({ ok: true }), {
             status: 200,
             headers: { "Content-Type": "application/json", ...CORS },
