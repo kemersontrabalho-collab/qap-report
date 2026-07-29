@@ -22,6 +22,7 @@ import {
   ArrowLeft,
   Clock,
   Crown,
+  AlertTriangle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/assinar")({
