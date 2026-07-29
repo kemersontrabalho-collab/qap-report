@@ -18,7 +18,10 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:url", content: "https://qap-report.lovable.app/" },
     ],
-    links: [{ rel: "canonical", href: "https://qap-report.lovable.app/" }],
+    links: [
+      { rel: "canonical", href: "https://qap-report.lovable.app/" },
+      { rel: "preload", as: "image", href: logoAsset.url, fetchpriority: "high" },
+    ],
     scripts: [
       {
         type: "application/ld+json",
@@ -72,7 +75,15 @@ function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
-          <img src={logoAsset.url} alt="QAP Report" className="h-10 w-10 object-contain" />
+          <img
+            src={logoAsset.url}
+            alt="QAP Report"
+            width={40}
+            height={40}
+            fetchPriority="high"
+            decoding="async"
+            className="h-10 w-10 object-contain"
+          />
           <span className="text-lg font-semibold tracking-tight">QAP Report</span>
         </div>
         <nav className="flex items-center gap-3">
