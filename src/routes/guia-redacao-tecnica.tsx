@@ -109,6 +109,12 @@ function GuidePage() {
             Guia
           </Link>
           <Link
+            to="/modelos-boletim-ocorrencia"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Modelos
+          </Link>
+          <Link
             to="/auth"
             className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
           >
@@ -349,6 +355,9 @@ function GuidePage() {
             </Link>
             <Link to="/guia-redacao-tecnica" className="hover:text-foreground">
               Guia de redação
+            </Link>
+            <Link to="/modelos-boletim-ocorrencia" className="hover:text-foreground">
+              Modelos de boletim
             </Link>
             <Link to="/auth" className="hover:text-foreground">
               Entrar

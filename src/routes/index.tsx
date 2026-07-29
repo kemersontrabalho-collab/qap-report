@@ -83,6 +83,12 @@ function Landing() {
             Guia
           </Link>
           <Link
+            to="/modelos-boletim-ocorrencia"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Modelos
+          </Link>
+          <Link
             to="/auth"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
@@ -186,6 +192,9 @@ function Landing() {
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <Link to="/guia-redacao-tecnica" className="hover:text-foreground">
               Guia de redação técnica
+            </Link>
+            <Link to="/modelos-boletim-ocorrencia" className="hover:text-foreground">
+              Modelos de boletim
             </Link>
             <Link to="/auth" className="hover:text-foreground">
               Entrar
