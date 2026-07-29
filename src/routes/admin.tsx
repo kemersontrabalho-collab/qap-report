@@ -61,7 +61,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Painel Administrativo — QAP Report" },
-      { name: "description", content: "Painel de administração do QAP Report." },
+      { name: "description", content: "Painel administrativo interno do QAP Report para gestão de usuários, cupons, notificações e monitoramento da plataforma." },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
