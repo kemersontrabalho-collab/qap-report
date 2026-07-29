@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "https://qap-report.lovable.app/" },
-      { rel: "preload", as: "image", href: logoAsset.url, fetchpriority: "high" },
+      { rel: "preload", as: "image", href: logoAsset.url, type: "image/webp", fetchpriority: "high" },
     ],
     scripts: [
       {
