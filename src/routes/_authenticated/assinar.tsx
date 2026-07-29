@@ -49,7 +49,7 @@ const PLANS = {
 type PlanId = keyof typeof PLANS;
 
 // ============================================================
-type Step = "plans" | "hasCoupon" | "coupon" | "paymentMethod" | "pix";
+type Step = "plans" | "hasCoupon" | "coupon" | "pix";
 
 function AssinarPage() {
   const qc = useQueryClient();
