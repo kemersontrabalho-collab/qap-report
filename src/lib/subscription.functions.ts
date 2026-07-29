@@ -43,8 +43,9 @@ export const createPixRequest = createServerFn({ method: "POST" })
     plan: planSchema.parse(data.plan),
   }))
   .handler(async ({ context, data }) => {
-    const { supabase, userId } = context;
-    const { data: result, error } = await supabase.rpc("create_pix_payment_request", {
+    const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: result, error } = await supabaseAdmin.rpc("create_pix_payment_request", {
       _user_id: userId,
       _plan: data.plan,
     });
@@ -66,13 +67,16 @@ export const cancelPixRequest = createServerFn({ method: "POST" })
     z.object({ requestId: z.string().uuid() }).parse(data),
   )
   .handler(async ({ context, data }) => {
-    const { supabase } = context;
-    const { error } = await supabase.rpc("cancel_pix_payment_request", {
+    const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.rpc("cancel_pix_payment_request", {
+      _user_id: userId,
       _request_id: data.requestId,
     });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
 
 /**
  * Resgata um código promocional (cupom/gift card).
