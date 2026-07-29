@@ -139,10 +139,29 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
   const [i, setI] = useState(0);
   const navigate = useNavigate();
   const lastRoute = useRef<string | undefined>(undefined);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [cardSize, setCardSize] = useState<{ w: number; h: number }>({ w: getCardWidth(), h: 220 });
+  const [vp, setVp] = useState<{ w: number; h: number }>(() => ({
+    w: typeof window !== "undefined" ? window.innerWidth : 360,
+    h: typeof window !== "undefined" ? window.innerHeight : 640,
+  }));
 
   useEffect(() => {
     if (open) setI(0);
   }, [open]);
+
+  useEffect(() => {
+    const onResize = () => {
+      setVp({ w: window.innerWidth, h: window.innerHeight });
+      setCardSize((s) => ({ ...s, w: getCardWidth() }));
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
+  }, []);
 
   const step = STEPS[i];
 
@@ -156,8 +175,20 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
 
   const rect = useElementRect(open ? step?.target : undefined, [open, i, step?.target, step?.route]);
 
+  // Measure real card size after render to position accurately on any screen
+  useLayoutEffect(() => {
+    if (!open) return;
+    const el = cardRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (Math.abs(r.width - cardSize.w) > 1 || Math.abs(r.height - cardSize.h) > 1) {
+      setCardSize({ w: r.width, h: r.height });
+    }
+  }, [open, i, rect, vp.w, vp.h, cardSize.h, cardSize.w]);
+
   if (!open || !step) return null;
   const last = i === STEPS.length - 1;
+  const isMobile = vp.w < 480;
 
   // Compute spotlight box
   const spot = rect
@@ -169,20 +200,27 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
       }
     : null;
 
-  // Card position: below the target if room, else above; else centered
+  // Card position: on mobile, dock to bottom / top away from spot; on desktop, near target
   let cardStyle: React.CSSProperties = {
     left: "50%",
     top: "50%",
     transform: "translate(-50%, -50%)",
   };
-  if (spot) {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+  const CARD_W = cardSize.w;
+  const CARD_H = cardSize.h;
+
+  if (isMobile) {
+    // Bottom sheet by default, unless spotlight is in bottom half → dock to top
+    const dockTop = spot && spot.top + spot.height / 2 > vp.h / 2;
+    const top = dockTop ? MARGIN : vp.h - CARD_H - MARGIN;
+    const left = Math.max(MARGIN, (vp.w - CARD_W) / 2);
+    cardStyle = { top, left, transform: "none" };
+  } else if (spot) {
     const below = spot.top + spot.height + 12;
-    const above = spot.top - CARD_H_APPROX - 12;
-    const useBelow = below + CARD_H_APPROX < vh - 12 || above < 12;
+    const above = spot.top - CARD_H - 12;
+    const useBelow = below + CARD_H < vp.h - 12 || above < 12;
     const top = useBelow ? below : Math.max(above, 12);
-    const left = Math.min(Math.max(spot.left + spot.width / 2 - CARD_W / 2, 12), vw - CARD_W - 12);
+    const left = Math.min(Math.max(spot.left + spot.width / 2 - CARD_W / 2, 12), vp.w - CARD_W - 12);
     cardStyle = { top, left, transform: "none" };
   }
 
@@ -212,14 +250,15 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
 
       {/* Floating card */}
       <div
-        className="pointer-events-auto absolute w-[320px] max-w-[calc(100vw-24px)] animate-fade-in rounded-2xl border bg-card p-5 shadow-2xl"
-        style={cardStyle}
+        ref={cardRef}
+        className="pointer-events-auto absolute animate-fade-in rounded-2xl border bg-card p-4 shadow-2xl sm:p-5"
+        style={{ ...cardStyle, width: CARD_W, maxHeight: `calc(100dvh - ${MARGIN * 2}px)`, overflowY: "auto" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
-            Passo {i + 1} de {STEPS.length}
+        <div className="flex items-center justify-between gap-2">
+          <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-primary">
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">Passo {i + 1} de {STEPS.length}</span>
           </span>
           <button
             onClick={onClose}
