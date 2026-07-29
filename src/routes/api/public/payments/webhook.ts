@@ -58,17 +58,19 @@ async function handleSubscriptionCreatedOrUpdated(data: any, env: PaddleEnv) {
         plan,
         current_period_start: currentBillingPeriod?.startsAt,
         current_period_end: currentBillingPeriod?.endsAt,
-        canceled_at: scheduledChange?.action === "cancel" ? new Date().toISOString() : null,
+        canceled_at:
+          scheduledChange?.action === "cancel" ? new Date().toISOString() : null,
         payment_method: "card",
         external_id: id,
         paddle_subscription_id: id,
         paddle_customer_id: customerId,
         environment: env,
         updated_at: new Date().toISOString(),
-      },
+      } as any,
       { onConflict: "user_id" },
     );
 }
+
 
 async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
   // mantém current_period_end para grace period; is_premium_user cobre status='canceled'
