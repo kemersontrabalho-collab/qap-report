@@ -12,6 +12,17 @@ export const adminLogin = createServerFn({ method: "POST" })
     const userOk = equalsCT(data.username ?? "", expectedUser);
     const passOk = equalsCT(data.password ?? "", expectedPass);
     if (!userOk || !passOk) {
+      const { logError } = await import("./monitoring.server");
+      const { getRequestIP, getRequestHeader } = await import("@tanstack/react-start/server");
+      await logError({
+        category: "security",
+        severity: "warning",
+        message: "Tentativa de login administrativo falhou",
+        route: "/admin",
+        metadata: { usernameAttempt: (data.username ?? "").slice(0, 120) },
+        userAgent: getRequestHeader("user-agent") ?? null,
+        ip: getRequestIP({ xForwardedFor: true }) ?? null,
+      });
       return { ok: false as const, error: "Usuário ou senha incorretos" };
     }
     const session = await getAdminSession();
