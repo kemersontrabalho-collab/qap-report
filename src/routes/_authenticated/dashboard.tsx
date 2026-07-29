@@ -268,7 +268,7 @@ function Dashboard() {
       </div>
 
 
-      <section className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section data-tour="bulletin-types" className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {BULLETIN_TYPES.map((t) => (
           <button
             key={t.code}
