@@ -75,8 +75,12 @@ const STEPS: Step[] = [
 ];
 
 const PADDING = 8;
-const CARD_W = 320;
-const CARD_H_APPROX = 220;
+const MARGIN = 12;
+
+function getCardWidth() {
+  if (typeof window === "undefined") return 320;
+  return Math.min(340, window.innerWidth - MARGIN * 2);
+}
 
 function pickVisible(selector: string): HTMLElement | null {
   const nodes = Array.from(document.querySelectorAll(selector)) as HTMLElement[];
@@ -135,10 +139,29 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
   const [i, setI] = useState(0);
   const navigate = useNavigate();
   const lastRoute = useRef<string | undefined>(undefined);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [cardSize, setCardSize] = useState<{ w: number; h: number }>({ w: getCardWidth(), h: 220 });
+  const [vp, setVp] = useState<{ w: number; h: number }>(() => ({
+    w: typeof window !== "undefined" ? window.innerWidth : 360,
+    h: typeof window !== "undefined" ? window.innerHeight : 640,
+  }));
 
   useEffect(() => {
     if (open) setI(0);
   }, [open]);
+
+  useEffect(() => {
+    const onResize = () => {
+      setVp({ w: window.innerWidth, h: window.innerHeight });
+      setCardSize((s) => ({ ...s, w: getCardWidth() }));
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
+  }, []);
 
   const step = STEPS[i];
 
@@ -152,8 +175,20 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
 
   const rect = useElementRect(open ? step?.target : undefined, [open, i, step?.target, step?.route]);
 
+  // Measure real card size after render to position accurately on any screen
+  useLayoutEffect(() => {
+    if (!open) return;
+    const el = cardRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (Math.abs(r.width - cardSize.w) > 1 || Math.abs(r.height - cardSize.h) > 1) {
+      setCardSize({ w: r.width, h: r.height });
+    }
+  }, [open, i, rect, vp.w, vp.h, cardSize.h, cardSize.w]);
+
   if (!open || !step) return null;
   const last = i === STEPS.length - 1;
+  const isMobile = vp.w < 480;
 
   // Compute spotlight box
   const spot = rect
@@ -165,20 +200,27 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
       }
     : null;
 
-  // Card position: below the target if room, else above; else centered
+  // Card position: on mobile, dock to bottom / top away from spot; on desktop, near target
   let cardStyle: React.CSSProperties = {
     left: "50%",
     top: "50%",
     transform: "translate(-50%, -50%)",
   };
-  if (spot) {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+  const CARD_W = cardSize.w;
+  const CARD_H = cardSize.h;
+
+  if (isMobile) {
+    // Bottom sheet by default, unless spotlight is in bottom half → dock to top
+    const dockTop = spot && spot.top + spot.height / 2 > vp.h / 2;
+    const top = dockTop ? MARGIN : vp.h - CARD_H - MARGIN;
+    const left = Math.max(MARGIN, (vp.w - CARD_W) / 2);
+    cardStyle = { top, left, transform: "none" };
+  } else if (spot) {
     const below = spot.top + spot.height + 12;
-    const above = spot.top - CARD_H_APPROX - 12;
-    const useBelow = below + CARD_H_APPROX < vh - 12 || above < 12;
+    const above = spot.top - CARD_H - 12;
+    const useBelow = below + CARD_H < vp.h - 12 || above < 12;
     const top = useBelow ? below : Math.max(above, 12);
-    const left = Math.min(Math.max(spot.left + spot.width / 2 - CARD_W / 2, 12), vw - CARD_W - 12);
+    const left = Math.min(Math.max(spot.left + spot.width / 2 - CARD_W / 2, 12), vp.w - CARD_W - 12);
     cardStyle = { top, left, transform: "none" };
   }
 
@@ -208,14 +250,15 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
 
       {/* Floating card */}
       <div
-        className="pointer-events-auto absolute w-[320px] max-w-[calc(100vw-24px)] animate-fade-in rounded-2xl border bg-card p-5 shadow-2xl"
-        style={cardStyle}
+        ref={cardRef}
+        className="pointer-events-auto absolute animate-fade-in rounded-2xl border bg-card p-4 shadow-2xl sm:p-5"
+        style={{ ...cardStyle, width: CARD_W, maxHeight: `calc(100dvh - ${MARGIN * 2}px)`, overflowY: "auto" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
-            Passo {i + 1} de {STEPS.length}
+        <div className="flex items-center justify-between gap-2">
+          <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-primary">
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">Passo {i + 1} de {STEPS.length}</span>
           </span>
           <button
             onClick={onClose}
@@ -225,44 +268,46 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
             <X className="h-4 w-4" />
           </button>
         </div>
-        <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+        <h3 className="mt-2 text-base font-semibold sm:text-lg">{step.title}</h3>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground sm:text-sm">{step.body}</p>
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-accent">
           <div
             className="h-full bg-primary transition-all duration-300"
             style={{ width: `${((i + 1) / STEPS.length) * 100}%` }}
           />
         </div>
-        <div className="mt-4 flex items-center justify-between gap-2">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
           <button
             onClick={() => setI((v) => Math.max(0, v - 1))}
             disabled={i === 0}
-            className="inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm hover:bg-accent disabled:opacity-40"
+            className="inline-flex shrink-0 items-center gap-1 rounded-lg border px-2.5 py-2 text-xs hover:bg-accent disabled:opacity-40 sm:px-3 sm:text-sm"
           >
-            <ChevronLeft className="h-4 w-4" /> Anterior
+            <ChevronLeft className="h-4 w-4" />
+            <span className="hidden xs:inline sm:inline">Anterior</span>
           </button>
           <button
             onClick={onClose}
-            className="text-xs text-muted-foreground hover:underline"
+            className="shrink-0 text-xs text-muted-foreground hover:underline"
           >
             Pular
           </button>
           {last ? (
             <button
               onClick={onClose}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className="shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 sm:px-4 sm:text-sm"
             >
               Concluir
             </button>
           ) : (
             <button
               onClick={() => setI((v) => Math.min(STEPS.length - 1, v + 1))}
-              className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-primary px-2.5 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 sm:px-3 sm:text-sm"
             >
               Próximo <ChevronRight className="h-4 w-4" />
             </button>
           )}
         </div>
+
       </div>
     </div>
   );
