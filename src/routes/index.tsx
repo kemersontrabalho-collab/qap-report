@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Feather, Search, Moon, Sparkles } from "lucide-react";
-import logoAsset from "@/assets/qap-report-logo.png.asset.json";
+import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "https://qap-report.lovable.app/" },
-      { rel: "preload", as: "image", href: logoAsset.url, fetchpriority: "high" },
+      { rel: "preload", as: "image", href: logoAsset.url, type: "image/webp", fetchpriority: "high" },
     ],
     scripts: [
       {

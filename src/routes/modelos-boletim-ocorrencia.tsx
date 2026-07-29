@@ -13,7 +13,7 @@ import {
   Briefcase,
   Download,
 } from "lucide-react";
-import logoAsset from "@/assets/qap-report-logo.png.asset.json";
+import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 import { useState } from "react";
 
 export const Route = createFileRoute("/modelos-boletim-ocorrencia")({
