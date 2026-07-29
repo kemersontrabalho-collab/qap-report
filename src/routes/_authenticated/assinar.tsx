@@ -309,74 +309,8 @@ function CouponStep({ onBack, onRedeemed }: { onBack: () => void; onRedeemed: ()
   );
 }
 
-// ============================================================
-function PaymentMethodStep({
-  plan,
-  onBack,
-  onPickPix,
-}: {
-  plan: PlanId;
-  onBack: () => void;
-  onPickPix: () => void;
-}) {
-  const p = PLANS[plan];
-  const { openCheckout, loading } = usePaddleCheckout();
 
-  async function payWithCard() {
-    try {
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
-      if (!user) {
-        toast.error("Sessão expirada. Faça login novamente.");
-        return;
-      }
-      await openCheckout({
-        priceId: plan === "mensal" ? "qap_mensal" : "qap_anual",
-        customerEmail: user.email ?? undefined,
-        customData: { userId: user.id },
-      });
-    } catch (e: any) {
-      toast.error(e?.message ?? "Não foi possível abrir o checkout.");
-    }
-  }
 
-  return (
-    <section className="rounded-2xl border bg-card p-5">
-      <BackBtn onClick={onBack} />
-      <h2 className="mt-2 text-lg font-semibold">Forma de pagamento</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Plano <strong>{p.label}</strong> — <strong>{p.priceLabel}</strong> {p.cycle}.
-      </p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <button
-          onClick={payWithCard}
-          disabled={loading}
-          className="flex items-start gap-3 rounded-lg border p-4 text-left hover:bg-accent disabled:opacity-60"
-        >
-          <CreditCard className="h-5 w-5 text-primary" />
-          <div>
-            <p className="font-medium">Cartão de crédito/débito</p>
-            <p className="text-xs text-muted-foreground">
-              Ativação automática — renova {plan === "mensal" ? "mensalmente" : "anualmente"}.
-            </p>
-          </div>
-        </button>
-        <button
-          onClick={onPickPix}
-          className="flex items-start gap-3 rounded-lg border p-4 text-left hover:bg-accent"
-        >
-          <QrCode className="h-5 w-5 text-primary" />
-          <div>
-            <p className="font-medium">Pix</p>
-            <p className="text-xs text-muted-foreground">
-              Chave aleatória Mercado Pago. Liberação após confirmação do comprovante.
-            </p>
-          </div>
-        </button>
-      </div>
-    </section>
-  );
-}
 
 
 // ============================================================
