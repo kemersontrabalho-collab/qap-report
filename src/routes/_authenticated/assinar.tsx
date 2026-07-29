@@ -137,7 +137,7 @@ function AssinarPage() {
           <HasCouponStep
             onBack={() => setStep("plans")}
             onYes={() => setStep("coupon")}
-            onNo={() => setStep("paymentMethod")}
+            onNo={() => setStep("pix")}
           />
         )}
 
@@ -151,18 +151,10 @@ function AssinarPage() {
           />
         )}
 
-        {step === "paymentMethod" && (
-          <PaymentMethodStep
-            plan={plan}
-            onBack={() => setStep("hasCoupon")}
-            onPickPix={() => setStep("pix")}
-          />
-        )}
-
         {step === "pix" && (
           <PixStep
             plan={plan}
-            onBack={() => setStep("paymentMethod")}
+            onBack={() => setStep("hasCoupon")}
             onDone={() => {
               qc.invalidateQueries({ queryKey: ["my-subscription"] });
               setStep("plans");
