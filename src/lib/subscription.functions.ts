@@ -95,10 +95,13 @@ export const redeemCoupon = createServerFn({ method: "POST" })
     return { code: cleaned };
   })
   .handler(async ({ context, data }) => {
-    const { supabase } = context;
-    const { data: result, error } = await supabase.rpc("redeem_coupon", {
+    const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: result, error } = await supabaseAdmin.rpc("redeem_coupon", {
+      _user_id: userId,
       _code: data.code,
     });
+
     if (error) throw new Error(error.message);
     return result as {
       ok: boolean;
