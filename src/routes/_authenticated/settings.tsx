@@ -178,6 +178,21 @@ function SettingsPage() {
 
 
 
+        <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
+          <h2 className="flex items-center gap-2 font-semibold"><Crown className="h-4 w-4 text-primary" /> Assinatura</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Ative seu plano mensal ou anual, resgate um código promocional ou envie comprovante de Pix.
+          </p>
+          <Link
+            to="/assinar"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
+            <Crown className="h-4 w-4" /> Gerenciar assinatura
+          </Link>
+        </section>
+
+
+
 
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Aparência</h2>
