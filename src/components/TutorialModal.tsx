@@ -75,8 +75,12 @@ const STEPS: Step[] = [
 ];
 
 const PADDING = 8;
-const CARD_W = 320;
-const CARD_H_APPROX = 220;
+const MARGIN = 12;
+
+function getCardWidth() {
+  if (typeof window === "undefined") return 320;
+  return Math.min(340, window.innerWidth - MARGIN * 2);
+}
 
 function pickVisible(selector: string): HTMLElement | null {
   const nodes = Array.from(document.querySelectorAll(selector)) as HTMLElement[];
