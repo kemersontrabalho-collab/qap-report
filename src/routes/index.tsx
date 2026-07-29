@@ -118,12 +118,6 @@ function Landing() {
             Guia
           </Link>
           <Link
-            to="/modelos-boletim-ocorrencia"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Modelos
-          </Link>
-          <Link
             to="/auth"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
