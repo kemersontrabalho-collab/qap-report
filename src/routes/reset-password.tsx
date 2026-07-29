@@ -9,9 +9,9 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       { title: "Nova senha · QAP Report" },
-      { name: "description", content: "Defina uma nova senha para sua conta QAP Report." },
+      { name: "description", content: "Portal seguro para recuperar o acesso à sua conta QAP Report e definir uma nova senha com validação em tempo real." },
       { property: "og:title", content: "Nova senha · QAP Report" },
-      { property: "og:description", content: "Defina uma nova senha para sua conta QAP Report." },
+      { property: "og:description", content: "Portal seguro para recuperar o acesso à sua conta QAP Report e definir uma nova senha com validação em tempo real." },
       { property: "og:url", content: "https://qap-report.lovable.app/reset-password" },
       { name: "robots", content: "noindex" },
     ],
