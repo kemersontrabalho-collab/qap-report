@@ -11,8 +11,6 @@ import {
   redeemCoupon,
 } from "@/lib/subscription.functions";
 import { supabase } from "@/integrations/supabase/client";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 import {
   Loader2,
@@ -20,7 +18,6 @@ import {
   Copy,
   Ticket,
   QrCode,
-  CreditCard,
   MessageCircle,
   ArrowLeft,
   Clock,
@@ -52,7 +49,7 @@ const PLANS = {
 type PlanId = keyof typeof PLANS;
 
 // ============================================================
-type Step = "plans" | "hasCoupon" | "coupon" | "paymentMethod" | "pix";
+type Step = "plans" | "hasCoupon" | "coupon" | "pix";
 
 function AssinarPage() {
   const qc = useQueryClient();
@@ -94,7 +91,6 @@ function AssinarPage() {
 
   return (
     <AppShell>
-      <PaymentTestModeBanner />
       <div className="mx-auto max-w-2xl space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Assinatura QAP Report</h1>
@@ -141,7 +137,7 @@ function AssinarPage() {
           <HasCouponStep
             onBack={() => setStep("plans")}
             onYes={() => setStep("coupon")}
-            onNo={() => setStep("paymentMethod")}
+            onNo={() => setStep("pix")}
           />
         )}
 
@@ -155,18 +151,10 @@ function AssinarPage() {
           />
         )}
 
-        {step === "paymentMethod" && (
-          <PaymentMethodStep
-            plan={plan}
-            onBack={() => setStep("hasCoupon")}
-            onPickPix={() => setStep("pix")}
-          />
-        )}
-
         {step === "pix" && (
           <PixStep
             plan={plan}
-            onBack={() => setStep("paymentMethod")}
+            onBack={() => setStep("hasCoupon")}
             onDone={() => {
               qc.invalidateQueries({ queryKey: ["my-subscription"] });
               setStep("plans");
@@ -247,10 +235,10 @@ function HasCouponStep({
           onClick={onNo}
           className="flex items-center gap-2 rounded-lg border p-4 text-left hover:bg-accent"
         >
-          <CreditCard className="h-5 w-5 text-primary" />
+          <QrCode className="h-5 w-5 text-primary" />
           <div>
-            <p className="font-medium">Não, quero pagar</p>
-            <p className="text-xs text-muted-foreground">Escolha Pix ou cartão</p>
+            <p className="font-medium">Não, quero pagar com Pix</p>
+            <p className="text-xs text-muted-foreground">Liberação após confirmação do comprovante</p>
           </div>
         </button>
       </div>
@@ -321,74 +309,8 @@ function CouponStep({ onBack, onRedeemed }: { onBack: () => void; onRedeemed: ()
   );
 }
 
-// ============================================================
-function PaymentMethodStep({
-  plan,
-  onBack,
-  onPickPix,
-}: {
-  plan: PlanId;
-  onBack: () => void;
-  onPickPix: () => void;
-}) {
-  const p = PLANS[plan];
-  const { openCheckout, loading } = usePaddleCheckout();
 
-  async function payWithCard() {
-    try {
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
-      if (!user) {
-        toast.error("Sessão expirada. Faça login novamente.");
-        return;
-      }
-      await openCheckout({
-        priceId: plan === "mensal" ? "qap_mensal" : "qap_anual",
-        customerEmail: user.email ?? undefined,
-        customData: { userId: user.id },
-      });
-    } catch (e: any) {
-      toast.error(e?.message ?? "Não foi possível abrir o checkout.");
-    }
-  }
 
-  return (
-    <section className="rounded-2xl border bg-card p-5">
-      <BackBtn onClick={onBack} />
-      <h2 className="mt-2 text-lg font-semibold">Forma de pagamento</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Plano <strong>{p.label}</strong> — <strong>{p.priceLabel}</strong> {p.cycle}.
-      </p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <button
-          onClick={payWithCard}
-          disabled={loading}
-          className="flex items-start gap-3 rounded-lg border p-4 text-left hover:bg-accent disabled:opacity-60"
-        >
-          <CreditCard className="h-5 w-5 text-primary" />
-          <div>
-            <p className="font-medium">Cartão de crédito/débito</p>
-            <p className="text-xs text-muted-foreground">
-              Ativação automática — renova {plan === "mensal" ? "mensalmente" : "anualmente"}.
-            </p>
-          </div>
-        </button>
-        <button
-          onClick={onPickPix}
-          className="flex items-start gap-3 rounded-lg border p-4 text-left hover:bg-accent"
-        >
-          <QrCode className="h-5 w-5 text-primary" />
-          <div>
-            <p className="font-medium">Pix</p>
-            <p className="text-xs text-muted-foreground">
-              Chave aleatória Mercado Pago. Liberação após confirmação do comprovante.
-            </p>
-          </div>
-        </button>
-      </div>
-    </section>
-  );
-}
 
 
 // ============================================================

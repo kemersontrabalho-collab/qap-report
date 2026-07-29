@@ -24,7 +24,6 @@ import { Route as AuthenticatedAiChatRouteImport } from './routes/_authenticated
 import { Route as ApiPublicLogErrorRouteImport } from './routes/api/public/log-error'
 import { Route as AuthenticatedBulletinsNewRouteImport } from './routes/_authenticated/bulletins.new'
 import { Route as AuthenticatedBulletinsIdRouteImport } from './routes/_authenticated/bulletins.$id'
-import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -103,12 +102,6 @@ const AuthenticatedBulletinsIdRoute =
     path: '/bulletins/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicPaymentsWebhookRoute =
-  ApiPublicPaymentsWebhookRouteImport.update({
-    id: '/api/public/payments/webhook',
-    path: '/api/public/payments/webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -125,7 +118,6 @@ export interface FileRoutesByFullPath {
   '/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/bulletins/new': typeof AuthenticatedBulletinsNewRoute
   '/api/public/log-error': typeof ApiPublicLogErrorRoute
-  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,7 +134,6 @@ export interface FileRoutesByTo {
   '/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/bulletins/new': typeof AuthenticatedBulletinsNewRoute
   '/api/public/log-error': typeof ApiPublicLogErrorRoute
-  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,7 +152,6 @@ export interface FileRoutesById {
   '/_authenticated/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/_authenticated/bulletins/new': typeof AuthenticatedBulletinsNewRoute
   '/api/public/log-error': typeof ApiPublicLogErrorRoute
-  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -180,7 +170,6 @@ export interface FileRouteTypes {
     | '/bulletins/$id'
     | '/bulletins/new'
     | '/api/public/log-error'
-    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -197,7 +186,6 @@ export interface FileRouteTypes {
     | '/bulletins/$id'
     | '/bulletins/new'
     | '/api/public/log-error'
-    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
@@ -215,7 +203,6 @@ export interface FileRouteTypes {
     | '/_authenticated/bulletins/$id'
     | '/_authenticated/bulletins/new'
     | '/api/public/log-error'
-    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -228,7 +215,6 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicLogErrorRoute: typeof ApiPublicLogErrorRoute
-  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -338,13 +324,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBulletinsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/payments/webhook': {
-      id: '/api/public/payments/webhook'
-      path: '/api/public/payments/webhook'
-      fullPath: '/api/public/payments/webhook'
-      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -379,7 +358,6 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicLogErrorRoute: ApiPublicLogErrorRoute,
-  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
