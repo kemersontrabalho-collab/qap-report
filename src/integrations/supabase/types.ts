@@ -289,6 +289,51 @@ export type Database = {
         }
         Relationships: []
       }
+      error_logs: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          ip_hash: string | null
+          message: string
+          metadata: Json
+          resolved: boolean
+          route: string | null
+          severity: string
+          stack: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          message: string
+          metadata?: Json
+          resolved?: boolean
+          route?: string | null
+          severity?: string
+          stack?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          message?: string
+          metadata?: Json
+          resolved?: boolean
+          route?: string | null
+          severity?: string
+          stack?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       notification_reads: {
         Row: {
           notification_id: string
