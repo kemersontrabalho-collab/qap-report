@@ -268,44 +268,46 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
             <X className="h-4 w-4" />
           </button>
         </div>
-        <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+        <h3 className="mt-2 text-base font-semibold sm:text-lg">{step.title}</h3>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground sm:text-sm">{step.body}</p>
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-accent">
           <div
             className="h-full bg-primary transition-all duration-300"
             style={{ width: `${((i + 1) / STEPS.length) * 100}%` }}
           />
         </div>
-        <div className="mt-4 flex items-center justify-between gap-2">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
           <button
             onClick={() => setI((v) => Math.max(0, v - 1))}
             disabled={i === 0}
-            className="inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm hover:bg-accent disabled:opacity-40"
+            className="inline-flex shrink-0 items-center gap-1 rounded-lg border px-2.5 py-2 text-xs hover:bg-accent disabled:opacity-40 sm:px-3 sm:text-sm"
           >
-            <ChevronLeft className="h-4 w-4" /> Anterior
+            <ChevronLeft className="h-4 w-4" />
+            <span className="hidden xs:inline sm:inline">Anterior</span>
           </button>
           <button
             onClick={onClose}
-            className="text-xs text-muted-foreground hover:underline"
+            className="shrink-0 text-xs text-muted-foreground hover:underline"
           >
             Pular
           </button>
           {last ? (
             <button
               onClick={onClose}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className="shrink-0 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 sm:px-4 sm:text-sm"
             >
               Concluir
             </button>
           ) : (
             <button
               onClick={() => setI((v) => Math.min(STEPS.length - 1, v + 1))}
-              className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-primary px-2.5 py-2 text-xs font-medium text-primary-foreground hover:opacity-90 sm:px-3 sm:text-sm"
             >
               Próximo <ChevronRight className="h-4 w-4" />
             </button>
           )}
         </div>
+
       </div>
     </div>
   );
