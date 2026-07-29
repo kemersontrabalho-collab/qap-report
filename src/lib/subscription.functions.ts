@@ -43,10 +43,12 @@ export const createPixRequest = createServerFn({ method: "POST" })
     plan: planSchema.parse(data.plan),
   }))
   .handler(async ({ context, data }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
     const { data: result, error } = await supabase.rpc("create_pix_payment_request", {
+      _user_id: userId,
       _plan: data.plan,
     });
+
     if (error) throw new Error(error.message);
     return result as {
       ok: boolean;
