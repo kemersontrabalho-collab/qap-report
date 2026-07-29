@@ -545,8 +545,11 @@ export type Database = {
           created_at: string
           current_period_end: string
           current_period_start: string
+          environment: string
           external_id: string | null
           id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
           payment_method: string | null
           plan: string
           status: string
@@ -559,8 +562,11 @@ export type Database = {
           created_at?: string
           current_period_end?: string
           current_period_start?: string
+          environment?: string
           external_id?: string | null
           id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           payment_method?: string | null
           plan?: string
           status?: string
@@ -573,8 +579,11 @@ export type Database = {
           created_at?: string
           current_period_end?: string
           current_period_start?: string
+          environment?: string
           external_id?: string | null
           id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           payment_method?: string | null
           plan?: string
           status?: string
