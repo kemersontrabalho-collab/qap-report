@@ -430,19 +430,12 @@ function EditBulletin() {
             </div>
             <div>
               <label className="text-sm font-medium">Categoria *</label>
-              <select
-                value={b.category ?? ""}
-                onChange={(e) => update("category", e.target.value || null)}
-                className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-              >
-                <option value="">Selecione...</option>
-                {categories.map((c) => (
-                  <option key={c.name} value={c.name}>
-                    {c.name}
-                    {b.bulletin_type === "BO-COP" && c.requiresTC ? " (requer TC)" : ""}
-                  </option>
-                ))}
-              </select>
+              <CategorySearch
+                categories={categories}
+                value={b.category}
+                bulletinType={b.bulletin_type}
+                onChange={(v) => update("category", v)}
+              />
               {b.bulletin_type === "BO-COP" &&
                 b.category &&
                 categories.find((c) => c.name === b.category)?.requiresTC && (
