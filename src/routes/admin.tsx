@@ -571,12 +571,21 @@ function severityColor(sev: string): string {
 }
 
 function categoryLabel(cat: string): string {
-  if (cat === "frontend") return "Frontend";
-  if (cat === "server_function") return "Backend";
+  if (cat === "frontend") return "Interface";
+  if (cat === "server_function") return "Servidor";
   if (cat === "security") return "Segurança";
-  if (cat === "performance") return "Performance";
+  if (cat === "performance") return "Desempenho";
   return cat;
 }
+
+function severityLabel(sev: string): string {
+  if (sev === "critical") return "CRÍTICO";
+  if (sev === "error") return "ERRO";
+  if (sev === "warning") return "ALERTA";
+  if (sev === "info") return "INFO";
+  return sev.toUpperCase();
+}
+
 
 function MonitoringPanel() {
   const qc = useQueryClient();
@@ -635,10 +644,10 @@ function MonitoringPanel() {
           <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas categorias</SelectItem>
-            <SelectItem value="frontend">Frontend</SelectItem>
-            <SelectItem value="server_function">Backend</SelectItem>
+            <SelectItem value="frontend">Interface</SelectItem>
+            <SelectItem value="server_function">Servidor</SelectItem>
             <SelectItem value="security">Segurança</SelectItem>
-            <SelectItem value="performance">Performance</SelectItem>
+            <SelectItem value="performance">Desempenho</SelectItem>
           </SelectContent>
         </Select>
         <Select value={severity} onValueChange={(v) => setSeverity(v as typeof severity)}>
@@ -648,7 +657,8 @@ function MonitoringPanel() {
             <SelectItem value="critical">Crítico</SelectItem>
             <SelectItem value="error">Erro</SelectItem>
             <SelectItem value="warning">Alerta</SelectItem>
-            <SelectItem value="info">Info</SelectItem>
+            <SelectItem value="info">Informação</SelectItem>
+
           </SelectContent>
         </Select>
         <div className="flex items-center gap-2 rounded-md border px-3 py-2">
@@ -672,7 +682,7 @@ function MonitoringPanel() {
               <CardContent className="space-y-2 p-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className={`rounded px-2 py-0.5 text-xs font-medium ${severityColor(row.severity)}`}>
-                    {row.severity.toUpperCase()}
+                    {severityLabel(row.severity)}
                   </span>
                   <Badge variant="outline">{categoryLabel(row.category)}</Badge>
                   {row.resolved && <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">Resolvido</Badge>}
@@ -684,16 +694,17 @@ function MonitoringPanel() {
                 {row.route && <p className="text-xs text-muted-foreground">Rota: {row.route}</p>}
                 {row.stack && (
                   <details className="text-xs">
-                    <summary className="cursor-pointer text-muted-foreground">Stack trace</summary>
+                    <summary className="cursor-pointer text-muted-foreground">Rastreamento técnico</summary>
                     <pre className="mt-2 max-h-64 overflow-auto rounded bg-muted p-2 text-[11px]">{row.stack}</pre>
                   </details>
                 )}
                 {row.metadata && Object.keys(row.metadata as object).length > 0 && (
                   <details className="text-xs">
-                    <summary className="cursor-pointer text-muted-foreground">Metadata</summary>
+                    <summary className="cursor-pointer text-muted-foreground">Dados adicionais</summary>
                     <pre className="mt-2 overflow-auto rounded bg-muted p-2 text-[11px]">{JSON.stringify(row.metadata, null, 2)}</pre>
                   </details>
                 )}
+
                 <div className="flex justify-end">
                   <Button
                     size="sm"
