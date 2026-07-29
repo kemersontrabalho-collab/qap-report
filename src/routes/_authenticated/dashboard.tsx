@@ -301,7 +301,7 @@ function Dashboard() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="relative flex-1 sm:w-64 sm:flex-none">
+            <div data-tour="dashboard-search" className="relative flex-1 sm:w-64 sm:flex-none">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 value={search}
