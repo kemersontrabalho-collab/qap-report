@@ -206,10 +206,24 @@ function Dashboard() {
 
   const tabs: { key: Tab; label: string; icon: typeof FileText }[] = [
     { key: "drafts", label: "Rascunhos", icon: ClipboardEdit },
-    { key: "done", label: "Já Feitos", icon: CheckCircle2 },
+    { key: "done", label: "Concluídos", icon: CheckCircle2 },
     { key: "favorites", label: "Favoritos", icon: Star },
     { key: "trash", label: "Lixeira", icon: Trash2 },
   ];
+
+  const counts = tabs.reduce<Record<Tab, number>>((acc, t) => {
+    acc[t.key] = bulletins.filter((b) => {
+      if (t.key === "trash") return !!b.deleted_at;
+      if (b.deleted_at) return false;
+      if (t.key === "drafts") return b.status === "draft";
+      if (t.key === "done") return b.status === "done";
+      if (t.key === "favorites") return b.is_favorite;
+      return true;
+    }).length;
+    return acc;
+  }, { drafts: 0, done: 0, favorites: 0, trash: 0 });
+
+  const activeTab = tabs.find((t) => t.key === tab)!;
 
   return (
     <AppShell>
@@ -245,39 +259,12 @@ function Dashboard() {
 
       <section className="rounded-2xl border bg-card">
         <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-1 overflow-x-auto">
-            {tabs.map((t) => {
-              const active = tab === t.key;
-              const count = bulletins.filter((b) => {
-                if (t.key === "trash") return !!b.deleted_at;
-                if (b.deleted_at) return false;
-                if (t.key === "drafts") return b.status === "draft";
-                if (t.key === "done") return b.status === "done";
-                if (t.key === "favorites") return b.is_favorite;
-                return true;
-              }).length;
-              return (
-                <button
-                  key={t.key}
-                  onClick={() => setTab(t.key)}
-                  className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm ${
-                    active
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-accent"
-                  }`}
-                >
-                  <t.icon className="h-4 w-4" />
-                  {t.label}
-                  <span
-                    className={`ml-1 rounded-full px-1.5 text-xs ${
-                      active ? "bg-primary-foreground/20" : "bg-muted"
-                    }`}
-                  >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-2 min-w-0">
+            <activeTab.icon className="h-5 w-5 text-primary shrink-0" />
+            <h2 className="truncate text-base font-semibold">{activeTab.label}</h2>
+            <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+              {counts[activeTab.key]}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <div className="relative flex-1 sm:w-64 sm:flex-none">
@@ -297,8 +284,37 @@ function Dashboard() {
                 Esvaziar
               </button>
             )}
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                aria-label="Abrir menu de abas"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border bg-background text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <Menu className="h-5 w-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Abas</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {tabs.map((t) => {
+                  const active = tab === t.key;
+                  return (
+                    <DropdownMenuItem
+                      key={t.key}
+                      onSelect={() => setTab(t.key)}
+                      className={active ? "bg-accent" : ""}
+                    >
+                      <t.icon className="mr-2 h-4 w-4" />
+                      <span className="flex-1">{t.label}</span>
+                      <span className="ml-2 rounded-full bg-muted px-1.5 text-xs text-muted-foreground">
+                        {counts[t.key]}
+                      </span>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
+
 
         <ul className="divide-y">
           {isLoading && (
