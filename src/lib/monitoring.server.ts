@@ -30,7 +30,7 @@ export async function logError(input: LogErrorInput): Promise<void> {
       stack: input.stack ? String(input.stack).slice(0, 8000) : null,
       route: input.route ?? null,
       user_id: input.userId ?? null,
-      metadata: input.metadata ?? {},
+      metadata: (input.metadata ?? {}) as never,
       user_agent: input.userAgent ? String(input.userAgent).slice(0, 512) : null,
       ip_hash: hashIp(input.ip ?? null),
     });

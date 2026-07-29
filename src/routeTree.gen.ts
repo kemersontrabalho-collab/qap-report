@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAiChatRouteImport } from './routes/_authenticated/ai-chat'
+import { Route as ApiPublicLogErrorRouteImport } from './routes/api/public/log-error'
 import { Route as AuthenticatedBulletinsNewRouteImport } from './routes/_authenticated/bulletins.new'
 import { Route as AuthenticatedBulletinsIdRouteImport } from './routes/_authenticated/bulletins.$id'
 
@@ -71,6 +72,11 @@ const AuthenticatedAiChatRoute = AuthenticatedAiChatRouteImport.update({
   path: '/ai-chat',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicLogErrorRoute = ApiPublicLogErrorRouteImport.update({
+  id: '/api/public/log-error',
+  path: '/api/public/log-error',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedBulletinsNewRoute =
   AuthenticatedBulletinsNewRouteImport.update({
     id: '/bulletins/new',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/bulletins/new': typeof AuthenticatedBulletinsNewRoute
+  '/api/public/log-error': typeof ApiPublicLogErrorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/bulletins/new': typeof AuthenticatedBulletinsNewRoute
+  '/api/public/log-error': typeof ApiPublicLogErrorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/_authenticated/bulletins/new': typeof AuthenticatedBulletinsNewRoute
+  '/api/public/log-error': typeof ApiPublicLogErrorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/bulletins/$id'
     | '/bulletins/new'
+    | '/api/public/log-error'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/bulletins/$id'
     | '/bulletins/new'
+    | '/api/public/log-error'
   id:
     | '__root__'
     | '/'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/bulletins/$id'
     | '/_authenticated/bulletins/new'
+    | '/api/public/log-error'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   GuiaRedacaoTecnicaRoute: typeof GuiaRedacaoTecnicaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicLogErrorRoute: typeof ApiPublicLogErrorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiChatRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/log-error': {
+      id: '/api/public/log-error'
+      path: '/api/public/log-error'
+      fullPath: '/api/public/log-error'
+      preLoaderRoute: typeof ApiPublicLogErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/bulletins/new': {
       id: '/_authenticated/bulletins/new'
       path: '/bulletins/new'
@@ -294,6 +314,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuiaRedacaoTecnicaRoute: GuiaRedacaoTecnicaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicLogErrorRoute: ApiPublicLogErrorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
