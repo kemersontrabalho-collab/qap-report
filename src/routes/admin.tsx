@@ -31,6 +31,9 @@ import {
   adminCreateCoupon,
   adminToggleCoupon,
   adminGrantSubscription,
+  adminListPixRequests,
+  adminApprovePixRequest,
+  adminRejectPixRequest,
 } from "@/lib/admin.functions";
 import {
   adminListErrorLogs,
@@ -55,7 +58,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift, AlertTriangle, CheckCircle2, RefreshCcw } from "lucide-react";
+import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift, AlertTriangle, CheckCircle2, RefreshCcw, QrCode, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -168,16 +171,18 @@ function DashboardView() {
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Tabs defaultValue="stats">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6">
             <TabsTrigger value="stats">Dashboard</TabsTrigger>
             <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
             <TabsTrigger value="users">Usuários</TabsTrigger>
+            <TabsTrigger value="pix">Pagamentos Pix</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="coupons">Cupons</TabsTrigger>
           </TabsList>
           <TabsContent value="stats" className="mt-6"><StatsPanel /></TabsContent>
           <TabsContent value="monitoring" className="mt-6"><MonitoringPanel /></TabsContent>
           <TabsContent value="users" className="mt-6"><UsersPanel /></TabsContent>
+          <TabsContent value="pix" className="mt-6"><PixPanel /></TabsContent>
           <TabsContent value="notifications" className="mt-6"><NotifPanel /></TabsContent>
           <TabsContent value="coupons" className="mt-6"><CouponsPanel /></TabsContent>
         </Tabs>
@@ -680,6 +685,123 @@ function MonitoringPanel() {
           {(list.data ?? []).length === 0 && (
             <p className="text-sm text-muted-foreground">Nenhum registro no filtro atual. 🎉</p>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// Pagamentos Pix — moderação
+// ============================================================
+function PixPanel() {
+  const qc = useQueryClient();
+  const listFn = useServerFn(adminListPixRequests);
+  const approveFn = useServerFn(adminApprovePixRequest);
+  const rejectFn = useServerFn(adminRejectPixRequest);
+  const [filter, setFilter] = useState<"aguardando_aprovacao" | "aprovado" | "rejeitado" | "cancelado" | "all">(
+    "aguardando_aprovacao",
+  );
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-pix", filter],
+    queryFn: () => listFn({ data: { status: filter } }),
+    refetchInterval: 20_000,
+  });
+
+  const approve = useMutation({
+    mutationFn: (requestId: string) => approveFn({ data: { requestId } }),
+    onSuccess: () => {
+      toast.success("Assinatura ativada para o usuário.");
+      qc.invalidateQueries({ queryKey: ["admin-pix"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reject = useMutation({
+    mutationFn: (v: { requestId: string; reason?: string }) => rejectFn({ data: v }),
+    onSuccess: () => {
+      toast.success("Solicitação rejeitada.");
+      qc.invalidateQueries({ queryKey: ["admin-pix"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const pending = data?.requests ?? [];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <QrCode className="h-5 w-5 text-primary" />
+          <h2 className="text-base font-semibold">Solicitações de pagamento via Pix</h2>
+        </div>
+        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+          <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="aguardando_aprovacao">Aguardando aprovação</SelectItem>
+            <SelectItem value="aprovado">Aprovadas</SelectItem>
+            <SelectItem value="rejeitado">Rejeitadas</SelectItem>
+            <SelectItem value="cancelado">Canceladas</SelectItem>
+            <SelectItem value="all">Todas</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {isLoading ? (
+        <Loader2 className="h-5 w-5 animate-spin" />
+      ) : pending.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Nenhuma solicitação no filtro atual.</p>
+      ) : (
+        <div className="space-y-2">
+          {pending.map((r) => (
+            <Card key={r.id}>
+              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="truncate font-medium">{r.full_name || "(sem nome)"}</p>
+                    <Badge variant={r.plan === "anual" ? "default" : "secondary"}>
+                      {r.plan === "anual" ? "Anual · R$ 90,00" : "Mensal · R$ 10,00"}
+                    </Badge>
+                    <Badge variant="outline">{r.status}</Badge>
+                  </div>
+                  <p className="truncate text-sm text-muted-foreground">
+                    {r.user_email || r.profile_email || "(sem email)"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Criada em {new Date(r.created_at).toLocaleString("pt-BR")}
+                    {r.decided_at && ` · decidida em ${new Date(r.decided_at).toLocaleString("pt-BR")}`}
+                  </p>
+                  {r.admin_note && (
+                    <p className="mt-1 text-xs text-red-700 dark:text-red-300">Motivo: {r.admin_note}</p>
+                  )}
+                </div>
+                {r.status === "aguardando_aprovacao" && (
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => approve.mutate(r.id)}
+                      disabled={approve.isPending}
+                    >
+                      <CheckCircle2 className="mr-1 h-4 w-4" /> Aprovar acesso
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const reason = window.prompt("Motivo da rejeição (opcional):") ?? undefined;
+                        reject.mutate({ requestId: r.id, reason: reason || undefined });
+                      }}
+                      disabled={reject.isPending}
+                    >
+                      <XCircle className="mr-1 h-4 w-4" /> Rejeitar
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
     </div>

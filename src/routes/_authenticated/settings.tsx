@@ -1,10 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send, Crown } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { tutorialStore } from "@/lib/tutorial-store";
@@ -175,6 +175,21 @@ function SettingsPage() {
             Personalize sua experiência e seus dados de perfil.
           </p>
         </div>
+
+
+
+        <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
+          <h2 className="flex items-center gap-2 font-semibold"><Crown className="h-4 w-4 text-primary" /> Assinatura</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Ative seu plano mensal ou anual, resgate um código promocional ou envie comprovante de Pix.
+          </p>
+          <Link
+            to="/assinar"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          >
+            <Crown className="h-4 w-4" /> Gerenciar assinatura
+          </Link>
+        </section>
 
 
 

@@ -244,3 +244,146 @@ export const adminGrantSubscription = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+// =========================================================
+// Pix payment requests — moderação pelo admin
+// =========================================================
+
+export const adminListPixRequests = createServerFn({ method: "POST" })
+  .inputValidator((d: { status?: "aguardando_aprovacao" | "aprovado" | "rejeitado" | "cancelado" | "all" }) => d)
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    const status = data.status ?? "aguardando_aprovacao";
+    let q = sb
+      .from("pix_payment_requests")
+      .select("id, user_id, plan, amount_brl, status, user_email, created_at, decided_at, admin_note")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (status !== "all") q = q.eq("status", status);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    // Enriquecer com nome do perfil
+    const ids = Array.from(new Set((rows ?? []).map((r) => r.user_id as string)));
+    const nameMap = new Map<string, { name: string | null; email: string | null }>();
+    if (ids.length > 0) {
+      const { data: profs } = await sb
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", ids);
+      for (const p of profs ?? []) {
+        nameMap.set(p.id as string, {
+          name: (p.full_name as string) ?? null,
+          email: (p.email as string) ?? null,
+        });
+      }
+    }
+    return {
+      requests: (rows ?? []).map((r) => {
+        const info = nameMap.get(r.user_id as string);
+        return {
+          ...r,
+          full_name: info?.name ?? null,
+          profile_email: info?.email ?? null,
+        };
+      }),
+    };
+  });
+
+export const adminApprovePixRequest = createServerFn({ method: "POST" })
+  .inputValidator((d: { requestId: string }) => d)
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    // Lê a solicitação para pegar plano/usuário
+    const { data: req, error: readErr } = await sb
+      .from("pix_payment_requests")
+      .select("id, user_id, plan, status")
+      .eq("id", data.requestId)
+      .single();
+    if (readErr) throw new Error(readErr.message);
+    if (req.status !== "aguardando_aprovacao") {
+      throw new Error("Esta solicitação já foi processada.");
+    }
+    const now = new Date();
+    const days = req.plan === "mensal" ? 30 : 365;
+    const end = new Date(now.getTime() + days * 86400000);
+
+    // 1) Ativa/atualiza assinatura mantendo a maior data de validade
+    const { data: existing } = await sb
+      .from("subscriptions")
+      .select("current_period_end")
+      .eq("user_id", req.user_id)
+      .maybeSingle();
+    const finalEnd =
+      existing?.current_period_end && new Date(existing.current_period_end).getTime() > end.getTime()
+        ? existing.current_period_end
+        : end.toISOString();
+
+    const { error: subErr } = await sb.from("subscriptions").upsert(
+      {
+        user_id: req.user_id,
+        status: "active",
+        plan: req.plan,
+        current_period_start: now.toISOString(),
+        current_period_end: finalEnd,
+        payment_method: "pix",
+        canceled_at: null,
+      },
+      { onConflict: "user_id" },
+    );
+    if (subErr) throw new Error(subErr.message);
+
+    // 2) Marca a solicitação como aprovada
+    const { error: updErr } = await sb
+      .from("pix_payment_requests")
+      .update({ status: "aprovado", decided_at: now.toISOString() })
+      .eq("id", data.requestId);
+    if (updErr) throw new Error(updErr.message);
+
+    // 3) Notifica o usuário
+    await sb.from("notifications").insert({
+      title: "Assinatura ativada",
+      body: `Seu pagamento do plano ${req.plan} foi confirmado. Bom trabalho!`,
+      category: "info",
+      audience: "user",
+      target_user_id: req.user_id,
+    });
+
+    return { ok: true as const };
+  });
+
+export const adminRejectPixRequest = createServerFn({ method: "POST" })
+  .inputValidator((d: { requestId: string; reason?: string }) => d)
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    const { data: req, error: readErr } = await sb
+      .from("pix_payment_requests")
+      .select("id, user_id, status")
+      .eq("id", data.requestId)
+      .single();
+    if (readErr) throw new Error(readErr.message);
+    if (req.status !== "aguardando_aprovacao") {
+      throw new Error("Esta solicitação já foi processada.");
+    }
+    const { error } = await sb
+      .from("pix_payment_requests")
+      .update({
+        status: "rejeitado",
+        decided_at: new Date().toISOString(),
+        admin_note: (data.reason ?? "").slice(0, 500) || null,
+      })
+      .eq("id", data.requestId);
+    if (error) throw new Error(error.message);
+
+    await sb.from("notifications").insert({
+      title: "Pagamento não confirmado",
+      body: `Não conseguimos confirmar seu Pix. Entre em contato pelo WhatsApp para regularizar. ${data.reason ? `Motivo: ${data.reason}` : ""}`.trim(),
+      category: "warning",
+      audience: "user",
+      target_user_id: req.user_id,
+    });
+    return { ok: true as const };
+  });

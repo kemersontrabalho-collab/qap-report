@@ -458,6 +458,51 @@ export type Database = {
           },
         ]
       }
+      pix_payment_requests: {
+        Row: {
+          admin_note: string | null
+          amount_brl: number
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          plan: string
+          status: string
+          updated_at: string
+          user_email: string | null
+          user_id: string
+          user_note: string | null
+        }
+        Insert: {
+          admin_note?: string | null
+          amount_brl: number
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          plan: string
+          status?: string
+          updated_at?: string
+          user_email?: string | null
+          user_id: string
+          user_note?: string | null
+        }
+        Update: {
+          admin_note?: string | null
+          amount_brl?: number
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string
+          user_note?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -565,6 +610,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_pix_payment_request: {
+        Args: { _request_id: string }
+        Returns: Json
+      }
+      cancel_pix_payment_request: {
+        Args: { _request_id: string }
+        Returns: Json
+      }
+      create_pix_payment_request: { Args: { _plan: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -599,6 +653,10 @@ export type Database = {
         }[]
       }
       redeem_coupon: { Args: { _code: string }; Returns: Json }
+      reject_pix_payment_request: {
+        Args: { _reason?: string; _request_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "fundador" | "admin" | "usuario"

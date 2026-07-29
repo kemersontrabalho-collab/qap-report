@@ -19,6 +19,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAssinarRouteImport } from './routes/_authenticated/assinar'
 import { Route as AuthenticatedAiChatRouteImport } from './routes/_authenticated/ai-chat'
 import { Route as ApiPublicLogErrorRouteImport } from './routes/api/public/log-error'
 import { Route as AuthenticatedBulletinsNewRouteImport } from './routes/_authenticated/bulletins.new'
@@ -74,6 +75,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAssinarRoute = AuthenticatedAssinarRouteImport.update({
+  id: '/assinar',
+  path: '/assinar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAiChatRoute = AuthenticatedAiChatRouteImport.update({
   id: '/ai-chat',
   path: '/ai-chat',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
+  '/assinar': typeof AuthenticatedAssinarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
+  '/assinar': typeof AuthenticatedAssinarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/ai-chat': typeof AuthenticatedAiChatRoute
+  '/_authenticated/assinar': typeof AuthenticatedAssinarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/ai-chat'
+    | '/assinar'
     | '/dashboard'
     | '/settings'
     | '/bulletins/$id'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/ai-chat'
+    | '/assinar'
     | '/dashboard'
     | '/settings'
     | '/bulletins/$id'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/_authenticated/ai-chat'
+    | '/_authenticated/assinar'
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
     | '/_authenticated/bulletins/$id'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/assinar': {
+      id: '/_authenticated/assinar'
+      path: '/assinar'
+      fullPath: '/assinar'
+      preLoaderRoute: typeof AuthenticatedAssinarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ai-chat': {
       id: '/_authenticated/ai-chat'
       path: '/ai-chat'
@@ -310,6 +329,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAiChatRoute: typeof AuthenticatedAiChatRoute
+  AuthenticatedAssinarRoute: typeof AuthenticatedAssinarRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedBulletinsIdRoute: typeof AuthenticatedBulletinsIdRoute
@@ -318,6 +338,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAiChatRoute: AuthenticatedAiChatRoute,
+  AuthenticatedAssinarRoute: AuthenticatedAssinarRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedBulletinsIdRoute: AuthenticatedBulletinsIdRoute,
