@@ -15,6 +15,12 @@ export const Route = createFileRoute("/_authenticated/ai-chat")({
         name: "description",
         content: "Tire dúvidas jurídico-policiais: enquadramento legal, penas e qual documento usar.",
       },
+      { property: "og:title", content: "Dúvidas com IA · QAP Report" },
+      {
+        property: "og:description",
+        content: "Área privada para tirar dúvidas jurídico-policiais com apoio de IA no QAP Report.",
+      },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: AIChatPage,

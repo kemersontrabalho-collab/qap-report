@@ -32,7 +32,21 @@ type Bulletin = {
 type Tab = "drafts" | "done" | "favorites" | "trash";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Painel · QAP Report" }] }),
+  head: () => ({
+    meta: [
+      { title: "Painel · QAP Report" },
+      {
+        name: "description",
+        content: "Área privada do QAP Report para criar, editar e gerenciar boletins policiais do usuário.",
+      },
+      { property: "og:title", content: "Painel · QAP Report" },
+      {
+        property: "og:description",
+        content: "Área privada para criar, editar e gerenciar boletins policiais no QAP Report.",
+      },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: Dashboard,
 });
 
