@@ -6,7 +6,7 @@ import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { Loader2, Check, X } from "lucide-react";
 import { translateAuthError } from "@/lib/i18n-errors";
-import { setSessionLifetime } from "@/lib/session-lifetime";
+import { setSessionLifetime, getKeepSignedInPreference } from "@/lib/session-lifetime";
 import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 
 const search = z.object({
@@ -43,7 +43,9 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [keepSignedIn, setKeepSignedIn] = useState(false);
+  const [keepSignedIn, setKeepSignedIn] = useState<boolean>(() =>
+    typeof window === "undefined" ? true : getKeepSignedInPreference(),
+  );
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -226,7 +228,7 @@ function AuthPage() {
                     onChange={(e) => setKeepSignedIn(e.target.checked)}
                     className="h-4 w-4 rounded border-input accent-primary"
                   />
-                  Manter conectado por 8 horas
+                  Manter conectado por 8 horas neste dispositivo
                 </label>
               )}
               <button
