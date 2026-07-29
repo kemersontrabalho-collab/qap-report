@@ -476,6 +476,15 @@ function CouponsPanel() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-coupons"] }),
   });
 
+  const remove = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Cupom excluído");
+      qc.invalidateQueries({ queryKey: ["admin-coupons"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <div className="space-y-6">
       <Card>
