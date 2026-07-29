@@ -34,6 +34,7 @@ export function TrialBanner() {
   }, []);
 
   const sub = data?.subscription;
+  const isPremium = !!data?.isPremium;
   if (!sub) return null;
 
   const endMs = sub.current_period_end ? new Date(sub.current_period_end).getTime() : null;
@@ -43,6 +44,11 @@ export function TrialBanner() {
 
   // Vitalício: nunca importunar.
   if (isLifetime) return null;
+
+  // Premium via papel (ex.: fundador) sem plano pago vigente: não mostrar
+  // banner de trial expirado — o usuário tem acesso liberado por outro motivo.
+  const nearExpiry = endMs ? endMs - now <= 7 * 86_400_000 : false;
+  if (isPremium && !isPaidPlan && !nearExpiry) return null;
 
   // Plano pago vigente (mensal/anual/premium) — só avisar quando estiver perto de vencer (<=7 dias).
   const isActivePaid =
