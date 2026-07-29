@@ -58,7 +58,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift, AlertTriangle, CheckCircle2, RefreshCcw } from "lucide-react";
+import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift, AlertTriangle, CheckCircle2, RefreshCcw, QrCode, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
