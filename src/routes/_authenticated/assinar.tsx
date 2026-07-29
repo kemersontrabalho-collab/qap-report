@@ -18,7 +18,6 @@ import {
   Copy,
   Ticket,
   QrCode,
-  CreditCard,
   MessageCircle,
   ArrowLeft,
   Clock,
