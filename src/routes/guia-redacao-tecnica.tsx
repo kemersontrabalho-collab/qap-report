@@ -5,32 +5,32 @@ import logoAsset from "@/assets/qap-report-logo.png.asset.json";
 export const Route = createFileRoute("/guia-redacao-tecnica")({
   head: () => ({
     meta: [
-      { title: "Guia de Redação Técnica de Boletim de Ocorrência — QAP Report" },
+      { title: "Guia de Redação de Boletim de Ocorrência — QAP Report" },
       {
         name: "description",
         content:
-          "Aprenda a redigir boletim de ocorrência online com linguagem técnica e jurídica. Guia completo sobre BA, BO-COP, BO-TC, BOAT, Súmula Vinculante 11 e como o QAP Report automatiza a redação policial.",
+          "Guia prático de redação técnica para BA, BO-COP, BO-TC e BOAT com fundamentos legais e exemplos jurídicos.",
       },
       {
         property: "og:title",
-        content: "Guia de Redação Técnica de Boletim de Ocorrência — QAP Report",
+        content: "Guia de Redação de Boletim de Ocorrência — QAP Report",
       },
       {
         property: "og:description",
         content:
-          "Aprenda a redigir boletim de ocorrência online com linguagem técnica e jurídica. Guia completo sobre BA, BO-COP, BO-TC, BOAT, Súmula Vinculante 11 e como o QAP Report automatiza a redação policial.",
+          "Guia prático de redação técnica para BA, BO-COP, BO-TC e BOAT com fundamentos legais e exemplos jurídicos.",
       },
       { property: "og:type", content: "article" },
       { property: "og:url", content: "https://qap-report.lovable.app/guia-redacao-tecnica" },
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "Guia de Redação Técnica de Boletim de Ocorrência — QAP Report",
+        content: "Guia de Redação de Boletim de Ocorrência — QAP Report",
       },
       {
         name: "twitter:description",
         content:
-          "Aprenda a redigir boletim de ocorrência online com linguagem técnica e jurídica. Guia completo sobre BA, BO-COP, BO-TC, BOAT, Súmula Vinculante 11 e como o QAP Report automatiza a redação policial.",
+          "Guia prático de redação técnica para BA, BO-COP, BO-TC e BOAT com fundamentos legais e exemplos jurídicos.",
       },
     ],
     links: [
