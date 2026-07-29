@@ -10,7 +10,7 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Ordem respeita FKs. Falhas em tabelas dependentes abortam a exclusão do auth.user.
-    const steps: Array<[string, Promise<{ error: unknown }>]> = [
+    const steps: Array<[string, PromiseLike<{ error: { message?: string } | null }>]> = [
       ["bulletin_knowledge", supabaseAdmin.from("bulletin_knowledge").delete().eq("owner_id", userId)],
       ["bulletins", supabaseAdmin.from("bulletins").delete().eq("user_id", userId)],
       ["notification_reads", supabaseAdmin.from("notification_reads").delete().eq("user_id", userId)],
@@ -25,7 +25,7 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     for (const [table, p] of steps) {
       const { error } = await p;
       if (error) {
-        throw new Error(`Falha ao remover ${table}: ${(error as { message?: string }).message ?? "erro"}`);
+        throw new Error(`Falha ao remover ${table}: ${error.message ?? "erro"}`);
       }
     }
 
