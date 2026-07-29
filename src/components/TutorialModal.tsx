@@ -13,25 +13,36 @@ type Step = {
 const STEPS: Step[] = [
   {
     title: "Bem-vindo ao QAP Report",
-    body: "Vamos fazer um tour rápido pelo app. A cada passo o tutorial vai te levar até a tela real e destacar o que importa.",
+    body: "Vamos fazer um tour rápido pelas telas reais do app. A cada passo destacamos o que importa.",
     route: "/dashboard",
   },
   {
-    title: "Painel principal",
-    body: "Esta é sua tela inicial. Todos os boletins ficam organizados por status: Rascunhos, Feitos, Favoritos e Lixeira.",
+    title: "Seu período de teste (24h)",
+    body: "Toda nova conta ganha 24h grátis para usar tudo. Um aviso no topo do painel mostra quanto tempo resta. Depois, o acesso fica limitado até você assinar um plano ou resgatar um cupom em Configurações.",
     route: "/dashboard",
-    target: '[data-tour="nav-dashboard"], [data-tour-mobile="nav-dashboard"]',
   },
   {
-    title: "Criar um novo boletim",
-    body: "Toque no botão 'Novo' (canto superior direito) para iniciar um BA, BO-COP, BO-TC ou BOAT.",
+    title: "Escolha o tipo de boletim",
+    body: "No painel, clique em BA, BO-COP, BO-TC ou BOAT para criar um novo boletim já com o modelo certo. O botão 'Novo' no topo também abre o mesmo fluxo.",
     route: "/dashboard",
-    target: '[data-tour="new-bulletin"]',
+    target: '[data-tour="bulletin-types"]',
   },
   {
-    title: "Escolha o tipo",
-    body: "Cada tipo de boletim tem uma finalidade. Selecione o mais adequado à ocorrência para começar a redigir.",
-    route: "/bulletins/new",
+    title: "Busca inteligente",
+    body: "Encontre boletins por título, trecho de texto, categoria ou data — a busca ignora acentos e maiúsculas.",
+    route: "/dashboard",
+    target: '[data-tour="dashboard-search"]',
+  },
+  {
+    title: "Abas organizadas",
+    body: "As três linhas no canto superior direito abrem o menu de abas: Rascunhos, Concluídos, Favoritos e Lixeira. Ao favoritar um boletim, ele sai dos Rascunhos e vai direto para Favoritos.",
+    route: "/dashboard",
+    target: '[data-tour="tabs-menu"]',
+  },
+  {
+    title: "Editor padronizado",
+    body: "Cada boletim tem campos fixos: Título, Categoria (com busca da infração), Composição da Guarnição, Localização da Guarnição, Localização da Ocorrência (via GPS/Google Maps) e Data/Hora automática. Ditado por voz e exportação em PDF estão prontos para uso.",
+    route: "/dashboard",
   },
   {
     title: "Notificações",
@@ -41,19 +52,19 @@ const STEPS: Step[] = [
   },
   {
     title: "Dúvidas com IA",
-    body: "Precisa consultar uma lei, pena ou o documento correto para uma situação? A aba 'Dúvidas IA' é seu apoio jurídico.",
+    body: "Precisa consultar uma lei, pena ou o documento correto para uma situação? A aba 'Dúvidas IA' é seu apoio jurídico rápido.",
     route: "/ai-chat",
     target: '[data-tour="nav-ai-chat"], [data-tour-mobile="nav-ai-chat"]',
   },
   {
-    title: "Configurações",
-    body: "Ative notificações do dispositivo, envie suporte ao administrador, verifique atualizações e compartilhe o link oficial do QAP Report.",
+    title: "Configurações e assinatura",
+    body: "Em Configurações você assina planos, resgata cupons, envia suporte ao administrador, ativa notificações do dispositivo, reabre este tutorial e pode excluir a conta com segurança.",
     route: "/settings",
     target: '[data-tour="nav-settings"], [data-tour-mobile="nav-settings"]',
   },
   {
-    title: "Instalação",
-    body: "Instale o QAP Report na tela inicial para acesso rápido como um app nativo, em tela cheia.",
+    title: "Instale como app",
+    body: "Instale o QAP Report na tela inicial para acesso rápido em tela cheia, funcionando como um app nativo em Android, iOS e navegador.",
     route: "/settings",
   },
   {

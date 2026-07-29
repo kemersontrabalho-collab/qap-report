@@ -268,7 +268,7 @@ function Dashboard() {
       </div>
 
 
-      <section className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section data-tour="bulletin-types" className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {BULLETIN_TYPES.map((t) => (
           <button
             key={t.code}
@@ -301,7 +301,7 @@ function Dashboard() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="relative flex-1 sm:w-64 sm:flex-none">
+            <div data-tour="dashboard-search" className="relative flex-1 sm:w-64 sm:flex-none">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 value={search}
@@ -320,6 +320,7 @@ function Dashboard() {
             )}
             <DropdownMenu>
               <DropdownMenuTrigger
+                data-tour="tabs-menu"
                 aria-label="Abrir menu de abas"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-lg border bg-background text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
               >
