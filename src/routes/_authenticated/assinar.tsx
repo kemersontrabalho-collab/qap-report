@@ -94,6 +94,7 @@ function AssinarPage() {
 
   return (
     <AppShell>
+      <PaymentTestModeBanner />
       <div className="mx-auto max-w-2xl space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Assinatura QAP Report</h1>
@@ -101,6 +102,7 @@ function AssinarPage() {
             Libere todas as funcionalidades do assistente de redação policial.
           </p>
         </div>
+
 
         {activePlan && (
           <section className="rounded-2xl border bg-emerald-500/5 border-emerald-500/40 p-5">
@@ -330,6 +332,26 @@ function PaymentMethodStep({
   onPickPix: () => void;
 }) {
   const p = PLANS[plan];
+  const { openCheckout, loading } = usePaddleCheckout();
+
+  async function payWithCard() {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+      if (!user) {
+        toast.error("Sessão expirada. Faça login novamente.");
+        return;
+      }
+      await openCheckout({
+        priceId: plan === "mensal" ? "qap_mensal" : "qap_anual",
+        customerEmail: user.email ?? undefined,
+        customData: { userId: user.id },
+      });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Não foi possível abrir o checkout.");
+    }
+  }
+
   return (
     <section className="rounded-2xl border bg-card p-5">
       <BackBtn onClick={onBack} />
@@ -339,6 +361,19 @@ function PaymentMethodStep({
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <button
+          onClick={payWithCard}
+          disabled={loading}
+          className="flex items-start gap-3 rounded-lg border p-4 text-left hover:bg-accent disabled:opacity-60"
+        >
+          <CreditCard className="h-5 w-5 text-primary" />
+          <div>
+            <p className="font-medium">Cartão de crédito/débito</p>
+            <p className="text-xs text-muted-foreground">
+              Ativação automática — renova {plan === "mensal" ? "mensalmente" : "anualmente"}.
+            </p>
+          </div>
+        </button>
+        <button
           onClick={onPickPix}
           className="flex items-start gap-3 rounded-lg border p-4 text-left hover:bg-accent"
         >
@@ -346,25 +381,15 @@ function PaymentMethodStep({
           <div>
             <p className="font-medium">Pix</p>
             <p className="text-xs text-muted-foreground">
-              Pagamento com chave aleatória do Mercado Pago. Liberação após confirmação.
+              Chave aleatória Mercado Pago. Liberação após confirmação do comprovante.
             </p>
-          </div>
-        </button>
-        <button
-          disabled
-          className="flex cursor-not-allowed items-start gap-3 rounded-lg border p-4 text-left opacity-60"
-          title="Em breve"
-        >
-          <CreditCard className="h-5 w-5 text-primary" />
-          <div>
-            <p className="font-medium">Cartão de crédito/débito</p>
-            <p className="text-xs text-muted-foreground">Em breve — estamos concluindo a integração.</p>
           </div>
         </button>
       </div>
     </section>
   );
 }
+
 
 // ============================================================
 function PixStep({
