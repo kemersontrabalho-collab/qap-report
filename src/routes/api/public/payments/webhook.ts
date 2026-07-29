@@ -80,9 +80,10 @@ async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
       status: "canceled",
       canceled_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    })
-    .eq("paddle_subscription_id", data.id)
-    .eq("environment", env);
+    } as any)
+    .eq("paddle_subscription_id" as any, data.id)
+    .eq("environment" as any, env);
+
 }
 
 async function handleWebhook(req: Request, env: PaddleEnv) {
