@@ -31,6 +31,9 @@ import {
   adminCreateCoupon,
   adminToggleCoupon,
   adminGrantSubscription,
+  adminListPixRequests,
+  adminApprovePixRequest,
+  adminRejectPixRequest,
 } from "@/lib/admin.functions";
 import {
   adminListErrorLogs,
