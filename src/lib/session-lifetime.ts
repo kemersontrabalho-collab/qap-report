@@ -1,17 +1,36 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const KEY = "qap.session-expires-at";
+const PREF_KEY = "qap.keep-signed-in";
+const TAB_KEY = "qap.session-tab-open";
 const HOUR = 60 * 60 * 1000;
 
-// Duração da sessão: com "Manter conectado" o usuário fica logado por 8h;
-// sem marcar, a sessão dura 45 min (suficiente para o plantão imediato).
+// Com "Manter conectado" o usuário fica logado por 8 horas ininterruptas.
+// Sem marcar, a sessão dura enquanto a aba estiver aberta (encerra ao fechar a aba/navegador).
 const KEEP_MS = 8 * HOUR;
-const SHORT_MS = 45 * 60 * 1000;
+
+export function getKeepSignedInPreference(): boolean {
+  try {
+    const v = localStorage.getItem(PREF_KEY);
+    // Padrão = true (facilita o login para o próximo turno de plantão).
+    return v === null ? true : v === "1";
+  } catch {
+    return true;
+  }
+}
 
 export function setSessionLifetime(keep: boolean) {
   try {
-    const expiresAt = Date.now() + (keep ? KEEP_MS : SHORT_MS);
-    localStorage.setItem(KEY, String(expiresAt));
+    localStorage.setItem(PREF_KEY, keep ? "1" : "0");
+    if (keep) {
+      const expiresAt = Date.now() + KEEP_MS;
+      localStorage.setItem(KEY, String(expiresAt));
+      sessionStorage.removeItem(TAB_KEY);
+    } else {
+      // Sessão apenas enquanto a aba viver: marca a aba atual.
+      localStorage.removeItem(KEY);
+      sessionStorage.setItem(TAB_KEY, "1");
+    }
   } catch {
     /* ignore */
   }
@@ -20,23 +39,39 @@ export function setSessionLifetime(keep: boolean) {
 export function clearSessionLifetime() {
   try {
     localStorage.removeItem(KEY);
+    sessionStorage.removeItem(TAB_KEY);
   } catch {
     /* ignore */
   }
 }
 
-/** Se a sessão local expirou, encerra a sessão do Supabase. */
+/**
+ * Encerra a sessão do Supabase se:
+ *  - a expiração de 8h foi atingida (modo "Manter conectado"), ou
+ *  - o usuário optou por sessão temporária e abriu o app numa NOVA aba
+ *    (sessionStorage não persiste entre abas/janelas).
+ * Não faz nada se o usuário nunca fez login neste dispositivo.
+ */
 export async function enforceSessionLifetime(): Promise<boolean> {
   try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return false;
-    const expiresAt = Number(raw);
-    if (!Number.isFinite(expiresAt)) {
-      localStorage.removeItem(KEY);
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) return false;
+
+    const expiresRaw = localStorage.getItem(KEY);
+    if (expiresRaw) {
+      const expiresAt = Number(expiresRaw);
+      if (Number.isFinite(expiresAt) && Date.now() >= expiresAt) {
+        clearSessionLifetime();
+        await supabase.auth.signOut();
+        return true;
+      }
       return false;
     }
-    if (Date.now() >= expiresAt) {
-      localStorage.removeItem(KEY);
+
+    // Sem expiração persistida: só encerra se o usuário escolheu sessão temporária
+    // E a aba atual não é a que iniciou a sessão.
+    const pref = localStorage.getItem(PREF_KEY);
+    if (pref === "0" && !sessionStorage.getItem(TAB_KEY)) {
       await supabase.auth.signOut();
       return true;
     }
