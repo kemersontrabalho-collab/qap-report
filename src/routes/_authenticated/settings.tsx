@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send } from "lucide-react";
+import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send, Crown } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { tutorialStore } from "@/lib/tutorial-store";
