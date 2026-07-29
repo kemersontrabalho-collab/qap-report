@@ -32,6 +32,12 @@ import {
   adminToggleCoupon,
   adminGrantSubscription,
 } from "@/lib/admin.functions";
+import {
+  adminListErrorLogs,
+  adminGetErrorStats,
+  adminResolveErrorLog,
+  adminClearResolvedLogs,
+} from "@/lib/monitoring.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,7 +55,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift } from "lucide-react";
+import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift, AlertTriangle, CheckCircle2, RefreshCcw } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -162,13 +168,15 @@ function DashboardView() {
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Tabs defaultValue="stats">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="stats">Dashboard</TabsTrigger>
+            <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
             <TabsTrigger value="users">Usuários</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="coupons">Cupons</TabsTrigger>
           </TabsList>
           <TabsContent value="stats" className="mt-6"><StatsPanel /></TabsContent>
+          <TabsContent value="monitoring" className="mt-6"><MonitoringPanel /></TabsContent>
           <TabsContent value="users" className="mt-6"><UsersPanel /></TabsContent>
           <TabsContent value="notifications" className="mt-6"><NotifPanel /></TabsContent>
           <TabsContent value="coupons" className="mt-6"><CouponsPanel /></TabsContent>
@@ -177,6 +185,7 @@ function DashboardView() {
     </div>
   );
 }
+
 
 function StatsPanel() {
   const fn = useServerFn(adminGetStats);
@@ -517,6 +526,160 @@ function CouponsPanel() {
             </Card>
           ))}
           {data?.coupons.length === 0 && <p className="text-sm text-muted-foreground">Nenhum cupom criado ainda.</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function severityColor(sev: string): string {
+  if (sev === "critical") return "bg-red-600 text-white";
+  if (sev === "error") return "bg-red-500/15 text-red-700 dark:text-red-300";
+  if (sev === "warning") return "bg-amber-500/15 text-amber-700 dark:text-amber-300";
+  return "bg-muted text-muted-foreground";
+}
+
+function categoryLabel(cat: string): string {
+  if (cat === "frontend") return "Frontend";
+  if (cat === "server_function") return "Backend";
+  if (cat === "security") return "Segurança";
+  if (cat === "performance") return "Performance";
+  return cat;
+}
+
+function MonitoringPanel() {
+  const qc = useQueryClient();
+  const listFn = useServerFn(adminListErrorLogs);
+  const statsFn = useServerFn(adminGetErrorStats);
+  const resolveFn = useServerFn(adminResolveErrorLog);
+  const clearFn = useServerFn(adminClearResolvedLogs);
+  const [category, setCategory] = useState<"all" | "frontend" | "server_function" | "security" | "performance">("all");
+  const [severity, setSeverity] = useState<"all" | "info" | "warning" | "error" | "critical">("all");
+  const [onlyUnresolved, setOnlyUnresolved] = useState(true);
+
+  const stats = useQuery({ queryKey: ["error-stats"], queryFn: () => statsFn(), refetchInterval: 30_000 });
+  const list = useQuery({
+    queryKey: ["error-logs", category, severity, onlyUnresolved],
+    queryFn: () => listFn({ data: { category, severity, onlyUnresolved, limit: 100 } }),
+    refetchInterval: 30_000,
+  });
+
+  const resolve = useMutation({
+    mutationFn: (v: { id: string; resolved: boolean }) => resolveFn({ data: v }),
+    onSuccess: () => {
+      toast.success("Status atualizado");
+      qc.invalidateQueries({ queryKey: ["error-logs"] });
+      qc.invalidateQueries({ queryKey: ["error-stats"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const clearAll = useMutation({
+    mutationFn: () => clearFn(),
+    onSuccess: () => {
+      toast.success("Registros resolvidos removidos");
+      qc.invalidateQueries({ queryKey: ["error-logs"] });
+      qc.invalidateQueries({ queryKey: ["error-stats"] });
+    },
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StatCard label="Últimas 24h" value={stats.data?.total ?? 0} />
+        <StatCard label="Não resolvidos" value={stats.data?.unresolved ?? 0} />
+        <StatCard label="Críticos abertos" value={stats.data?.critical ?? 0} />
+        <StatCard label="Segurança 24h" value={stats.data?.byCategory?.security ?? 0} />
+      </div>
+
+      {(stats.data?.critical ?? 0) > 0 && (
+        <div className="flex items-center gap-2 rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300">
+          <AlertTriangle className="h-4 w-4" />
+          {stats.data?.critical} evento(s) crítico(s) aguardando revisão.
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Select value={category} onValueChange={(v) => setCategory(v as typeof category)}>
+          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas categorias</SelectItem>
+            <SelectItem value="frontend">Frontend</SelectItem>
+            <SelectItem value="server_function">Backend</SelectItem>
+            <SelectItem value="security">Segurança</SelectItem>
+            <SelectItem value="performance">Performance</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={severity} onValueChange={(v) => setSeverity(v as typeof severity)}>
+          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas severidades</SelectItem>
+            <SelectItem value="critical">Crítico</SelectItem>
+            <SelectItem value="error">Erro</SelectItem>
+            <SelectItem value="warning">Alerta</SelectItem>
+            <SelectItem value="info">Info</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="flex items-center gap-2 rounded-md border px-3 py-2">
+          <Switch checked={onlyUnresolved} onCheckedChange={setOnlyUnresolved} id="unresolved-only" />
+          <Label htmlFor="unresolved-only" className="text-sm">Só não resolvidos</Label>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => { list.refetch(); stats.refetch(); }}>
+          <RefreshCcw className="mr-2 h-4 w-4" />Atualizar
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => clearAll.mutate()} disabled={clearAll.isPending}>
+          Limpar resolvidos
+        </Button>
+      </div>
+
+      {list.isLoading ? (
+        <Loader2 className="h-5 w-5 animate-spin" />
+      ) : (
+        <div className="space-y-2">
+          {(list.data ?? []).map((row) => (
+            <Card key={row.id}>
+              <CardContent className="space-y-2 p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`rounded px-2 py-0.5 text-xs font-medium ${severityColor(row.severity)}`}>
+                    {row.severity.toUpperCase()}
+                  </span>
+                  <Badge variant="outline">{categoryLabel(row.category)}</Badge>
+                  {row.resolved && <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">Resolvido</Badge>}
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {new Date(row.created_at).toLocaleString("pt-BR")}
+                  </span>
+                </div>
+                <p className="text-sm font-medium break-words">{row.message}</p>
+                {row.route && <p className="text-xs text-muted-foreground">Rota: {row.route}</p>}
+                {row.stack && (
+                  <details className="text-xs">
+                    <summary className="cursor-pointer text-muted-foreground">Stack trace</summary>
+                    <pre className="mt-2 max-h-64 overflow-auto rounded bg-muted p-2 text-[11px]">{row.stack}</pre>
+                  </details>
+                )}
+                {row.metadata && Object.keys(row.metadata as object).length > 0 && (
+                  <details className="text-xs">
+                    <summary className="cursor-pointer text-muted-foreground">Metadata</summary>
+                    <pre className="mt-2 overflow-auto rounded bg-muted p-2 text-[11px]">{JSON.stringify(row.metadata, null, 2)}</pre>
+                  </details>
+                )}
+                <div className="flex justify-end">
+                  <Button
+                    size="sm"
+                    variant={row.resolved ? "outline" : "default"}
+                    onClick={() => resolve.mutate({ id: row.id, resolved: !row.resolved })}
+                    disabled={resolve.isPending}
+                  >
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                    {row.resolved ? "Reabrir" : "Marcar resolvido"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {(list.data ?? []).length === 0 && (
+            <p className="text-sm text-muted-foreground">Nenhum registro no filtro atual. 🎉</p>
+          )}
         </div>
       )}
     </div>

@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { registerPWA, initInstallPrompt } from "@/lib/pwa";
+import { installClientErrorMonitor } from "@/lib/client-error-monitor";
 import { enforceSessionLifetime, clearSessionLifetime } from "@/lib/session-lifetime";
 import { Toaster } from "sonner";
 
@@ -141,6 +142,7 @@ function RootComponent() {
 
   useEffect(() => {
     initInstallPrompt();
+    installClientErrorMonitor();
     void registerPWA();
     void enforceSessionLifetime();
     const onVisible = () => {
