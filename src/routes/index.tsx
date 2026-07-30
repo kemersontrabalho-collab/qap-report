@@ -216,6 +216,7 @@ function Landing() {
         </section>
 
         <section className="grid gap-4 pb-20 md:grid-cols-3">
+          <h2 className="sr-only">Recursos do QAP Report</h2>
           <Feature
             icon={Feather}
             title="Linguagem técnica"
