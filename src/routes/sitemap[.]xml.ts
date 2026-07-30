@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { routeTree } from "@/routeTree.gen";
+
 
 const BASE_URL = "https://qap-report.lovable.app";
 
