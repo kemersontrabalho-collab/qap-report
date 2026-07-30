@@ -66,7 +66,7 @@ function Feature({
       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-accent-foreground">
         <Icon className="h-5 w-5" />
       </div>
-      <h2 className="mt-4 font-semibold">{title}</h2>
+      <h3 className="mt-4 font-semibold">{title}</h3>
       <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{desc}</p>
     </div>
   );
@@ -201,7 +201,7 @@ function Landing() {
           <div className="relative">
             <div className="rounded-3xl border bg-card p-6 shadow-lg">
               <div className="text-xs font-medium text-muted-foreground">Prévia · BO-COP</div>
-              <h4 className="mt-2 font-semibold">Comunicação de Ocorrência Policial</h4>
+              <h2 className="mt-2 font-semibold">Comunicação de Ocorrência Policial</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 Aos vinte e três dias do mês corrente, esta guarnição composta pelos policiais
                 militares acima identificados, em patrulhamento pela viatura de prefixo indicado,
