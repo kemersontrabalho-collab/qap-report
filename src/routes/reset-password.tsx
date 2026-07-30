@@ -76,8 +76,13 @@ function ResetPage() {
             : "Abra este link a partir do email de recuperação para continuar."}
         </p>
         <div className="mt-5">
-          <label className="text-sm font-medium">Nova senha</label>
+          <label htmlFor="new-password" className="text-sm font-medium">
+            Nova senha
+          </label>
           <input
+            id="new-password"
+            name="newPassword"
+            autoComplete="new-password"
             required
             minLength={6}
             type="password"
@@ -88,8 +93,13 @@ function ResetPage() {
           />
         </div>
         <div className="mt-3">
-          <label className="text-sm font-medium">Confirmar nova senha</label>
+          <label htmlFor="confirm-password" className="text-sm font-medium">
+            Confirmar nova senha
+          </label>
           <input
+            id="confirm-password"
+            name="confirmPassword"
+            autoComplete="new-password"
             required
             minLength={6}
             type="password"

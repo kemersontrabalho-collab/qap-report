@@ -188,8 +188,13 @@ function AuthPage() {
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               {mode === "signup" && (
                 <div>
-                  <label className="text-sm font-medium">Nome completo</label>
+                  <label htmlFor="auth-fullname" className="text-sm font-medium">
+                    Nome completo
+                  </label>
                   <input
+                    id="auth-fullname"
+                    name="fullName"
+                    autoComplete="name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -199,8 +204,13 @@ function AuthPage() {
                 </div>
               )}
               <div>
-                <label className="text-sm font-medium">Email</label>
+                <label htmlFor="auth-email" className="text-sm font-medium">
+                  Email
+                </label>
                 <input
+                  id="auth-email"
+                  name="email"
+                  autoComplete="email"
                   required
                   type="email"
                   value={email}
@@ -211,8 +221,13 @@ function AuthPage() {
               </div>
               {mode !== "forgot" && (
                 <div>
-                  <label className="text-sm font-medium">Senha</label>
+                  <label htmlFor="auth-password" className="text-sm font-medium">
+                    Senha
+                  </label>
                   <input
+                    id="auth-password"
+                    name="password"
+                    autoComplete={mode === "signup" ? "new-password" : "current-password"}
                     required
                     minLength={mode === "signup" ? 8 : 6}
                     type="password"

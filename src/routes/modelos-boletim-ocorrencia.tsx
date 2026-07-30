@@ -20,23 +20,21 @@ export const Route = createFileRoute("/modelos-boletim-ocorrencia")({
   head: () => ({
     meta: [
       {
-        title:
-          "Modelos de Boletim de Ocorrência Prontos — BA, BO-COP, BO-TC, BOAT",
+        title: "Modelos de Boletim de Ocorrência Prontos | QAP Report",
       },
       {
         name: "description",
         content:
-          "Modelos de boletim de ocorrência prontos para roubo, furto, perda de documentos, acidente de trânsito, lesão corporal e dano. Textos técnicos e jurídicos para copiar e usar. Assistente online QAP Report.",
+          "Modelos prontos de boletim de ocorrência (BA, BO-COP, BO-TC, BOAT) para roubo, furto, acidente e dano. Textos técnicos para copiar e usar.",
       },
       {
         property: "og:title",
-        content:
-          "Modelos de Boletim de Ocorrência Prontos — BA, BO-COP, BO-TC, BOAT",
+        content: "Modelos de Boletim de Ocorrência Prontos | QAP Report",
       },
       {
         property: "og:description",
         content:
-          "Modelos de boletim de ocorrência prontos para roubo, furto, perda de documentos, acidente de trânsito, lesão corporal e dano. Textos técnicos e jurídicos para copiar e usar.",
+          "Modelos prontos de boletim de ocorrência (BA, BO-COP, BO-TC, BOAT) para roubo, furto, acidente e dano. Textos técnicos para copiar e usar.",
       },
       { property: "og:type", content: "article" },
       {
