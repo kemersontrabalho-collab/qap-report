@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
 import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send, Crown } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
@@ -33,7 +33,6 @@ function SettingsPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
   const [notifPerm, setNotifPerm] = useState<NotificationPermission | "unsupported">(
@@ -96,16 +95,18 @@ function SettingsPage() {
     }
   }
 
-  useEffect(() => {
-    (async () => {
+  // Perfil via React Query: aproveita cache/SWR e evita refetch a cada visita.
+  const { data: profileData, isLoading: loading } = useQuery({
+    queryKey: ["my-profile"],
+    queryFn: async (): Promise<Profile | null> => {
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return;
+      if (!userData.user) return null;
       const { data } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userData.user.id)
-        .single();
-      setProfile(
+        .maybeSingle();
+      return (
         (data as Profile) ?? {
           id: userData.user.id,
           full_name: "",
@@ -114,11 +115,14 @@ function SettingsPage() {
           email: userData.user.email ?? "",
           functional_id: "",
           avatar_url: null,
-        },
+        }
       );
-      setLoading(false);
-    })();
-  }, []);
+    },
+  });
+
+  useEffect(() => {
+    if (profileData) setProfile((prev) => prev ?? profileData);
+  }, [profileData]);
 
   async function save() {
     if (!profile) return;

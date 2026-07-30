@@ -18,7 +18,6 @@ import {
   Copy,
   Star,
   Trash2,
-  WifiOff,
   MapPin,
   ExternalLink,
   
@@ -132,7 +131,6 @@ function EditBulletin() {
   const [generating, setGenerating] = useState(false);
   const [locating, setLocating] = useState<"crew" | "occ" | null>(null);
   const [b, setB] = useState<Bulletin | null>(null);
-  const [online, setOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
   const dirtyRef = useRef(false);
   const bRef = useRef<Bulletin | null>(null);
   bRef.current = b;
@@ -142,19 +140,6 @@ function EditBulletin() {
     () => (b ? CATEGORIES_BY_TYPE[b.bulletin_type] ?? [] : []),
     [b],
   );
-  const cacheKey = `bulletin-cache:${id}`;
-  const dirtyKey = `bulletin-dirty:${id}`;
-
-  useEffect(() => {
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
-    return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
-    };
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -163,55 +148,24 @@ function EditBulletin() {
         const loaded = data as Bulletin;
         if (!loaded.occurrence_at) loaded.occurrence_at = new Date().toISOString();
         setB(loaded);
-        // Se tinha alterações pendentes salvas localmente, mantém como dirty
-        // para o effect de "online" ressincronizar.
-        if (localStorage.getItem(dirtyKey) === "1") dirtyRef.current = true;
       } else if (!error || error.code === "PGRST116") {
-        // 404 real (registro não existe / RLS). Não tentar cache — evita
-        // reviver boletins apagados por outro dispositivo.
         toast.error("Boletim não encontrado");
         navigate({ to: "/dashboard" });
       } else {
-        // Erro de rede — tenta o cache local silenciosamente.
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          try {
-            setB(JSON.parse(cached));
-            if (localStorage.getItem(dirtyKey) === "1") dirtyRef.current = true;
-          } catch {
-            toast.error(translateDbError(error));
-            navigate({ to: "/dashboard" });
-          }
-        } else {
-          toast.error(translateDbError(error));
-          navigate({ to: "/dashboard" });
-        }
+        toast.error(translateDbError(error));
+        navigate({ to: "/dashboard" });
       }
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  useEffect(() => {
-    if (!b) return;
-    localStorage.setItem(cacheKey, JSON.stringify(b));
-    if (dirtyRef.current) localStorage.setItem(dirtyKey, "1");
-  }, [b, cacheKey, dirtyKey]);
-
-  useEffect(() => {
-    if (!online) return;
-    if (!bRef.current) return;
-    if (!dirtyRef.current) return;
-    save();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [online]);
-
   function update<K extends keyof Bulletin>(key: K, value: Bulletin[K]) {
     if (!b) return;
     dirtyRef.current = true;
-    localStorage.setItem(dirtyKey, "1");
     setB({ ...b, [key]: value });
   }
+
 
 
   async function save(nextStatus?: "draft" | "done") {
@@ -219,11 +173,8 @@ function EditBulletin() {
     if (!current) return;
     setSaving(true);
     try {
-      if (!online) {
-        toast.error("Sem conexão. Verifique sua internet e tente novamente.");
-        return;
-      }
       // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
+
       // o autosave enquanto o usuário ainda está digitando.
       const finalContent = nextStatus === "done" ? stripBraces(current.content) : current.content;
       const patch: Partial<Bulletin> = {
@@ -247,7 +198,7 @@ function EditBulletin() {
       const { error } = await supabase.from("bulletins").update(patch).eq("id", current.id);
       if (error) throw error;
       dirtyRef.current = false;
-      localStorage.removeItem(dirtyKey);
+
       setB({ ...current, content: finalContent, ...(nextStatus ? { status: nextStatus } : {}) });
       toast.success(nextStatus === "done" ? "Boletim concluído" : "Salvo");
     } catch (e) {
@@ -264,11 +215,8 @@ function EditBulletin() {
       toast.error("Informe as palavras-chave antes de gerar.");
       return;
     }
-    if (!online) {
-      toast.error("A geração por IA requer conexão com a internet.");
-      return;
-    }
     setGenerating(true);
+
     try {
       const res = await genFn({
         data: {
@@ -357,9 +305,8 @@ function EditBulletin() {
       toast.error(translateDbError(error));
       return;
     }
-    localStorage.removeItem(cacheKey);
-    localStorage.removeItem(dirtyKey);
     navigate({ to: "/dashboard" });
+
   }
 
 
@@ -383,11 +330,7 @@ function EditBulletin() {
           <ArrowLeft className="h-4 w-4" /> Voltar
         </Link>
         <div className="flex items-center gap-2">
-          {!online && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-warning/15 px-2 py-1 text-xs text-warning-foreground">
-              <WifiOff className="h-3 w-3" /> Sem conexão
-            </span>
-          )}
+
           <button
             onClick={() => update("is_favorite", !b.is_favorite)}
             className="grid h-9 w-9 place-items-center rounded-lg border hover:bg-accent"
