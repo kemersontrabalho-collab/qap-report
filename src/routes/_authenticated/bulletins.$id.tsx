@@ -219,10 +219,8 @@ function EditBulletin() {
     if (!current) return;
     setSaving(true);
     try {
-      if (!online) {
-        toast.error("Sem conexão. Verifique sua internet e tente novamente.");
-        return;
-      }
+      // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
+
       // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
       // o autosave enquanto o usuário ainda está digitando.
       const finalContent = nextStatus === "done" ? stripBraces(current.content) : current.content;
