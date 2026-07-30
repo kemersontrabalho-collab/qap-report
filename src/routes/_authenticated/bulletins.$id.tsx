@@ -18,7 +18,6 @@ import {
   Copy,
   Star,
   Trash2,
-  WifiOff,
   MapPin,
   ExternalLink,
   
