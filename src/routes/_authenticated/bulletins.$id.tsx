@@ -264,11 +264,8 @@ function EditBulletin() {
       toast.error("Informe as palavras-chave antes de gerar.");
       return;
     }
-    if (!online) {
-      toast.error("A geração por IA requer conexão com a internet.");
-      return;
-    }
     setGenerating(true);
+
     try {
       const res = await genFn({
         data: {
