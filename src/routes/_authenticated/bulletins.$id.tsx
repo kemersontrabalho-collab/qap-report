@@ -221,7 +221,6 @@ function EditBulletin() {
     try {
       // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
 
-      // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
       // o autosave enquanto o usuário ainda está digitando.
       const finalContent = nextStatus === "done" ? stripBraces(current.content) : current.content;
       const patch: Partial<Bulletin> = {
