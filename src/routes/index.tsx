@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ShieldCheck, Feather, Search, Moon, Sparkles } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -72,8 +72,29 @@ function Feature({
   );
 }
 
+function hasStoredSession() {
+  if (typeof window === "undefined") return false;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith("sb-") && k.endsWith("-auth-token")) return true;
+    }
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
+
 function Landing() {
   const navigate = useNavigate();
+  // Evita o "flash" da landing para quem já está logado: se houver sessão
+  // persistida no dispositivo, mostramos um estado de transição enquanto o
+  // redirecionamento acontece. No SSR/visitante anônimo nada muda (SEO intacto).
+  const [redirecting, setRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (hasStoredSession()) setRedirecting(true);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,8 +105,12 @@ function Landing() {
         navigate({ to: "/dashboard", replace: true });
       }
     });
+    supabase.auth.getSession().then(({ data }) => {
+      if (!cancelled && !data.session) setRedirecting(false);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+        setRedirecting(true);
         navigate({ to: "/dashboard", replace: true });
       }
     });
@@ -94,6 +119,17 @@ function Landing() {
       sub.subscription.unsubscribe();
     };
   }, [navigate]);
+
+  if (redirecting) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          Entrando...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
