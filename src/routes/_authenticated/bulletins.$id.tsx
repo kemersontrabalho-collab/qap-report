@@ -357,9 +357,8 @@ function EditBulletin() {
       toast.error(translateDbError(error));
       return;
     }
-    localStorage.removeItem(cacheKey);
-    localStorage.removeItem(dirtyKey);
     navigate({ to: "/dashboard" });
+
   }
 
 
