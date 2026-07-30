@@ -107,12 +107,14 @@ function AuthPage() {
   async function handleGoogle() {
     setLoading(true);
     try {
+      // Grava a preferência ANTES de iniciar o OAuth: em fluxo com redirect
+      // completo a página é descarregada e o código abaixo nunca roda.
+      setSessionLifetime(keepSignedIn);
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
-      setSessionLifetime(keepSignedIn);
       toast.success("Bem-vindo(a)!");
       navigate({ to: safeRedirect(), replace: true });
     } catch (err) {
@@ -125,12 +127,14 @@ function AuthPage() {
   async function handleApple() {
     setLoading(true);
     try {
+      // Grava a preferência ANTES de iniciar o OAuth: em fluxo com redirect
+      // completo a página é descarregada e o código abaixo nunca roda.
+      setSessionLifetime(keepSignedIn);
       const result = await lovable.auth.signInWithOAuth("apple", {
         redirect_uri: window.location.origin,
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
-      setSessionLifetime(keepSignedIn);
       toast.success("Bem-vindo(a)!");
       navigate({ to: safeRedirect(), replace: true });
     } catch (err) {
