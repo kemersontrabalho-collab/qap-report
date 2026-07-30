@@ -383,11 +383,7 @@ function EditBulletin() {
           <ArrowLeft className="h-4 w-4" /> Voltar
         </Link>
         <div className="flex items-center gap-2">
-          {!online && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-warning/15 px-2 py-1 text-xs text-warning-foreground">
-              <WifiOff className="h-3 w-3" /> Sem conexão
-            </span>
-          )}
+
           <button
             onClick={() => update("is_favorite", !b.is_favorite)}
             className="grid h-9 w-9 place-items-center rounded-lg border hover:bg-accent"
