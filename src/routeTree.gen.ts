@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ModelosBoletimOcorrenciaRouteImport } from './routes/modelos-boletim-ocorrencia'
 import { Route as GuiaRedacaoTecnicaRouteImport } from './routes/guia-redacao-tecnica'
+import { Route as GuiaDelegaciaOnlineRouteImport } from './routes/guia-delegacia-online'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -44,6 +45,11 @@ const ModelosBoletimOcorrenciaRoute =
 const GuiaRedacaoTecnicaRoute = GuiaRedacaoTecnicaRouteImport.update({
   id: '/guia-redacao-tecnica',
   path: '/guia-redacao-tecnica',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaDelegaciaOnlineRoute = GuiaDelegaciaOnlineRouteImport.update({
+  id: '/guia-delegacia-online',
+  path: '/guia-delegacia-online',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/guia-delegacia-online': typeof GuiaDelegaciaOnlineRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/guia-delegacia-online': typeof GuiaDelegaciaOnlineRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/guia-delegacia-online': typeof GuiaDelegaciaOnlineRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/guia-delegacia-online'
     | '/guia-redacao-tecnica'
     | '/modelos-boletim-ocorrencia'
     | '/reset-password'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/guia-delegacia-online'
     | '/guia-redacao-tecnica'
     | '/modelos-boletim-ocorrencia'
     | '/reset-password'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/admin'
     | '/auth'
+    | '/guia-delegacia-online'
     | '/guia-redacao-tecnica'
     | '/modelos-boletim-ocorrencia'
     | '/reset-password'
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  GuiaDelegaciaOnlineRoute: typeof GuiaDelegaciaOnlineRoute
   GuiaRedacaoTecnicaRoute: typeof GuiaRedacaoTecnicaRoute
   ModelosBoletimOcorrenciaRoute: typeof ModelosBoletimOcorrenciaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/guia-redacao-tecnica'
       fullPath: '/guia-redacao-tecnica'
       preLoaderRoute: typeof GuiaRedacaoTecnicaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia-delegacia-online': {
+      id: '/guia-delegacia-online'
+      path: '/guia-delegacia-online'
+      fullPath: '/guia-delegacia-online'
+      preLoaderRoute: typeof GuiaDelegaciaOnlineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -353,6 +373,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  GuiaDelegaciaOnlineRoute: GuiaDelegaciaOnlineRoute,
   GuiaRedacaoTecnicaRoute: GuiaRedacaoTecnicaRoute,
   ModelosBoletimOcorrenciaRoute: ModelosBoletimOcorrenciaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -362,3 +383,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
