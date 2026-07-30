@@ -43,53 +43,46 @@ const DEFAULT_ENTRY: Omit<SitemapEntry, "path"> = {
   priority: "0.6",
 };
 
-type AnyRoute = {
-  id?: string;
-  children?: unknown;
-};
+/**
+ * Lista os arquivos de rota em tempo de build. Assim, qualquer rota nova
+ * entra automaticamente no sitemap e nenhuma lista manual fica desatualizada.
+ */
+const ROUTE_FILES = import.meta.glob("./**/*.{ts,tsx}", { eager: false });
 
-/** Converte o id gerado ("/_authenticated/settings") no caminho público ("/settings"). */
-function idToPath(id: string): string {
-  const segments = id
+/** Converte "./_authenticated/settings.tsx" no caminho público "/settings". */
+function fileToPath(file: string): string | null {
+  let clean = file.replace(/^\.\//, "").replace(/\.(tsx|ts)$/, "");
+  if (clean.startsWith("__root")) return null;
+  // Segmentos escapados: "sitemap[.]xml" -> "sitemap.xml"
+  clean = clean.replace(/\[(.)\]/g, "$1");
+
+  const segments = clean
     .split("/")
+    .flatMap((part) =>
+      part.includes(".") && !part.includes("sitemap") ? part.split(".") : [part],
+    )
     .filter(Boolean)
-    .filter((s) => !s.startsWith("_"));
+    .filter((s) => !s.startsWith("_"))
+    .filter((s) => s !== "index" && s !== "route");
+
+  if (segments.some((s) => s.includes("$") || s.includes("*"))) return null;
+
   return "/" + segments.join("/");
 }
 
-function collectRouteIds(route: AnyRoute, acc: string[] = []): string[] {
-  if (typeof route.id === "string" && route.id !== "__root__") acc.push(route.id);
-  const children = route.children;
-  const list = Array.isArray(children)
-    ? children
-    : children && typeof children === "object"
-      ? Object.values(children as Record<string, AnyRoute>)
-      : [];
-  for (const child of list) collectRouteIds(child as AnyRoute, acc);
-  return acc;
-}
-
-/**
- * Deriva as entradas do sitemap diretamente da árvore de rotas gerada.
- * Assim, qualquer rota nova entra automaticamente e nenhuma lista manual
- * fica desatualizada.
- */
 function buildEntries(): SitemapEntry[] {
   const paths = new Set<string>();
 
-  for (const id of collectRouteIds(routeTree as AnyRoute)) {
-    // Rotas dinâmicas/curinga não têm URL pública estável
-    if (id.includes("$") || id.includes("*")) continue;
-
-    const path = idToPath(id);
-    if (path === "" || EXCLUDED_PATHS.has(path)) continue;
+  for (const file of Object.keys(ROUTE_FILES)) {
+    const path = fileToPath(file);
+    if (!path || EXCLUDED_PATHS.has(path)) continue;
     if (EXCLUDED_PREFIXES.some((p) => path === p || path.startsWith(p + "/"))) continue;
-
     paths.add(path);
   }
 
-  // Garante a home mesmo que a árvore mude de formato
+  // Garante a home
   paths.add("/");
+
 
   return [...paths]
     .sort((a, b) => (a === "/" ? -1 : b === "/" ? 1 : a.localeCompare(b)))
