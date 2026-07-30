@@ -244,7 +244,7 @@ function EditBulletin() {
       const { error } = await supabase.from("bulletins").update(patch).eq("id", current.id);
       if (error) throw error;
       dirtyRef.current = false;
-      localStorage.removeItem(dirtyKey);
+      dirtyRef.current = false;
       setB({ ...current, content: finalContent, ...(nextStatus ? { status: nextStatus } : {}) });
       toast.success(nextStatus === "done" ? "Boletim concluído" : "Salvo");
     } catch (e) {
