@@ -40,9 +40,8 @@ export const Route = createFileRoute("/_authenticated/assinar")({
 // Constantes de negócio (centralizadas p/ facilitar troca)
 // ============================================================
 const PIX_KEY = "dc748121-4fd1-4277-b987-7b4b5aa2de0f";
-const WHATSAPP_NUMBER = "5597153371"; // 55 (país) + 97 (DDD interno) — mantido conforme spec
-// Observação: o número informado tinha ambiguidade; usamos o formato E.164 pedido: 55 + 97153371
-const WHATSAPP_FULL = "5597153371";
+const WHATSAPP_NUMBER = "5555997153371"; // 55 (país) + 55 (DDD) + 997153371
+const WHATSAPP_FULL = "5555997153371";
 const PLANS = {
   mensal: { label: "Mensal", price: 10, priceLabel: "R$ 10,00", cycle: "por mês" },
   anual: { label: "Anual", price: 90, priceLabel: "R$ 90,00", cycle: "por ano (economize 25%)" },
