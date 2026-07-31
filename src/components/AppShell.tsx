@@ -3,6 +3,8 @@ import { LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle } fro
 import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
+import { usePresence } from "@/lib/usePresence";
+
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { NotificationBell } from "@/components/NotificationBell";
