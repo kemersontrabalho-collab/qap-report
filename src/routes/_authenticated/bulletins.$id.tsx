@@ -439,7 +439,11 @@ function EditBulletin() {
                 className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            {/* Abaixo de 480px (relógio, dobrável fechado, fonte ampliada) o par
+                "Prefixo / Data e Hora" vira coluna única — um input datetime-local
+                não é utilizável com menos de ~150px. */}
+            <div className="grid grid-cols-1 gap-3 xs:grid-cols-2">
+
               <div>
                 <label className="text-sm font-medium">Prefixo da viatura</label>
                 <input
