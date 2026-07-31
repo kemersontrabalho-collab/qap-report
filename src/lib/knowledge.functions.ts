@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { assertPremium } from "./premium.server";
 
 const findInput = z.object({
   query: z.string().min(3).max(2000),
@@ -23,6 +24,7 @@ export const findSimilarBulletins = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => findInput.parse(data))
   .handler(async ({ data, context }): Promise<SimilarCase[]> => {
+    await assertPremium(context.supabase, context.userId);
     const limit = data.limit ?? 3;
     const [own, tpl, community] = await Promise.all([
       context.supabase.rpc("match_bulletin_knowledge", {
