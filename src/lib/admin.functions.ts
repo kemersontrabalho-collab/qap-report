@@ -469,7 +469,7 @@ export const adminUpdateCommunityKnowledge = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdminSession();
     const sb = await admin();
-    const patch: Record<string, unknown> = {};
+    const patch: { title?: string; category?: string | null; content?: string } = {};
     if (typeof data.title === "string") patch.title = data.title.slice(0, 300);
     if (data.category !== undefined) patch.category = data.category;
     if (typeof data.content === "string") patch.content = data.content.slice(0, 20000);
