@@ -154,160 +154,278 @@ function Landing() {
   }
 
   return (
-    <div className="min-h-dvh bg-background text-foreground">
-      {/* Header da landing: marca elástica + navegação que quebra para a linha
-          de baixo em telas muito estreitas, em vez de comprimir os links. */}
-      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-fluid py-4 sm:py-5">
-        <div className="flex min-w-0 items-center gap-2">
-          <img
-            src={logoAsset.url}
-            alt="QAP Report"
-            width={40}
-            height={40}
-            fetchPriority="high"
-            decoding="async"
-            // aspect-square reserva a caixa antes do byte chegar → sem CLS.
-            className="aspect-square h-10 w-10 shrink-0 object-contain"
-          />
-          <span className="truncate text-fluid-lg font-semibold tracking-tight">QAP Report</span>
-        </div>
-        <nav className="flex flex-wrap items-center gap-x-3 gap-y-2">
+    <div className="relative min-h-dvh overflow-x-clip bg-background text-foreground">
+      {/* Campo de grade técnica de fundo (32px = 8pt × 4), esmaecido por mask.
+          `fixed` + `-z-10` mantém o custo de pintura fora do fluxo do scroll. */}
+      <div aria-hidden className="grid-field pointer-events-none fixed inset-0 -z-10" />
 
-          <Link
-            to="/guia-redacao-tecnica"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Guia
+      {/*
+       * HEADER — barra de vidro fixa. O véu translúcido só aparece sobre
+       * conteúdo, então o topo da página continua limpo; a borda inferior de
+       * 1px em cor semitransparente evita a "linha dura" típica de UI comum.
+       */}
+      <header className="glass sticky top-0 z-40 border-x-0 border-t-0">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-fluid py-3">
+          <Link to="/" className="group flex min-w-0 items-center gap-2.5">
+            <img
+              src={logoAsset.url}
+              alt="QAP Report"
+              width={40}
+              height={40}
+              fetchPriority="high"
+              decoding="async"
+              className="aspect-square h-9 w-9 shrink-0 object-contain transition-transform duration-500 ease-[var(--ease-spring)] group-hover:scale-105"
+            />
+            <span className="truncate text-fluid-lg font-semibold tracking-[-0.02em]">
+              QAP Report
+            </span>
           </Link>
-          <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">
-            Entrar
-          </Link>
-          <Link
-            to="/auth"
-            search={{ mode: "signup" }}
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
-          >
-            Criar conta
-          </Link>
-        </nav>
+
+          <nav className="flex flex-wrap items-center gap-x-1 gap-y-2 sm:gap-x-2">
+            <Link
+              to="/guia-redacao-tecnica"
+              className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors duration-300 hover:bg-accent hover:text-foreground"
+            >
+              Guia
+            </Link>
+            <Link
+              to="/auth"
+              className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors duration-300 hover:bg-accent hover:text-foreground"
+            >
+              Entrar
+            </Link>
+            <Link
+              to="/auth"
+              search={{ mode: "signup" }}
+              className="btn-brand inline-flex min-h-10 items-center justify-center rounded-xl px-4 text-sm font-medium"
+            >
+              Criar conta
+            </Link>
+          </nav>
+        </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-fluid">
         {/*
-         * HERO — coluna única até md (o cartão de prévia embaixo funciona como
-         * prova social após a chamada). A partir de md as duas colunas ficam
-         * lado a lado e centradas verticalmente. O padding vertical é fluido,
-         * então não há salto de 16 para 24 unidades no breakpoint.
+         * HERO — assimetria 55/45 no desktop (grid 11 colunas: 6 + 5). O texto
+         * recebe mais peso que a prévia, mantendo o equilíbrio óptico sem cair
+         * no 50/50 previsível. `aurora` injeta o halo de luz da marca.
          */}
-        <section className="grid gap-8 py-fluid-section md:grid-cols-2 md:items-center">
-          <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-fluid-xs text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5 shrink-0" /> Assistente de redação policial
+        <section className="aurora grid items-center gap-10 py-fluid-section lg:grid-cols-11 lg:gap-16">
+          <div className="min-w-0 lg:col-span-6">
+            <div
+              className="reveal glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-fluid-xs font-medium text-muted-foreground"
+              style={{ "--d": "0ms" } as React.CSSProperties}
+            >
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-bright opacity-70" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-bright" />
+              </span>
+              Assistente de redação policial com IA
             </div>
-            {/* text-fluid-hero: 28px no relógio → 60px no ultrawide, contínuo. */}
-            <h1 className="mt-4 text-fluid-hero font-bold">
-              Boletins policiais bem redigidos, em segundos.
+
+            <h1
+              className="reveal mt-6 text-fluid-hero font-bold"
+              style={{ "--d": "90ms" } as React.CSSProperties}
+            >
+              Boletins policiais bem redigidos,{" "}
+              {/* Acento cromático em duas palavras apenas — mais que isso vira ruído. */}
+              <span className="text-gradient-brand">em segundos.</span>
             </h1>
-            {/* measure trava a linha em ~68 caracteres: legibilidade preservada
-                tanto no celular quanto num monitor de 32". */}
-            <p className="measure mt-4 text-fluid-base text-muted-foreground">
+
+            <p
+              className="reveal measure mt-6 text-fluid-base text-muted-foreground"
+              style={{ "--d": "170ms" } as React.CSSProperties}
+            >
               Informe o tipo de ocorrência (BA, BO-COP, BO-TC ou BOAT) e as palavras-chave. O QAP
               Report produz um texto formal, técnico e fiel aos fatos — pronto para revisão.
             </p>
 
-            {/* CTAs: largura total no mobile (alvo de toque generoso e polegar
-                confortável), auto a partir de 480px. */}
-            <div className="mt-6 flex flex-col gap-3 xs:flex-row xs:flex-wrap">
+            <div
+              className="reveal mt-8 flex flex-col gap-3 xs:flex-row xs:flex-wrap"
+              style={{ "--d": "250ms" } as React.CSSProperties}
+            >
               <Link
                 to="/auth"
                 search={{ mode: "signup" }}
-                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="btn-brand group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold"
               >
                 Começar agora
+                <ArrowRight className="h-4 w-4 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
               </Link>
               <Link
                 to="/auth"
-                className="inline-flex min-h-11 items-center justify-center rounded-lg border px-5 text-sm font-medium hover:bg-accent"
+                className="btn-ghost-line inline-flex min-h-12 items-center justify-center rounded-xl px-6 text-sm font-medium"
               >
                 Já tenho conta
               </Link>
             </div>
+
+            {/* Prova de escopo: 8pt entre itens, divisores de 1px hairline. */}
+            <dl
+              className="reveal mt-10 flex flex-wrap items-center gap-x-8 gap-y-4"
+              style={{ "--d": "330ms" } as React.CSSProperties}
+            >
+              {[
+                ["4", "tipos de boletim"],
+                ["24h", "de teste gratuito"],
+                ["100%", "dados isolados por usuário"],
+              ].map(([value, label]) => (
+                <div key={label} className="stack-8">
+                  <dt className="text-fluid-xl font-bold tracking-tight">{value}</dt>
+                  <dd className="text-fluid-xs uppercase tracking-[0.12em] text-muted-foreground">
+                    {label}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
-          <div className="relative min-w-0">
-            <div className="rounded-3xl border bg-card p-4 shadow-lg sm:p-6">
-              <div className="text-fluid-xs font-medium text-muted-foreground">Prévia · BO-COP</div>
-              <h2 className="mt-2 text-fluid-base font-semibold">
+
+          {/* Prévia: cartão flutuante levemente rotacionado no desktop para
+              sugerir profundidade física, alinhado reto no mobile. */}
+          <div
+            className="reveal relative min-w-0 lg:col-span-5"
+            style={{ "--d": "200ms" } as React.CSSProperties}
+          >
+            <div className="surface-card rounded-3xl p-5 shadow-[var(--shadow-xl)] transition-transform duration-700 ease-[var(--ease-out-expo)] sm:p-7 lg:rotate-[0.6deg] lg:hover:rotate-0">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-fluid-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  Prévia
+                </span>
+                <span className="rounded-full bg-[image:var(--gradient-brand)] px-2.5 py-1 text-[0.6875rem] font-semibold text-primary-foreground">
+                  BO-COP
+                </span>
+              </div>
+
+              <h2 className="mt-4 text-fluid-lg font-semibold tracking-tight">
                 Comunicação de Ocorrência Policial
               </h2>
-              <p className="mt-3 text-fluid-sm text-muted-foreground">
+
+              <p className="mt-4 border-l-2 border-brand-bright/40 pl-4 text-fluid-sm italic text-muted-foreground">
                 Aos vinte e três dias do mês corrente, esta guarnição composta pelos policiais
                 militares acima identificados, em patrulhamento pela viatura de prefixo indicado,
                 foi acionada via COPOM para atender ocorrência...
               </p>
-              {/* flex-wrap evita que as duas tags de fundamentação legal estourem
-                  o cartão em telas estreitas. */}
-              <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                <span className="rounded-md bg-accent px-2 py-1 text-accent-foreground">
-                  Súm. Vinc. 11
-                </span>
-                <span className="rounded-md bg-accent px-2 py-1 text-accent-foreground">
-                  Art. 5º, LXIII CF
-                </span>
+
+              <div className="mt-6 flex flex-wrap gap-2 text-xs">
+                {["Súm. Vinc. 11", "Art. 5º, LXIII CF"].map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-lg border border-[var(--surface-line)] bg-accent/60 px-2.5 py-1 font-medium text-accent-foreground"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
         </section>
 
-        {/* Recursos: 1 → 2 (tablet retrato) → 3 (desktop). */}
-        <section className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 md:grid-cols-3 md:pb-20">
+        {/*
+         * BENTO GRID — 6 colunas no desktop: duas células-âncora ocupam 2
+         * colunas cada e as demais 2, criando ritmo assimétrico dentro de uma
+         * grade rígida. Colapsa para 2 colunas no tablet e 1 no celular.
+         */}
+        <section className="pb-fluid-section">
+          <div className="measure">
+            <h2 className="text-fluid-2xl font-bold">Tudo o que o plantão exige.</h2>
+            <p className="mt-3 text-fluid-base text-muted-foreground">
+              Ferramentas construídas em torno do vocabulário técnico policial — não um editor de
+              texto genérico com IA colada por cima.
+            </p>
+          </div>
 
-          <h2 className="sr-only">Recursos do QAP Report</h2>
-          <Feature
-            icon={Feather}
-            title="Linguagem técnica"
-            desc="Terminologia jurídica e policial adequada, sem inventar fatos ou dados."
-          />
-          <Feature
-            icon={Search}
-            title="Pesquisa e histórico"
-            desc="Rascunhos, favoritos e busca por palavra-chave ou data."
-          />
-          <Feature
-            icon={Sparkles}
-            title="Agilidade no plantão"
-            desc="Modelos prontos e sugestões da IA para acelerar a redação do boletim."
-          />
-          <Feature
-            icon={ShieldCheck}
-            title="Seguro"
-            desc="Autenticação protegida e dados isolados por usuário."
-          />
-          <Feature
-            icon={Moon}
-            title="Claro & escuro"
-            desc="Interface responsiva com tema adaptável ao seu ambiente."
-          />
-          <Feature
-            icon={Sparkles}
-            title="Assistente IA"
-            desc="Sugestões de preenchimento com base nas palavras-chave informadas."
-          />
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+            <Feature
+              icon={Feather}
+              title="Linguagem técnica"
+              desc="Terminologia jurídica e policial adequada, sem inventar fatos ou dados."
+              span="lg:col-span-2"
+              delay={0}
+            />
+            <Feature
+              icon={Sparkles}
+              title="Assistente IA"
+              desc="Sugestões de preenchimento a partir das palavras-chave informadas, com fundamentação legal pertinente."
+              span="lg:col-span-4"
+              delay={70}
+            />
+            <Feature
+              icon={Search}
+              title="Pesquisa e histórico"
+              desc="Rascunhos, favoritos, concluídos e lixeira, com busca por palavra-chave ou data."
+              span="lg:col-span-3"
+              delay={140}
+            />
+            <Feature
+              icon={ShieldCheck}
+              title="Seguro por padrão"
+              desc="Autenticação protegida e dados isolados por usuário."
+              span="lg:col-span-3"
+              delay={210}
+            />
+            <Feature
+              icon={Sparkles}
+              title="Agilidade no plantão"
+              desc="Modelos prontos para BA, BO-COP, BO-TC e BOAT."
+              span="lg:col-span-4"
+              delay={280}
+            />
+            <Feature
+              icon={Moon}
+              title="Claro & escuro"
+              desc="Interface adaptável ao ambiente do turno."
+              span="lg:col-span-2"
+              delay={350}
+            />
+          </div>
+        </section>
+
+        {/* CTA de fechamento: bloco de marca em largura total, o único momento
+            da página com fundo saturado — por isso funciona como clímax. */}
+        <section className="pb-fluid-section">
+          <div className="relative overflow-hidden rounded-3xl bg-[image:var(--gradient-brand)] px-6 py-12 text-center shadow-[var(--shadow-xl)] sm:px-12 sm:py-16">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-25 [background:radial-gradient(30rem_18rem_at_80%_0%,white,transparent_70%)]"
+            />
+            <h2 className="relative text-fluid-2xl font-bold text-primary-foreground">
+              Comece o turno com o relatório pronto.
+            </h2>
+            <p className="relative mx-auto mt-4 max-w-xl text-fluid-base text-primary-foreground/80">
+              Crie sua conta e tenha 24 horas de acesso completo para testar em ocorrências reais.
+            </p>
+            <Link
+              to="/auth"
+              search={{ mode: "signup" }}
+              className="relative mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-background px-7 text-sm font-semibold text-foreground shadow-[var(--shadow-lg)] transition-transform duration-300 ease-[var(--ease-spring)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.985]"
+            >
+              Criar conta gratuita
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </section>
       </main>
 
-      <footer className="border-t">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-6 sm:flex-row">
-          <p className="text-xs text-muted-foreground">
+      <footer className="border-t border-[var(--surface-line)]">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-fluid py-8 sm:flex-row">
+          <p className="text-fluid-xs text-muted-foreground">
             © {new Date().getFullYear()} QAP Report · Ferramenta de apoio à redação policial
           </p>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <Link to="/guia-redacao-tecnica" className="hover:text-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-fluid-xs text-muted-foreground">
+            <Link
+              to="/guia-redacao-tecnica"
+              className="transition-colors duration-300 hover:text-foreground"
+            >
               Guia de redação técnica
             </Link>
-            <Link to="/modelos-boletim-ocorrencia" className="hover:text-foreground">
+            <Link
+              to="/modelos-boletim-ocorrencia"
+              className="transition-colors duration-300 hover:text-foreground"
+            >
               Modelos de boletim
             </Link>
-            <Link to="/auth" className="hover:text-foreground">
+            <Link to="/auth" className="transition-colors duration-300 hover:text-foreground">
               Entrar
             </Link>
           </div>
@@ -316,3 +434,4 @@ function Landing() {
     </div>
   );
 }
+
