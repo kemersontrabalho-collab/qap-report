@@ -172,7 +172,8 @@ const geoInput = z.object({
 export const reverseGeocode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => geoInput.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertPremium(context.supabase, context.userId);
     const lovableKey = process.env.LOVABLE_API_KEY;
     const mapsKey = process.env.GOOGLE_MAPS_API_KEY;
     if (!lovableKey || !mapsKey) throw new Error("Google Maps não configurado");
