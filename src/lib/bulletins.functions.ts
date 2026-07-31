@@ -137,10 +137,13 @@ Produza o boletim seguindo rigorosamente as regras. Estrutura obrigatória:
 2) Em seguida, "## HISTÓRICO / VERSÃO POLICIAL" e o texto corrido.
 Todos os dados padronizados acima (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) devem estar EMBASADOS/EMBUTIDOS na narrativa do histórico — NÃO crie cabeçalho, lista ou bloco de campos acima do histórico. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — jamais invente informação.`;
 
-    const content = await callGateway([
+    const messages: { role: string; content: string }[] = [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: userMsg },
-    ]);
+    ];
+    if (references) messages.push({ role: "system", content: references });
+    messages.push({ role: "user", content: userMsg });
+    const content = await callGateway(messages);
+
     return { content };
   });
 
