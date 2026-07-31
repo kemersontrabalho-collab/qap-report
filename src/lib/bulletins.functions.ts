@@ -54,7 +54,6 @@ FORMATO DE SAÍDA:
 - (Se aplicável) TIPIFICAÇÃO LEGAL (artigos e leis pertinentes)
 - (Se necessário) PERGUNTAS COMPLEMENTARES`;
 
-
 const genInput = z.object({
   bulletinType: z.enum(["BA", "BO-COP", "BO-TC", "BOAT"]),
   category: z.string().optional(),
@@ -79,9 +78,12 @@ async function callGateway(messages: { role: string; content: string }[]) {
     body: JSON.stringify({ model: "openai/gpt-5.4-mini", messages }),
   });
   if (!res.ok) {
-    if (res.status === 429) throw new Error("Limite de requisições atingido. Tente novamente em instantes.");
-    if (res.status === 402) throw new Error("Créditos de IA esgotados. Adicione créditos no workspace.");
-    if (res.status >= 500) throw new Error("Serviço de IA indisponível no momento. Tente novamente em instantes.");
+    if (res.status === 429)
+      throw new Error("Limite de requisições atingido. Tente novamente em instantes.");
+    if (res.status === 402)
+      throw new Error("Créditos de IA esgotados. Adicione créditos no workspace.");
+    if (res.status >= 500)
+      throw new Error("Serviço de IA indisponível no momento. Tente novamente em instantes.");
     throw new Error("Não foi possível gerar o texto. Verifique os dados e tente novamente.");
   }
   const json = (await res.json()) as { choices: { message: { content: string } }[] };
@@ -94,7 +96,10 @@ export const generateBulletin = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertPremium(context.supabase, context.userId);
     const fmtDate = data.occurrenceAt
-      ? new Date(data.occurrenceAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
+      ? new Date(data.occurrenceAt).toLocaleString("pt-BR", {
+          dateStyle: "short",
+          timeStyle: "short",
+        })
       : undefined;
 
     // Nomenclatura padronizada: os rótulos devem aparecer literalmente
@@ -154,10 +159,7 @@ export const askAI = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => askInput.parse(data))
   .handler(async ({ data, context }) => {
     await assertPremium(context.supabase, context.userId);
-    const content = await callGateway([
-      { role: "system", content: CHAT_SYSTEM },
-      ...data.messages,
-    ]);
+    const content = await callGateway([{ role: "system", content: CHAT_SYSTEM }, ...data.messages]);
     return { content };
   });
 
@@ -201,4 +203,3 @@ export const reverseGeocode = createServerFn({ method: "POST" })
       clearTimeout(timer);
     }
   });
-

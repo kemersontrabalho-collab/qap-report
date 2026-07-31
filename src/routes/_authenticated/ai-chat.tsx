@@ -13,12 +13,14 @@ export const Route = createFileRoute("/_authenticated/ai-chat")({
       { title: "Dúvidas com IA · QAP Report" },
       {
         name: "description",
-        content: "Tire dúvidas jurídico-policiais: enquadramento legal, penas e qual documento usar.",
+        content:
+          "Tire dúvidas jurídico-policiais: enquadramento legal, penas e qual documento usar.",
       },
       { property: "og:title", content: "Dúvidas com IA · QAP Report" },
       {
         property: "og:description",
-        content: "Área privada para tirar dúvidas jurídico-policiais com apoio de IA no QAP Report.",
+        content:
+          "Área privada para tirar dúvidas jurídico-policiais com apoio de IA no QAP Report.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -56,7 +58,9 @@ function AIChatPage() {
       return;
     }
     if (messages.length >= MAX_MESSAGES) {
-      toast.error(`Limite de ${MAX_MESSAGES} mensagens por sessão atingido. Limpe o chat para continuar.`);
+      toast.error(
+        `Limite de ${MAX_MESSAGES} mensagens por sessão atingido. Limpe o chat para continuar.`,
+      );
       return;
     }
     const next: Msg[] = [...messages, { role: "user", content: trimmed }];
@@ -75,7 +79,6 @@ function AIChatPage() {
       setLoading(false);
     }
   }
-
 
   return (
     <AppShell>

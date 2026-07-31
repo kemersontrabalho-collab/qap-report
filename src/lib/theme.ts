@@ -31,7 +31,9 @@ export function useTheme() {
     apply(t);
     try {
       localStorage.setItem("theme", t);
-    } catch {}
+    } catch {
+      // localStorage indisponível (modo privativo)
+    }
   };
 
   const toggle = () => setTheme(theme === "dark" ? "light" : "dark");

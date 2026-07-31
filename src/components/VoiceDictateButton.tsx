@@ -10,15 +10,31 @@ type Props = {
 };
 
 // Web Speech API types (browser-provided)
-type SR = any;
+type SR = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start: () => void;
+  stop?: () => void;
+  onresult: ((event: SpeechResultEvent) => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
+  onend: (() => void) | null;
+};
 
-function getRecognitionCtor(): any | null {
+type SpeechResultEvent = {
+  resultIndex: number;
+  results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }>;
+};
+
+type SRConstructor = new () => SR;
+
+function getRecognitionCtor(): SRConstructor | null {
   if (typeof window === "undefined") return null;
-  return (
-    (window as any).SpeechRecognition ||
-    (window as any).webkitSpeechRecognition ||
-    null
-  );
+  const w = window as unknown as {
+    SpeechRecognition?: SRConstructor;
+    webkitSpeechRecognition?: SRConstructor;
+  };
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
 export function VoiceDictateButton({ value, onChange, label = "Ditar", className = "" }: Props) {
@@ -32,7 +48,9 @@ export function VoiceDictateButton({ value, onChange, label = "Ditar", className
     return () => {
       try {
         recogRef.current?.stop?.();
-      } catch {}
+      } catch {
+        // ignora: reconhecimento já encerrado
+      }
     };
   }, []);
 
@@ -49,7 +67,7 @@ export function VoiceDictateButton({ value, onChange, label = "Ditar", className
 
     baseRef.current = value ? value.replace(/\s+$/, "") + " " : "";
 
-    recog.onresult = (event: any) => {
+    recog.onresult = (event: SpeechResultEvent) => {
       let finalText = "";
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -64,7 +82,7 @@ export function VoiceDictateButton({ value, onChange, label = "Ditar", className
         onChange((baseRef.current + interim).trim());
       }
     };
-    recog.onerror = (e: any) => {
+    recog.onerror = (e: { error?: string }) => {
       if (e?.error === "not-allowed" || e?.error === "service-not-allowed") {
         toast.error("Permissão de microfone negada.");
       } else if (e?.error === "no-speech") {
@@ -88,7 +106,9 @@ export function VoiceDictateButton({ value, onChange, label = "Ditar", className
   const stop = () => {
     try {
       recogRef.current?.stop?.();
-    } catch {}
+    } catch {
+      // ignora: reconhecimento já encerrado
+    }
     setListening(false);
   };
 
@@ -101,9 +121,7 @@ export function VoiceDictateButton({ value, onChange, label = "Ditar", className
       title={listening ? "Parar ditado" : "Ditar por voz"}
       aria-label={listening ? "Parar ditado" : "Ditar por voz"}
       className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs transition ${
-        listening
-          ? "border-red-500 bg-red-500/10 text-red-600 animate-pulse"
-          : "hover:bg-accent"
+        listening ? "border-red-500 bg-red-500/10 text-red-600 animate-pulse" : "hover:bg-accent"
       } ${className}`}
     >
       {listening ? <MicOff className="h-3 w-3" /> : <Mic className="h-3 w-3" />}

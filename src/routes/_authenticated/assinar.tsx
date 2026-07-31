@@ -29,7 +29,11 @@ export const Route = createFileRoute("/_authenticated/assinar")({
   head: () => ({
     meta: [
       { title: "Assinar QAP Report" },
-      { name: "description", content: "Ative seu plano do QAP Report — mensal, anual, código promocional ou pagamento via Pix com liberação imediata." },
+      {
+        name: "description",
+        content:
+          "Ative seu plano do QAP Report — mensal, anual, código promocional ou pagamento via Pix com liberação imediata.",
+      },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -117,18 +121,15 @@ function AssinarPage() {
                     Seu tempo de teste ACABOU
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    A criação de boletins e o chat de dúvidas estão bloqueados.
-                    Escolha um plano abaixo ou resgate um código promocional para
-                    reativar todas as funções do QAP Report.
+                    A criação de boletins e o chat de dúvidas estão bloqueados. Escolha um plano
+                    abaixo ou resgate um código promocional para reativar todas as funções do QAP
+                    Report.
                   </p>
                 </div>
               </div>
             </section>
           );
         })()}
-
-
-
 
         {activePlan && (
           <section className="rounded-2xl border bg-emerald-500/5 border-emerald-500/40 p-5">
@@ -149,7 +150,10 @@ function AssinarPage() {
         )}
 
         {pendingPix && step === "plans" && (
-          <PendingPixCard pendingPix={pendingPix} onCanceled={() => qc.invalidateQueries({ queryKey: ["my-subscription"] })} />
+          <PendingPixCard
+            pendingPix={pendingPix}
+            onCanceled={() => qc.invalidateQueries({ queryKey: ["my-subscription"] })}
+          />
         )}
 
         {/* Fluxo passo-a-passo */}
@@ -197,13 +201,7 @@ function AssinarPage() {
 }
 
 // ============================================================
-function PlanSelector({
-  selected,
-  onSelect,
-}: {
-  selected: PlanId;
-  onSelect: (p: PlanId) => void;
-}) {
+function PlanSelector({ selected, onSelect }: { selected: PlanId; onSelect: (p: PlanId) => void }) {
   return (
     <section className="space-y-3">
       <h2 className="text-lg font-semibold">Escolha seu plano</h2>
@@ -268,7 +266,9 @@ function HasCouponStep({
           <QrCode className="h-5 w-5 text-primary" />
           <div>
             <p className="font-medium">Não, quero pagar com Pix</p>
-            <p className="text-xs text-muted-foreground">Liberação após confirmação do comprovante</p>
+            <p className="text-xs text-muted-foreground">
+              Liberação após confirmação do comprovante
+            </p>
           </div>
         </button>
       </div>
@@ -324,24 +324,26 @@ function CouponStep({ onBack, onRedeemed }: { onBack: () => void; onRedeemed: ()
           className="input font-mono tracking-widest text-lg uppercase"
         />
         {rawCode && clean !== rawCode && (
-          <p className="text-xs text-muted-foreground">Será validado como: <span className="font-mono">{clean}</span></p>
+          <p className="text-xs text-muted-foreground">
+            Será validado como: <span className="font-mono">{clean}</span>
+          </p>
         )}
         <button
           type="submit"
           disabled={mut.isPending || clean.length < 4}
           className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
         >
-          {mut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+          {mut.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <CheckCircle2 className="h-4 w-4" />
+          )}
           Validar código
         </button>
       </form>
     </section>
   );
 }
-
-
-
-
 
 // ============================================================
 function PixStep({
@@ -403,7 +405,9 @@ function PixStep({
       </div>
 
       <div className="mt-3 rounded-xl border bg-muted/40 p-4">
-        <p className="text-xs uppercase text-muted-foreground">Chave Pix aleatória (Mercado Pago)</p>
+        <p className="text-xs uppercase text-muted-foreground">
+          Chave Pix aleatória (Mercado Pago)
+        </p>
         <p className="mt-1 break-all font-mono text-sm">{PIX_KEY}</p>
         <button
           onClick={copyKey}
@@ -420,7 +424,11 @@ function PixStep({
             disabled={create.isPending}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
           >
-            {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+            {create.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle2 className="h-4 w-4" />
+            )}
             Já fiz o pagamento
           </button>
           <button
@@ -437,7 +445,8 @@ function PixStep({
             <div>
               <p className="font-medium">Seu pagamento está em análise.</p>
               <p className="mt-1 text-xs">
-                Envie o comprovante pelo WhatsApp para acelerar a liberação. A aprovação é feita pelo administrador.
+                Envie o comprovante pelo WhatsApp para acelerar a liberação. A aprovação é feita
+                pelo administrador.
               </p>
             </div>
           </div>
@@ -484,8 +493,10 @@ function PendingPixCard({
         <div className="flex-1">
           <h2 className="font-semibold">Pagamento em análise</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Você já enviou uma solicitação do plano <strong>{pendingPix.plan}</strong> (R$ {Number(pendingPix.amount_brl).toFixed(2).replace(".", ",")}) em{" "}
-            {new Date(pendingPix.created_at).toLocaleString("pt-BR")}. Aguarde a confirmação do administrador ou envie o comprovante pelo WhatsApp.
+            Você já enviou uma solicitação do plano <strong>{pendingPix.plan}</strong> (R${" "}
+            {Number(pendingPix.amount_brl).toFixed(2).replace(".", ",")}) em{" "}
+            {new Date(pendingPix.created_at).toLocaleString("pt-BR")}. Aguarde a confirmação do
+            administrador ou envie o comprovante pelo WhatsApp.
           </p>
           <button
             onClick={() => mut.mutate()}

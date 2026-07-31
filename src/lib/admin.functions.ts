@@ -121,7 +121,10 @@ export const adminListUsers = createServerFn({ method: "POST" })
       });
 
     const q = (data.search ?? "").trim().toLowerCase();
-    if (q) rows = rows.filter((r) => r.email.toLowerCase().includes(q) || r.full_name.toLowerCase().includes(q));
+    if (q)
+      rows = rows.filter(
+        (r) => r.email.toLowerCase().includes(q) || r.full_name.toLowerCase().includes(q),
+      );
     const f = data.filter ?? "all";
     if (f === "blocked") rows = rows.filter((r) => r.blocked);
     if (f === "active") rows = rows.filter((r) => !r.blocked && (r.inactive_days ?? 999) < 30);
@@ -204,7 +207,8 @@ export const adminCreateCoupon = createServerFn({ method: "POST" })
       .eq("role", "fundador")
       .limit(1)
       .maybeSingle();
-    if (!founder?.user_id) throw new Error("Nenhum usuário fundador cadastrado para atribuir o cupom.");
+    if (!founder?.user_id)
+      throw new Error("Nenhum usuário fundador cadastrado para atribuir o cupom.");
     const { error } = await sb.from("coupons").insert({
       code: data.code.trim(),
       duration_months: data.duration_months,
@@ -272,14 +276,18 @@ export const adminGrantSubscription = createServerFn({ method: "POST" })
 // =========================================================
 
 export const adminListPixRequests = createServerFn({ method: "POST" })
-  .inputValidator((d: { status?: "aguardando_aprovacao" | "aprovado" | "rejeitado" | "cancelado" | "all" }) => d)
+  .inputValidator(
+    (d: { status?: "aguardando_aprovacao" | "aprovado" | "rejeitado" | "cancelado" | "all" }) => d,
+  )
   .handler(async ({ data }) => {
     await requireAdminSession();
     const sb = await admin();
     const status = data.status ?? "aguardando_aprovacao";
     let q = sb
       .from("pix_payment_requests")
-      .select("id, user_id, plan, amount_brl, status, user_email, created_at, decided_at, admin_note")
+      .select(
+        "id, user_id, plan, amount_brl, status, user_email, created_at, decided_at, admin_note",
+      )
       .order("created_at", { ascending: false })
       .limit(500);
     if (status !== "all") q = q.eq("status", status);
@@ -339,7 +347,8 @@ export const adminApprovePixRequest = createServerFn({ method: "POST" })
       .eq("user_id", req.user_id)
       .maybeSingle();
     const finalEnd =
-      existing?.current_period_end && new Date(existing.current_period_end).getTime() > end.getTime()
+      existing?.current_period_end &&
+      new Date(existing.current_period_end).getTime() > end.getTime()
         ? existing.current_period_end
         : end.toISOString();
 
@@ -421,7 +430,9 @@ export const adminListCommunityKnowledge = createServerFn({ method: "POST" })
     const sb = await admin();
     let q = sb
       .from("community_knowledge")
-      .select("id, bulletin_type, category, title, keywords, content, status, created_at, approved_at")
+      .select(
+        "id, bulletin_type, category, title, keywords, content, status, created_at, approved_at",
+      )
       .order("created_at", { ascending: false })
       .limit(100);
     const status = data.status ?? "pendente";
@@ -465,7 +476,9 @@ export const adminReviewCommunityKnowledge = createServerFn({ method: "POST" })
   });
 
 export const adminUpdateCommunityKnowledge = createServerFn({ method: "POST" })
-  .inputValidator((d: { id: string; title?: string; category?: string | null; content?: string }) => d)
+  .inputValidator(
+    (d: { id: string; title?: string; category?: string | null; content?: string }) => d,
+  )
   .handler(async ({ data }) => {
     await requireAdminSession();
     const sb = await admin();

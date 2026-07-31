@@ -24,6 +24,7 @@ export function equalsCT(a: string, b: string) {
 }
 
 export async function getAdminSession() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- useSession é utilitário de servidor do TanStack, não um hook React
   return await useSession<AdminSession>(sessionConfig());
 }
 

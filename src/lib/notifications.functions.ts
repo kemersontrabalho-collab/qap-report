@@ -30,7 +30,7 @@ export const listNotifications = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(LIST_LIMIT);
     if (error) throw new Error(error.message);
-    const ids = (notifs ?? []).map((n: any) => n.id);
+    const ids = (notifs ?? []).map((n) => n.id);
     let readSet = new Set<string>();
     if (ids.length) {
       const { data: reads } = await supabase
@@ -38,10 +38,11 @@ export const listNotifications = createServerFn({ method: "GET" })
         .select("notification_id")
         .eq("user_id", userId)
         .in("notification_id", ids);
-      readSet = new Set((reads ?? []).map((r: any) => r.notification_id));
+      readSet = new Set((reads ?? []).map((r) => r.notification_id));
     }
-    const items: NotificationRow[] = (notifs ?? []).map((n: any) => ({
+    const items: NotificationRow[] = (notifs ?? []).map((n) => ({
       ...n,
+      audience: n.audience as NotificationRow["audience"],
       read: readSet.has(n.id),
     }));
     return { items, unread: items.filter((i) => !i.read).length };
@@ -63,7 +64,7 @@ export const markNotificationsRead = createServerFn({ method: "POST" })
         .or(`audience.eq.all,target_user_id.eq.${userId}`)
         .order("created_at", { ascending: false })
         .limit(LIST_LIMIT);
-      ids = (notifs ?? []).map((n: any) => n.id);
+      ids = (notifs ?? []).map((n) => n.id);
     }
     if (!ids.length) return { ok: true };
     const rows = ids.map((id) => ({ notification_id: id, user_id: userId }));

@@ -1,17 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-
 const BASE_URL = "https://qap-report.lovable.app";
 
-type ChangeFreq =
-  | "always"
-  | "hourly"
-  | "daily"
-  | "weekly"
-  | "monthly"
-  | "yearly"
-  | "never";
+type ChangeFreq = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
 interface SitemapEntry {
   path: string;
@@ -58,9 +50,7 @@ function fileToPath(file: string): string | null {
 
   const segments = clean
     .split("/")
-    .flatMap((part) =>
-      part.includes(".") && !part.includes("sitemap") ? part.split(".") : [part],
-    )
+    .flatMap((part) => (part.includes(".") && !part.includes("sitemap") ? part.split(".") : [part]))
     .filter(Boolean)
     .filter((s) => !s.startsWith("_"))
     .filter((s) => s !== "index" && s !== "route");
@@ -82,7 +72,6 @@ function buildEntries(): SitemapEntry[] {
 
   // Garante a home
   paths.add("/");
-
 
   return [...paths]
     .sort((a, b) => (a === "/" ? -1 : b === "/" ? 1 : a.localeCompare(b)))

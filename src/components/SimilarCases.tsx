@@ -47,7 +47,6 @@ export function SimilarCases({ bulletinType, keywords, category, context, onUseR
 
   if (query.length < 5) return null;
 
-
   return (
     <div className="rounded-2xl border bg-card p-4">
       <div className="flex items-center gap-2">
@@ -56,15 +55,16 @@ export function SimilarCases({ bulletinType, keywords, category, context, onUseR
         {loading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        Boletins concluídos anteriormente e casos anônimos aprovados da comunidade que se parecem com o
-        que você está redigindo.
+        Boletins concluídos anteriormente e casos anônimos aprovados da comunidade que se parecem
+        com o que você está redigindo.
       </p>
 
       {err && <div className="mt-3 text-xs text-destructive">{err}</div>}
 
       {!loading && !err && items.length === 0 && (
         <div className="mt-3 text-xs text-muted-foreground">
-          Nenhum caso semelhante encontrado ainda. À medida que boletins forem concluídos, sugestões aparecerão aqui.
+          Nenhum caso semelhante encontrado ainda. À medida que boletins forem concluídos, sugestões
+          aparecerão aqui.
         </div>
       )}
 

@@ -4,14 +4,29 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
-import { Loader2, Moon, Sun, LogOut, Trash2, Smartphone, Apple, Share2, RefreshCw, Link2, BookOpen, LifeBuoy, BellRing, Send, Crown } from "lucide-react";
+import {
+  Loader2,
+  Moon,
+  Sun,
+  LogOut,
+  Trash2,
+  Smartphone,
+  Apple,
+  Share2,
+  RefreshCw,
+  Link2,
+  BookOpen,
+  LifeBuoy,
+  BellRing,
+  Send,
+  Crown,
+} from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
 import { deleteMyAccount } from "@/lib/account.functions";
-
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
@@ -34,20 +49,20 @@ function SettingsPage() {
   const qc = useQueryClient();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
-  
+
   const [notifPerm, setNotifPerm] = useState<NotificationPermission | "unsupported">(
     typeof window !== "undefined" && "Notification" in window
       ? Notification.permission
       : "unsupported",
   );
-  const [supportSubject, setSupportSubject] = useState<"duvida" | "reclamacao" | "sugestao" | "outro">("duvida");
+  const [supportSubject, setSupportSubject] = useState<
+    "duvida" | "reclamacao" | "sugestao" | "outro"
+  >("duvida");
   const [supportMsg, setSupportMsg] = useState("");
   const [sendingSupport, setSendingSupport] = useState(false);
   const sendSupportFn = useServerFn(sendSupportMessage);
   const deleteAccountFn = useServerFn(deleteMyAccount);
   const [deletingAccount, setDeletingAccount] = useState(false);
-
-
 
   async function requestNotifications() {
     if (!("Notification" in window)) {
@@ -127,17 +142,15 @@ function SettingsPage() {
   async function save() {
     if (!profile) return;
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .upsert({
-        id: profile.id,
-        full_name: profile.full_name,
-        rank: profile.rank,
-        phone: profile.phone,
-        email: profile.email,
-        functional_id: profile.functional_id,
-        avatar_url: profile.avatar_url,
-      });
+    const { error } = await supabase.from("profiles").upsert({
+      id: profile.id,
+      full_name: profile.full_name,
+      rank: profile.rank,
+      phone: profile.phone,
+      email: profile.email,
+      functional_id: profile.functional_id,
+      avatar_url: profile.avatar_url,
+    });
     setSaving(false);
     if (error) toast.error(error.message);
     else toast.success("Dados atualizados");
@@ -188,12 +201,13 @@ function SettingsPage() {
           </p>
         </div>
 
-
-
         <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
-          <h2 className="flex items-center gap-2 font-semibold"><Crown className="h-4 w-4 text-primary" /> Assinatura</h2>
+          <h2 className="flex items-center gap-2 font-semibold">
+            <Crown className="h-4 w-4 text-primary" /> Assinatura
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ative seu plano mensal ou anual, resgate um código promocional ou envie comprovante de Pix.
+            Ative seu plano mensal ou anual, resgate um código promocional ou envie comprovante de
+            Pix.
           </p>
           <Link
             to="/assinar"
@@ -202,9 +216,6 @@ function SettingsPage() {
             <Crown className="h-4 w-4" /> Gerenciar assinatura
           </Link>
         </section>
-
-
-
 
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Aparência</h2>
@@ -282,9 +293,12 @@ function SettingsPage() {
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
-          <h2 className="flex items-center gap-2 font-semibold"><BookOpen className="h-4 w-4" /> Tutorial do aplicativo</h2>
+          <h2 className="flex items-center gap-2 font-semibold">
+            <BookOpen className="h-4 w-4" /> Tutorial do aplicativo
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Um guia passo a passo mostrando como usar cada parte do QAP Report: painel, criação de boletins, IA, casos semelhantes, PDF e mais.
+            Um guia passo a passo mostrando como usar cada parte do QAP Report: painel, criação de
+            boletins, IA, casos semelhantes, PDF e mais.
           </p>
           <button
             onClick={() => tutorialStore.open()}
@@ -295,9 +309,12 @@ function SettingsPage() {
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
-          <h2 className="flex items-center gap-2 font-semibold"><BellRing className="h-4 w-4" /> Notificações do dispositivo</h2>
+          <h2 className="flex items-center gap-2 font-semibold">
+            <BellRing className="h-4 w-4" /> Notificações do dispositivo
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ative para receber alertas do administrador e atualizações do app diretamente no seu dispositivo, mesmo com o QAP Report fechado.
+            Ative para receber alertas do administrador e atualizações do app diretamente no seu
+            dispositivo, mesmo com o QAP Report fechado.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
@@ -318,16 +335,19 @@ function SettingsPage() {
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
-          <h2 className="flex items-center gap-2 font-semibold"><LifeBuoy className="h-4 w-4" /> Suporte</h2>
+          <h2 className="flex items-center gap-2 font-semibold">
+            <LifeBuoy className="h-4 w-4" /> Suporte
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Envie dúvidas, reclamações ou sugestões. Sua mensagem chega diretamente à caixa de notificações do administrador.
+            Envie dúvidas, reclamações ou sugestões. Sua mensagem chega diretamente à caixa de
+            notificações do administrador.
           </p>
           <form onSubmit={submitSupport} className="mt-4 space-y-3">
             <div>
               <label className="text-sm font-medium">Assunto</label>
               <select
                 value={supportSubject}
-                onChange={(e) => setSupportSubject(e.target.value as any)}
+                onChange={(e) => setSupportSubject(e.target.value as typeof supportSubject)}
                 className="input"
               >
                 <option value="duvida">Dúvida</option>
@@ -355,18 +375,21 @@ function SettingsPage() {
               disabled={sendingSupport}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
             >
-              {sendingSupport ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {sendingSupport ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
               Enviar ao administrador
             </button>
           </form>
         </section>
 
-
-
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Instalar o aplicativo</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            O QAP Report funciona como app instalável (PWA). Sem download em loja — usa o próprio navegador do celular.
+            O QAP Report funciona como app instalável (PWA). Sem download em loja — usa o próprio
+            navegador do celular.
           </p>
           <div className="mt-4">
             <InstallAppButton />
@@ -406,14 +429,16 @@ function SettingsPage() {
             </button>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            Após instalado, o QAP Report abre como um app nativo, com atalho na tela inicial e experiência em tela cheia.
+            Após instalado, o QAP Report abre como um app nativo, com atalho na tela inicial e
+            experiência em tela cheia.
           </p>
         </section>
 
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Atualizações e link oficial</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Verifique novas versões do QAP Report e compartilhe o link oficial com colegas de guarnição. Não instale APKs de terceiros.
+            Verifique novas versões do QAP Report e compartilhe o link oficial com colegas de
+            guarnição. Não instale APKs de terceiros.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <button
@@ -445,7 +470,11 @@ function SettingsPage() {
                 const url = "https://qap-report.lovable.app/";
                 try {
                   if (navigator.share) {
-                    await navigator.share({ title: "QAP Report", text: "Assistente de redação policial", url });
+                    await navigator.share({
+                      title: "QAP Report",
+                      text: "Assistente de redação policial",
+                      url,
+                    });
                   } else {
                     await navigator.clipboard.writeText(url);
                     toast.success("Link copiado");
@@ -466,7 +495,8 @@ function SettingsPage() {
             </button>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            O QAP Report é distribuído como Progressive Web App (PWA). Não há APK avulso: instalar direto do navegador garante origem verificada e atualização automática.
+            O QAP Report é distribuído como Progressive Web App (PWA). Não há APK avulso: instalar
+            direto do navegador garante origem verificada e atualização automática.
           </p>
         </section>
 
@@ -492,7 +522,11 @@ function SettingsPage() {
             disabled={deletingAccount}
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:opacity-90 disabled:opacity-60"
           >
-            {deletingAccount ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            {deletingAccount ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
             {deletingAccount ? "Excluindo..." : "Excluir minha conta"}
           </button>
         </section>
@@ -500,7 +534,6 @@ function SettingsPage() {
         <style>{`.input{margin-top:.25rem;width:100%;border-radius:.5rem;border:1px solid var(--color-border);background:var(--color-background);padding:.5rem .75rem;font-size:.875rem;outline:none}
         .input:focus{box-shadow:0 0 0 2px var(--color-ring)}`}</style>
       </div>
-      
     </AppShell>
   );
 }

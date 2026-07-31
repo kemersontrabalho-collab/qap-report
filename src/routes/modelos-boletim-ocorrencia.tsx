@@ -44,8 +44,7 @@ export const Route = createFileRoute("/modelos-boletim-ocorrencia")({
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content:
-          "Modelos de Boletim de Ocorrência Prontos — BA, BO-COP, BO-TC, BOAT",
+        content: "Modelos de Boletim de Ocorrência Prontos — BA, BO-COP, BO-TC, BOAT",
       },
       {
         name: "twitter:description",
@@ -388,10 +387,7 @@ function ModelCard({
   const Icon = modelo.icone;
 
   return (
-    <section
-      id={modelo.id}
-      className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm"
-    >
+    <section id={modelo.id} className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent text-accent-foreground">
           <Icon className="h-5 w-5" />
@@ -473,13 +469,13 @@ function ModelsPage() {
           <span className="text-lg font-semibold tracking-tight">QAP Report</span>
         </Link>
         <nav className="flex items-center gap-3">
-          <Link to="/guia-redacao-tecnica" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+          <Link
+            to="/guia-redacao-tecnica"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
             Guia
           </Link>
-          <Link
-            to="/modelos-boletim-ocorrencia"
-            className="text-sm font-medium text-foreground"
-          >
+          <Link to="/modelos-boletim-ocorrencia" className="text-sm font-medium text-foreground">
             Modelos
           </Link>
           <Link
@@ -502,9 +498,9 @@ function ModelsPage() {
               Modelos de boletim de ocorrência para incidentes comuns
             </h1>
             <p className="mt-4 text-base text-muted-foreground md:text-lg">
-              Textos técnicos e jurídicos prontos para copiar, preencher e usar em
-              ocorrências de roubo, furto, perda de documentos, acidente de trânsito,
-              lesão corporal e dano. Edite com a QAP Report em segundos.
+              Textos técnicos e jurídicos prontos para copiar, preencher e usar em ocorrências de
+              roubo, furto, perda de documentos, acidente de trânsito, lesão corporal e dano. Edite
+              com a QAP Report em segundos.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
@@ -528,27 +524,22 @@ function ModelsPage() {
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
               {modelos.map((modelo) => (
-                <ModelCard
-                  key={modelo.id}
-                  modelo={modelo}
-                  copiedId={copiedId}
-                  onCopy={copy}
-                />
+                <ModelCard key={modelo.id} modelo={modelo} copiedId={copiedId} onCopy={copy} />
               ))}
 
               <Section icon={Scale} title="Como usar os modelos com segurança">
                 <p>
-                  Os modelos acima são estruturas de redação. Antes de enviar o
-                  boletim, substitua todos os placeholders entre colchetes
-                  (ex: <code>[HORA]</code>, <code>[LOCALIZAÇÃO DA OCORRÊNCIA]</code>) por
-                  dados reais, verificados e objetivos. Nunca invente testemunhas, valores
-                  ou circunstâncias que não constem na ocorrência.
+                  Os modelos acima são estruturas de redação. Antes de enviar o boletim, substitua
+                  todos os placeholders entre colchetes (ex: <code>[HORA]</code>,{" "}
+                  <code>[LOCALIZAÇÃO DA OCORRÊNCIA]</code>) por dados reais, verificados e
+                  objetivos. Nunca invente testemunhas, valores ou circunstâncias que não constem na
+                  ocorrência.
                 </p>
                 <p>
-                  A redação técnica policial exige: fidelidade aos fatos, cronologia
-                  clara, terminologia jurídica adequada e ausência de opinião pessoal.
-                  Use a QAP Report para acelerar o preenchimento, mas revise sempre o
-                  resultado final antes de assinar.
+                  A redação técnica policial exige: fidelidade aos fatos, cronologia clara,
+                  terminologia jurídica adequada e ausência de opinião pessoal. Use a QAP Report
+                  para acelerar o preenchimento, mas revise sempre o resultado final antes de
+                  assinar.
                 </p>
               </Section>
             </div>
@@ -585,10 +576,7 @@ function ModelsPage() {
                     "Fundamento legal foi citado com moderação.",
                     "Texto foi revisado por um superior, quando exigido.",
                   ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2 text-sm text-muted-foreground"
-                    >
+                    <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
                       <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                       {item}
                     </li>
@@ -599,8 +587,8 @@ function ModelsPage() {
               <div className="rounded-2xl border bg-primary p-5 text-primary-foreground shadow-sm">
                 <h3 className="font-semibold">Gere boletins em segundos</h3>
                 <p className="mt-2 text-sm opacity-90">
-                  A QAP Report transforma palavras-chave em boletins BA, BO-COP, BO-TC e
-                  BOAT com linguagem técnica e fundamento jurídico.
+                  A QAP Report transforma palavras-chave em boletins BA, BO-COP, BO-TC e BOAT com
+                  linguagem técnica e fundamento jurídico.
                 </p>
                 <Link
                   to="/auth"
@@ -624,8 +612,8 @@ function ModelsPage() {
                     <strong>Tipos de boletim:</strong> BA, BO-COP, BO-TC e BOAT.
                   </p>
                   <p className="text-muted-foreground">
-                    <strong>Súmula Vinculante 11:</strong> ausência de flagrante não
-                    impede o Termo Circunstanciado.
+                    <strong>Súmula Vinculante 11:</strong> ausência de flagrante não impede o Termo
+                    Circunstanciado.
                   </p>
                 </div>
               </div>

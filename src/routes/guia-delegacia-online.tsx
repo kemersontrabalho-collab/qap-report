@@ -185,18 +185,16 @@ function OnlinePoliceGuide() {
               BO online: como registrar na delegacia virtual do seu estado
             </h1>
             <p className="mt-4 text-base text-muted-foreground md:text-lg">
-              Passo a passo do registro de boletim de ocorrência pela internet,
-              o que cada estado aceita e como escrever o relato para que ele
-              seja homologado sem recusa.
+              Passo a passo do registro de boletim de ocorrência pela internet, o que cada estado
+              aceita e como escrever o relato para que ele seja homologado sem recusa.
             </p>
           </div>
 
           <div className="mt-10 space-y-6">
             <Section icon={FileText} title="O que dá (e o que não dá) para registrar online">
               <p>
-                A delegacia virtual foi criada para ocorrências sem flagrante e
-                sem violência imediata. Na maioria dos estados é possível
-                registrar:
+                A delegacia virtual foi criada para ocorrências sem flagrante e sem violência
+                imediata. Na maioria dos estados é possível registrar:
               </p>
               <ul>
                 <li>furto (sem violência ou grave ameaça);</li>
@@ -207,18 +205,16 @@ function OnlinePoliceGuide() {
                 <li>ameaça, injúria, calúnia e difamação (varia por estado).</li>
               </ul>
               <p>
-                <strong>Não</strong> use o canal online para roubo, lesão
-                corporal, violência doméstica, crimes em andamento ou situações
-                de flagrante: nesses casos acione o 190 e procure atendimento
-                presencial.
+                <strong>Não</strong> use o canal online para roubo, lesão corporal, violência
+                doméstica, crimes em andamento ou situações de flagrante: nesses casos acione o 190
+                e procure atendimento presencial.
               </p>
             </Section>
 
             <Section icon={Globe} title="Portais oficiais por estado">
               <p>
-                Os endereços abaixo são os canais oficiais das polícias civis.
-                Desconfie de sites que cobram taxa para registrar BO — o serviço
-                é gratuito.
+                Os endereços abaixo são os canais oficiais das polícias civis. Desconfie de sites
+                que cobram taxa para registrar BO — o serviço é gratuito.
               </p>
               <div className="not-prose mt-4 grid gap-3 sm:grid-cols-2">
                 {STATES.map((s) => (
@@ -242,33 +238,27 @@ function OnlinePoliceGuide() {
                 ))}
               </div>
               <p className="mt-4">
-                Outros estados seguem o mesmo modelo: procure por “delegacia
-                virtual” somado à sigla do estado no domínio oficial{" "}
-                <code>.gov.br</code>.
+                Outros estados seguem o mesmo modelo: procure por “delegacia virtual” somado à sigla
+                do estado no domínio oficial <code>.gov.br</code>.
               </p>
             </Section>
 
             <Section icon={CheckCircle} title="Passo a passo do registro">
               <ol>
                 <li>
-                  Reúna documentos pessoais, comprovante de endereço e dados do
-                  fato (data, hora e endereço exatos).
+                  Reúna documentos pessoais, comprovante de endereço e dados do fato (data, hora e
+                  endereço exatos).
                 </li>
-                <li>
-                  Acesse o portal do estado e faça login (muitos usam a conta
-                  gov.br).
-                </li>
+                <li>Acesse o portal do estado e faça login (muitos usam a conta gov.br).</li>
                 <li>Escolha a natureza da ocorrência mais próxima do fato.</li>
                 <li>
-                  Descreva o ocorrido em ordem cronológica, com linguagem
-                  objetiva e sem opinião pessoal.
+                  Descreva o ocorrido em ordem cronológica, com linguagem objetiva e sem opinião
+                  pessoal.
                 </li>
+                <li>Anexe fotos, notas fiscais e números de série quando houver.</li>
                 <li>
-                  Anexe fotos, notas fiscais e números de série quando houver.
-                </li>
-                <li>
-                  Envie e aguarde a homologação; o número do BO e o PDF chegam
-                  por e-mail ou ficam disponíveis para consulta no portal.
+                  Envie e aguarde a homologação; o número do BO e o PDF chegam por e-mail ou ficam
+                  disponíveis para consulta no portal.
                 </li>
               </ol>
             </Section>
@@ -279,12 +269,10 @@ function OnlinePoliceGuide() {
                 <li>narrativa confusa ou fora de ordem cronológica;</li>
                 <li>ausência de local exato, data e horário;</li>
                 <li>
-                  descrição genérica dos bens (“um celular”) em vez de marca,
-                  modelo, cor e IMEI;
+                  descrição genérica dos bens (“um celular”) em vez de marca, modelo, cor e IMEI;
                 </li>
                 <li>
-                  mistura de fato e suposição (“acho que foi o vizinho”), que
-                  fragiliza o registro;
+                  mistura de fato e suposição (“acho que foi o vizinho”), que fragiliza o registro;
                 </li>
                 <li>natureza escolhida incompatível com o fato descrito.</li>
               </ul>
@@ -292,11 +280,10 @@ function OnlinePoliceGuide() {
 
             <Section icon={Shield} title="Como o QAP Report ajuda antes do envio">
               <p>
-                O QAP Report é um assistente de redação policial: a partir de
-                palavras-chave, ele estrutura o texto em linguagem técnica,
-                cronológica e juridicamente coerente. Escreva o rascunho no app,
-                revise o resultado e cole no formulário da delegacia virtual — o
-                relato chega claro à autoridade que vai homologar.
+                O QAP Report é um assistente de redação policial: a partir de palavras-chave, ele
+                estrutura o texto em linguagem técnica, cronológica e juridicamente coerente.
+                Escreva o rascunho no app, revise o resultado e cole no formulário da delegacia
+                virtual — o relato chega claro à autoridade que vai homologar.
               </p>
               <p className="not-prose mt-4 flex flex-wrap gap-3">
                 <Link

@@ -4,7 +4,9 @@ import { requireAdminSession } from "./admin-gate.server";
 
 const listInputSchema = z
   .object({
-    category: z.enum(["frontend", "server_function", "security", "performance", "all"]).default("all"),
+    category: z
+      .enum(["frontend", "server_function", "security", "performance", "all"])
+      .default("all"),
     severity: z.enum(["info", "warning", "error", "critical", "all"]).default("all"),
     onlyUnresolved: z.boolean().default(false),
     limit: z.number().int().min(1).max(200).default(100),
@@ -18,7 +20,9 @@ export const adminListErrorLogs = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("error_logs")
-      .select("id, created_at, category, severity, message, stack, route, user_id, metadata, user_agent, resolved")
+      .select(
+        "id, created_at, category, severity, message, stack, route, user_id, metadata, user_agent, resolved",
+      )
       .order("created_at", { ascending: false })
       .limit(data.limit);
     if (data.category !== "all") q = q.eq("category", data.category);
@@ -48,7 +52,9 @@ export const adminGetErrorStats = createServerFn({ method: "POST" }).handler(asy
 });
 
 export const adminResolveErrorLog = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid(), resolved: z.boolean() }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), resolved: z.boolean() }).parse(input),
+  )
   .handler(async ({ data }) => {
     await requireAdminSession();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

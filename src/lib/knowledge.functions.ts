@@ -51,7 +51,10 @@ export const findSimilarBulletins = createServerFn({ method: "POST" })
       ...((tpl.data ?? []) as SimilarCase[]).map((r) => ({ ...r, source: "template" as const })),
       ...(community.error
         ? []
-        : ((community.data ?? []) as SimilarCase[]).map((r) => ({ ...r, source: "community" as const }))),
+        : ((community.data ?? []) as SimilarCase[]).map((r) => ({
+            ...r,
+            source: "community" as const,
+          }))),
     ] as SimilarCase[];
     merged.sort((a, b) => (b.rank ?? 0) - (a.rank ?? 0));
     return merged.slice(0, limit);

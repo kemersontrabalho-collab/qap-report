@@ -79,7 +79,6 @@ export const cancelPixRequest = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-
 /**
  * Resgata um código promocional (cupom/gift card).
  * A sanitização (uppercase, remoção de espaços/símbolos) acontece

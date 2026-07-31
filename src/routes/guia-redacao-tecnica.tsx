@@ -102,10 +102,7 @@ function GuidePage() {
           <span className="text-lg font-semibold tracking-tight">QAP Report</span>
         </Link>
         <nav className="flex items-center gap-3">
-          <Link
-            to="/guia-redacao-tecnica"
-            className="text-sm font-medium text-foreground"
-          >
+          <Link to="/guia-redacao-tecnica" className="text-sm font-medium text-foreground">
             Guia
           </Link>
           <Link
@@ -133,10 +130,9 @@ function GuidePage() {
               Guia de redação técnica de boletim de ocorrência
             </h1>
             <p className="mt-4 text-base text-muted-foreground md:text-lg">
-              Aprenda a redigir boletim de ocorrência online com linguagem
-              técnica, jurídica e objetiva. Entenda os tipos de boletins, os
-              fundamentos legais e como a ferramenta QAP Report automatiza a
-              complexidade da redação policial.
+              Aprenda a redigir boletim de ocorrência online com linguagem técnica, jurídica e
+              objetiva. Entenda os tipos de boletins, os fundamentos legais e como a ferramenta QAP
+              Report automatiza a complexidade da redação policial.
             </p>
           </div>
 
@@ -144,139 +140,122 @@ function GuidePage() {
             <div className="lg:col-span-2 space-y-6">
               <Section icon={BookOpen} title="O que é um boletim de ocorrência?">
                 <p>
-                  O <strong>boletim de ocorrência</strong> é o documento oficial
-                  que registra, de forma técnica e cronológica, os fatos
-                  observados por uma equipe policial. Ele serve como registro de
-                  atividade, suporte a investigações e base para eventuais
+                  O <strong>boletim de ocorrência</strong> é o documento oficial que registra, de
+                  forma técnica e cronológica, os fatos observados por uma equipe policial. Ele
+                  serve como registro de atividade, suporte a investigações e base para eventuais
                   procedimentos judiciais. Um boletim bem redigido deve ser:
                 </p>
                 <ul>
                   <li>
-                    <strong>Objetivo</strong> — relatar apenas fatos, sem opinião
-                    pessoal;
+                    <strong>Objetivo</strong> — relatar apenas fatos, sem opinião pessoal;
                   </li>
                   <li>
-                    <strong>Cronológico</strong> — apresentar os acontecimentos
-                    na ordem em que ocorreram;
+                    <strong>Cronológico</strong> — apresentar os acontecimentos na ordem em que
+                    ocorreram;
                   </li>
                   <li>
-                    <strong>Técnico</strong> — usar terminologia policial e
-                    jurídica adequada;
+                    <strong>Técnico</strong> — usar terminologia policial e jurídica adequada;
                   </li>
                   <li>
-                    <strong>Completo</strong> — conter quem, quando, onde, o que e
-                    como os fatos aconteceram.
+                    <strong>Completo</strong> — conter quem, quando, onde, o que e como os fatos
+                    aconteceram.
                   </li>
                 </ul>
               </Section>
 
               <Section icon={FileText} title="Tipos de boletim: BA, BO-COP, BO-TC e BOAT">
                 <p>
-                  Cada sigla representa um documento com finalidade específica.
-                  Conhecer a diferença é essencial para escolher a linguagem e o
-                  encaminhamento correto.
+                  Cada sigla representa um documento com finalidade específica. Conhecer a diferença
+                  é essencial para escolher a linguagem e o encaminhamento correto.
                 </p>
                 <h3>BA — Boletim de Atendimento</h3>
                 <p>
-                  Utilizado para conduta de pessoas à delegacia, incluindo
-                  situações de flagrante delito, como tráfico de drogas. Deve
-                  descrever a composição da guarnição, o local, o motivo da
-                  abordagem e as circunstâncias do flagrante.
+                  Utilizado para conduta de pessoas à delegacia, incluindo situações de flagrante
+                  delito, como tráfico de drogas. Deve descrever a composição da guarnição, o local,
+                  o motivo da abordagem e as circunstâncias do flagrante.
                 </p>
                 <h3>BO-COP — Comunicação de Ocorrência Policial</h3>
                 <p>
-                  Registra ocorrências em que um indivíduo está presente no local,
-                  como ocorrências de menor potencial ofensivo, consumo de
-                  entorpecentes ou situações que não demandam prisão em
-                  flagrante. Costuma ser elaborado em conjunto com o Termo
+                  Registra ocorrências em que um indivíduo está presente no local, como ocorrências
+                  de menor potencial ofensivo, consumo de entorpecentes ou situações que não
+                  demandam prisão em flagrante. Costuma ser elaborado em conjunto com o Termo
                   Circunstanciado.
                 </p>
                 <h3>BO-TC — Termo Circunstanciado</h3>
                 <p>
-                  Aplica-se às infrações de menor potencial ofensivo (Lei
-                  9.099/1995), como pequenos furtos, lesões corporais leves e
-                  perturbação da ordem. O texto deve ser conciso, indicar os
-                  elementos do crime, o valor envolvido e as condições do
-                  infrator.
+                  Aplica-se às infrações de menor potencial ofensivo (Lei 9.099/1995), como pequenos
+                  furtos, lesões corporais leves e perturbação da ordem. O texto deve ser conciso,
+                  indicar os elementos do crime, o valor envolvido e as condições do infrator.
                 </p>
                 <h3>BOAT — Boletim de Acidente de Trânsito</h3>
                 <p>
-                  Documento específico para ocorrências de trânsito, com foco em
-                  veículos, condutores, testemunhas, condições da via e sinais de
-                  trânsito. A clareza é fundamental para perícias e seguradoras.
+                  Documento específico para ocorrências de trânsito, com foco em veículos,
+                  condutores, testemunhas, condições da via e sinais de trânsito. A clareza é
+                  fundamental para perícias e seguradoras.
                 </p>
               </Section>
 
               <Section icon={Scale} title="Fundamentos legais: Súmula Vinculante 11">
                 <p>
-                  A <strong>Súmula Vinculante 11</strong> do Supremo Tribunal
-                  Federal estabelece que{" "}
+                  A <strong>Súmula Vinculante 11</strong> do Supremo Tribunal Federal estabelece que{" "}
                   <em>
-                    a falta de flagrante não impede a lavratura do Termo
-                    Circunstanciado de Ocorrência
+                    a falta de flagrante não impede a lavratura do Termo Circunstanciado de
+                    Ocorrência
                   </em>
-                  . Ela é uma referência constante na redação de BO-COP e BO-TC,
-                  sobretudo quando a conduta é atipicamente punível com pena
-                  mínima inferior a um ano.
+                  . Ela é uma referência constante na redação de BO-COP e BO-TC, sobretudo quando a
+                  conduta é atipicamente punível com pena mínima inferior a um ano.
                 </p>
-                <p>
-                  Além dela, outros dispositivos aparecem com frequência nos
-                  boletins:
-                </p>
+                <p>Além dela, outros dispositivos aparecem com frequência nos boletins:</p>
                 <ul>
                   <li>
-                    <strong>Art. 5º, LXIII, CF</strong> — direito do preso a
-                    identificação dos responsáveis pela prisão ou abordagem;
+                    <strong>Art. 5º, LXIII, CF</strong> — direito do preso a identificação dos
+                    responsáveis pela prisão ou abordagem;
                   </li>
                   <li>
-                    <strong>Lei 9.099/1995</strong> — regula as infrações de
-                    menor potencial ofensivo e a transação penal;
+                    <strong>Lei 9.099/1995</strong> — regula as infrações de menor potencial
+                    ofensivo e a transação penal;
                   </li>
                   <li>
-                    <strong>Lei 11.343/2006</strong> — define as condutas e
-                    penas relacionadas a drogas;
+                    <strong>Lei 11.343/2006</strong> — define as condutas e penas relacionadas a
+                    drogas;
                   </li>
                   <li>
-                    <strong>Código de Trânsito Brasileiro</strong> — base para
-                    BOAT e ocorrências de trânsito.
+                    <strong>Código de Trânsito Brasileiro</strong> — base para BOAT e ocorrências de
+                    trânsito.
                   </li>
                 </ul>
                 <Tip>
-                  <strong>Dica:</strong> cite a norma aplicável sem exagerar. A
-                  citação correta demonstra técnica, mas o foco do boletim deve
-                  permanecer no fato narrado.
+                  <strong>Dica:</strong> cite a norma aplicável sem exagerar. A citação correta
+                  demonstra técnica, mas o foco do boletim deve permanecer no fato narrado.
                 </Tip>
               </Section>
 
               <Section icon={Shield} title="Como a QAP Report automatiza a redação">
                 <p>
-                  A QAP Report é um assistente de redação policial que transforma
-                  palavras-chave em textos técnicos prontos para revisão. O
-                  usuário informa o tipo de boletim (BA, BO-COP, BO-TC ou BOAT) e
-                  os dados da ocorrência, e a ferramenta gera:
+                  A QAP Report é um assistente de redação policial que transforma palavras-chave em
+                  textos técnicos prontos para revisão. O usuário informa o tipo de boletim (BA,
+                  BO-COP, BO-TC ou BOAT) e os dados da ocorrência, e a ferramenta gera:
                 </p>
                 <ul>
                   <li>
-                    <strong>Histórico narrativo</strong> — em ordem cronológica,
-                    com início, meio e fim;
+                    <strong>Histórico narrativo</strong> — em ordem cronológica, com início, meio e
+                    fim;
                   </li>
                   <li>
-                    <strong>Fundamento legal</strong> — normas adequadas ao tipo
-                    de ocorrência;
+                    <strong>Fundamento legal</strong> — normas adequadas ao tipo de ocorrência;
                   </li>
                   <li>
-                    <strong>Previsão de procedimentos</strong> — encaminhamentos
-                    sugeridos com base no caso;
+                    <strong>Previsão de procedimentos</strong> — encaminhamentos sugeridos com base
+                    no caso;
                   </li>
                   <li>
-                    <strong>Sugestões de melhoria</strong> — perguntas
-                    complementares que ajudam a completar o boletim.
+                    <strong>Sugestões de melhoria</strong> — perguntas complementares que ajudam a
+                    completar o boletim.
                   </li>
                 </ul>
                 <p>
-                  Todo texto segue os padrões da redação técnica policial: sem
-                  inventar dados, sem linguagem subjetiva e pronto para ser
-                  copiado, revisado e assinado.
+                  Todo texto segue os padrões da redação técnica policial: sem inventar dados, sem
+                  linguagem subjetiva e pronto para ser copiado, revisado e assinado.
                 </p>
               </Section>
             </div>
@@ -306,7 +285,8 @@ function GuidePage() {
               <div className="rounded-2xl border bg-card p-5 shadow-sm">
                 <h3 className="font-semibold">Modelos prontos para usar</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Baixe ou copie textos-modelo para roubo, furto, perda, acidente de trânsito, lesão corporal e dano.
+                  Baixe ou copie textos-modelo para roubo, furto, perda, acidente de trânsito, lesão
+                  corporal e dano.
                 </p>
                 <Link
                   to="/modelos-boletim-ocorrencia"
@@ -319,8 +299,8 @@ function GuidePage() {
               <div className="rounded-2xl border bg-primary p-5 text-primary-foreground shadow-sm">
                 <h3 className="font-semibold">Experimente a QAP Report</h3>
                 <p className="mt-2 text-sm opacity-90">
-                  Crie boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e
-                  apoio de IA. Menos erros, mais agilidade no plantão.
+                  Crie boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA. Menos
+                  erros, mais agilidade no plantão.
                 </p>
                 <Link
                   to="/auth"
@@ -335,20 +315,20 @@ function GuidePage() {
                 <h3 className="font-semibold">Termos mais buscados</h3>
                 <div className="mt-4 space-y-2 text-sm text-muted-foreground">
                   <p>
-                    <strong>boletim de ocorrência</strong> — o documento
-                    oficial de registro policial.
+                    <strong>boletim de ocorrência</strong> — o documento oficial de registro
+                    policial.
                   </p>
                   <p>
-                    <strong>boletim online</strong> — a tendência de registrar
-                    ocorrências por meio digital.
+                    <strong>boletim online</strong> — a tendência de registrar ocorrências por meio
+                    digital.
                   </p>
                   <p>
-                    <strong>redação técnica policial</strong> — a linguagem
-                    objetiva usada em documentos oficiais.
+                    <strong>redação técnica policial</strong> — a linguagem objetiva usada em
+                    documentos oficiais.
                   </p>
                   <p>
-                    <strong>terminologia jurídica</strong> — termos como flagrante,
-                    autoria, materialidade, infração e procedimento.
+                    <strong>terminologia jurídica</strong> — termos como flagrante, autoria,
+                    materialidade, infração e procedimento.
                   </p>
                 </div>
               </div>

@@ -104,4 +104,3 @@ export function isStandalone(): boolean {
   const iosStandalone = (window.navigator as unknown as { standalone?: boolean }).standalone;
   return Boolean(mq || iosStandalone);
 }
-
