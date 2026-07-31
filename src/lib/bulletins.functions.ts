@@ -95,6 +95,12 @@ export const generateBulletin = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => genInput.parse(data))
   .handler(async ({ data, context }) => {
     await assertPremium(context.supabase, context.userId);
+
+    // RAG: recupera trechos de referência (modelos oficiais, base própria do
+    // usuário e base coletiva anonimizada aprovada) para servir de estilo/apoio.
+    const ragQuery = [data.category, data.keywords, data.context].filter(Boolean).join(" ");
+    const references = await buildReferences(context.supabase, ragQuery, data.bulletinType);
+
     const fmtDate = data.occurrenceAt
       ? new Date(data.occurrenceAt).toLocaleString("pt-BR", {
           dateStyle: "short",
