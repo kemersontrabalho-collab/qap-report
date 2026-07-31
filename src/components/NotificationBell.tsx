@@ -117,19 +117,24 @@ export function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative grid h-9 w-9 place-items-center rounded-lg border hover:bg-accent"
+        className="relative grid h-11 w-11 place-items-center rounded-lg border hover:bg-accent sm:h-9 sm:w-9"
         aria-label="Notificações"
+        aria-expanded={open}
       >
         <Bell className="h-4 w-4" />
         {unread > 0 && (
-          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+          <span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[0.625rem] font-bold text-destructive-foreground sm:-right-1 sm:-top-1">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-[22rem] max-w-[92vw] overflow-hidden rounded-xl border bg-popover shadow-lg">
+        // Largura fluida: nunca maior que 22rem, nunca mais larga que o viewport
+        // menos o gutter. Substitui o par w-[22rem]/max-w-[92vw], que em telas
+        // muito estreitas ainda encostava nas bordas.
+        <div className="absolute right-0 z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl border bg-popover shadow-lg">
+
           <div className="flex items-center justify-between border-b px-3 py-2">
             <span className="text-sm font-semibold">Notificações</span>
             <div className="flex items-center gap-1">
