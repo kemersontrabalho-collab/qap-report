@@ -90,11 +90,88 @@ async function callGateway(messages: { role: string; content: string }[]) {
   return json.choices[0]?.message?.content ?? "";
 }
 
+type RagRow = {
+  title?: string | null;
+  category?: string | null;
+  content?: string | null;
+};
+type RagClient = {
+  rpc: (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+};
+
+/**
+ * Monta um bloco de referências (RAG) com modelos oficiais, boletins do próprio
+ * usuário e trechos aprovados da base coletiva anonimizada. Falhas são
+ * silenciosas: a geração nunca deve quebrar por causa do RAG.
+ */
+async function buildReferences(
+  sb: unknown,
+  query: string,
+  bulletinType: string,
+): Promise<string | null> {
+  if (!query || query.trim().length < 3) return null;
+  const client = sb as RagClient;
+  const call = async (fn: string, limit: number): Promise<RagRow[]> => {
+    try {
+      const { data, error } = await client.rpc(fn, {
+        _query: query.slice(0, 1500),
+        _bulletin_type: bulletinType,
+        _limit: limit,
+      });
+      if (error) return [];
+      return (data ?? []) as RagRow[];
+    } catch {
+      return [];
+    }
+  };
+
+  const [tpl, own, community] = await Promise.all([
+    call("match_bulletin_templates", 2),
+    call("match_bulletin_knowledge", 2),
+    call("match_community_knowledge", 2),
+  ]);
+
+  const fmt = (rows: RagRow[], origem: string) =>
+    rows
+      .filter((r) => (r.content ?? "").trim().length > 100)
+      .map(
+        (r, i) =>
+          `[${origem} ${i + 1}] ${r.title ?? ""}${r.category ? ` — ${r.category}` : ""}\n${(
+            r.content ?? ""
+          )
+            .trim()
+            .slice(0, 2500)}`,
+      );
+
+  const blocks = [
+    ...fmt(tpl, "MODELO OFICIAL"),
+    ...fmt(own, "BOLETIM ANTERIOR DO USUÁRIO"),
+    ...fmt(community, "BASE COLETIVA ANONIMIZADA"),
+  ];
+  if (blocks.length === 0) return null;
+
+  return `REFERÊNCIAS DE ESTILO E ESTRUTURA (uso restrito):
+Abaixo estão trechos de boletins semelhantes já validados. Use-os APENAS como referência de estrutura, terminologia técnica, encadeamento cronológico e procedimentos padrão.
+PROIBIDO copiar fatos, nomes, endereços, horários, quantidades, placas ou qualquer dado circunstancial dessas referências. Os fatos do texto final devem vir EXCLUSIVAMENTE dos campos, palavras-chave e contexto informados pelo usuário.
+
+${blocks.join("\n\n---\n\n")}`;
+}
+
+
 export const generateBulletin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => genInput.parse(data))
   .handler(async ({ data, context }) => {
     await assertPremium(context.supabase, context.userId);
+
+    // RAG: recupera trechos de referência (modelos oficiais, base própria do
+    // usuário e base coletiva anonimizada aprovada) para servir de estilo/apoio.
+    const ragQuery = [data.category, data.keywords, data.context].filter(Boolean).join(" ");
+    const references = await buildReferences(context.supabase, ragQuery, data.bulletinType);
+
     const fmtDate = data.occurrenceAt
       ? new Date(data.occurrenceAt).toLocaleString("pt-BR", {
           dateStyle: "short",
@@ -131,10 +208,13 @@ Produza o boletim seguindo rigorosamente as regras. Estrutura obrigatória:
 2) Em seguida, "## HISTÓRICO / VERSÃO POLICIAL" e o texto corrido.
 Todos os dados padronizados acima (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) devem estar EMBASADOS/EMBUTIDOS na narrativa do histórico — NÃO crie cabeçalho, lista ou bloco de campos acima do histórico. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — jamais invente informação.`;
 
-    const content = await callGateway([
+    const messages: { role: string; content: string }[] = [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: userMsg },
-    ]);
+    ];
+    if (references) messages.push({ role: "system", content: references });
+    messages.push({ role: "user", content: userMsg });
+    const content = await callGateway(messages);
+
     return { content };
   });
 
