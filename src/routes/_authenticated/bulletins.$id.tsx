@@ -247,7 +247,6 @@ function EditBulletin() {
       window.removeEventListener("beforeunload", onBeforeUnload);
       if (dirtyRef.current && bRef.current) void save(undefined, { silent: true });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function generate() {
@@ -443,7 +442,6 @@ function EditBulletin() {
                 "Prefixo / Data e Hora" vira coluna única — um input datetime-local
                 não é utilizável com menos de ~150px. */}
             <div className="grid grid-cols-1 gap-3 xs:grid-cols-2">
-
               <div>
                 <label className="text-sm font-medium">Prefixo da viatura</label>
                 <input

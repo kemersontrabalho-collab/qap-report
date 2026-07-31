@@ -290,7 +290,6 @@ function Dashboard() {
         data-tour="bulletin-types"
         className="mb-8 grid auto-rows-fr grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4"
       >
-
         {BULLETIN_TYPES.map((t) => (
           <button
             key={t.code}

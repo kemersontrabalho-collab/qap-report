@@ -160,7 +160,6 @@ PROIBIDO copiar fatos, nomes, endereços, horários, quantidades, placas ou qual
 ${blocks.join("\n\n---\n\n")}`;
 }
 
-
 export const generateBulletin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => genInput.parse(data))
