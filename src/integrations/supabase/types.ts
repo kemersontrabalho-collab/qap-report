@@ -562,6 +562,7 @@ export type Database = {
           full_name: string | null
           functional_id: string | null
           id: string
+          last_seen_at: string | null
           phone: string | null
           rank: string | null
           updated_at: string
@@ -573,6 +574,7 @@ export type Database = {
           full_name?: string | null
           functional_id?: string | null
           id: string
+          last_seen_at?: string | null
           phone?: string | null
           rank?: string | null
           updated_at?: string
@@ -584,6 +586,7 @@ export type Database = {
           full_name?: string | null
           functional_id?: string | null
           id?: string
+          last_seen_at?: string | null
           phone?: string | null
           rank?: string | null
           updated_at?: string
