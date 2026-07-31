@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { assertPremium } from "./premium.server";
 
 const SYSTEM_PROMPT = `Você é um assistente especializado em redação de boletins policiais brasileiros. Sua missão é produzir textos com máxima COESÃO, COERÊNCIA, CLAREZA e RIGOR TÉCNICO-JURÍDICO.
 
@@ -90,7 +91,8 @@ async function callGateway(messages: { role: string; content: string }[]) {
 export const generateBulletin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => genInput.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertPremium(context.supabase, context.userId);
     const fmtDate = data.occurrenceAt
       ? new Date(data.occurrenceAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
       : undefined;
@@ -150,7 +152,8 @@ Use português formal. Nunca invente dispositivos legais.`;
 export const askAI = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => askInput.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertPremium(context.supabase, context.userId);
     const content = await callGateway([
       { role: "system", content: CHAT_SYSTEM },
       ...data.messages,
