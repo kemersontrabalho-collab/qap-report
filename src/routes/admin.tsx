@@ -434,6 +434,20 @@ function UsersPanel() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium">{u.full_name || "(sem nome)"}</p>
+                    <span
+                      className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs"
+                      title={
+                        u.last_seen_at
+                          ? `Visto em ${new Date(u.last_seen_at).toLocaleString("pt-BR")}`
+                          : "Sem registro de presença"
+                      }
+                    >
+                      <span
+                        aria-hidden
+                        className={`h-2 w-2 rounded-full ${u.online ? "bg-emerald-500" : "bg-muted-foreground/40"}`}
+                      />
+                      {u.online ? "Online" : "Offline"}
+                    </span>
                     {u.blocked && <Badge variant="destructive">Bloqueado</Badge>}
                     {u.subscription && (
                       <Badge variant="secondary">
@@ -448,6 +462,7 @@ function UsersPanel() {
                       ? `último acesso ${new Date(u.last_sign_in_at).toLocaleDateString("pt-BR")}`
                       : "nunca acessou"}
                   </p>
+
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Dialog>
