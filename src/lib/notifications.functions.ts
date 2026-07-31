@@ -42,6 +42,7 @@ export const listNotifications = createServerFn({ method: "GET" })
     }
     const items: NotificationRow[] = (notifs ?? []).map((n) => ({
       ...n,
+      audience: n.audience as NotificationRow["audience"],
       read: readSet.has(n.id),
     }));
     return { items, unread: items.filter((i) => !i.read).length };
