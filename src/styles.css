@@ -79,10 +79,21 @@
   --success-foreground: oklch(0.99 0 0);
   --warning: oklch(0.75 0.15 75);
   --warning-foreground: oklch(0.22 0.03 60);
-  --border: oklch(0.92 0.005 260);
+  --border: oklch(0.92 0.006 260);
   --input: oklch(0.94 0.005 260);
   --ring: oklch(0.42 0.14 258);
+
+  /* ACENTOS CALCULADOS — um único acento vibrante (azure) sobre base sóbria.
+   * Usado com parcimônia: brilho de foco, halo do hero e realce tipográfico. */
+  --brand: oklch(0.42 0.14 258);
+  --brand-bright: oklch(0.60 0.17 250);
+  --brand-glow: oklch(0.72 0.14 232);
+  --surface-veil: oklch(1 0 0 / 0.72);
+  --surface-line: oklch(0.20 0.02 260 / 0.08);
+  --gradient-brand: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 55%, var(--brand-glow) 100%);
+  --gradient-surface: linear-gradient(180deg, oklch(1 0 0 / 0.9) 0%, oklch(0.985 0.004 260 / 0.75) 100%);
 }
+
 
 .dark {
   --background: oklch(0.16 0.015 260);
