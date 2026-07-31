@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ShieldCheck, Feather, Search, Moon, Sparkles } from "lucide-react";
+import { ShieldCheck, Feather, Search, Moon, Sparkles, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
