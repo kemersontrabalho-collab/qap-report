@@ -347,7 +347,7 @@ function SettingsPage() {
               <label className="text-sm font-medium">Assunto</label>
               <select
                 value={supportSubject}
-                onChange={(e) => setSupportSubject(e.target.value as any)}
+                onChange={(e) => setSupportSubject(e.target.value as typeof supportSubject)}
                 className="input"
               >
                 <option value="duvida">Dúvida</option>

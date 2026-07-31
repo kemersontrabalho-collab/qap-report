@@ -678,7 +678,7 @@ function CouponsPanel() {
         <Loader2 className="h-5 w-5 animate-spin" />
       ) : (
         <div className="space-y-2">
-          {data?.coupons.map((c: any) => (
+          {data?.coupons.map((c) => (
             <Card key={c.id}>
               <CardContent className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>

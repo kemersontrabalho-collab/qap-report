@@ -37,10 +37,11 @@ export const sendSupportMessage = createServerFn({ method: "POST" })
       sugestao: "Sugestão",
       outro: "Mensagem",
     };
-    const senderName = (profile as any)?.full_name || (profile as any)?.email || "Usuário";
-    const senderEmail = (profile as any)?.email ?? "";
+    const prof = profile as { full_name?: string | null; email?: string | null } | null;
+    const senderName = prof?.full_name || prof?.email || "Usuário";
+    const senderEmail = prof?.email ?? "";
 
-    const rows = founders.map((f: any) => ({
+    const rows = founders.map((f) => ({
       title: `[Suporte · ${labels[data.subject]}] ${senderName}`,
       body: `De: ${senderName}${senderEmail ? ` <${senderEmail}>` : ""}\n\n${data.message}`,
       audience: "user" as const,
