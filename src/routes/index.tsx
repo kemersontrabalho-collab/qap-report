@@ -59,25 +59,40 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+/**
+ * Célula do Bento Grid.
+ * `span` controla a assimetria do mosaico (2 colunas em desktop para os dois
+ * recursos-âncora), `delay` alimenta a entrada escalonada via `--d`.
+ * O ícone vive numa placa com gradiente da marca — é o único ponto de cor
+ * saturada do cartão, o que mantém a leitura sóbria.
+ */
 function Feature({
   icon: Icon,
   title,
   desc,
+  span = "",
+  delay = 0,
 }: {
   icon: typeof ShieldCheck;
   title: string;
   desc: string;
+  span?: string;
+  delay?: number;
 }) {
   return (
-    <div className="rounded-2xl border bg-card p-5 shadow-sm">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-        <Icon className="h-5 w-5" />
+    <article
+      className={`reveal lift surface-card group flex flex-col rounded-2xl p-6 ${span}`}
+      style={{ "--d": `${delay}ms` } as React.CSSProperties}
+    >
+      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[image:var(--gradient-brand)] text-primary-foreground shadow-[var(--shadow-md)] transition-transform duration-500 ease-[var(--ease-spring)] group-hover:scale-110">
+        <Icon className="h-5 w-5" strokeWidth={1.75} />
       </div>
-      <h3 className="mt-4 font-semibold">{title}</h3>
-      <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{desc}</p>
-    </div>
+      <h3 className="mt-5 text-base font-semibold tracking-tight">{title}</h3>
+      <p className="mt-2 text-fluid-sm text-muted-foreground">{desc}</p>
+    </article>
   );
 }
+
 
 function hasStoredSession() {
   if (typeof window === "undefined") return false;
