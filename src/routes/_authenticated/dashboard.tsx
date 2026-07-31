@@ -274,6 +274,7 @@ function Dashboard() {
           <button
             key={t.code}
             disabled={createMut.isPending}
+            aria-busy={createMut.isPending && creatingType === t.code}
             onClick={() => {
               if (createMut.isPending) return;
               setCreatingType(t.code);
