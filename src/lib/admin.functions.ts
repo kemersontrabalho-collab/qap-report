@@ -64,7 +64,8 @@ export const adminListUsers = createServerFn({ method: "POST" })
     const sb = await admin();
     const { data: profiles, error } = await sb
       .from("profiles")
-      .select("id, email, full_name, created_at, updated_at")
+      .select("id, email, full_name, created_at, updated_at, last_seen_at")
+
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);
@@ -107,17 +108,24 @@ export const adminListUsers = createServerFn({ method: "POST" })
         const inactiveDays = lastSignIn
           ? Math.floor((Date.now() - new Date(lastSignIn).getTime()) / 86400000)
           : null;
+        const lastSeen = (p as { last_seen_at?: string | null }).last_seen_at ?? null;
+        // Considera online quem enviou batimento de presença nos últimos 3 min
+        // (o cliente atualiza a cada 60s enquanto a aba está visível).
+        const online = lastSeen ? Date.now() - new Date(lastSeen).getTime() < 180_000 : false;
         return {
           id: p.id,
           email: p.email ?? au?.email ?? "",
           full_name: p.full_name ?? "",
           created_at: p.created_at,
           last_sign_in_at: lastSignIn,
+          last_seen_at: lastSeen,
+          online,
           blocked: banned,
           bulletins: countByUser.get(p.id) ?? 0,
           subscription: sub ?? null,
           inactive_days: inactiveDays,
         };
+
       });
 
     const q = (data.search ?? "").trim().toLowerCase();
