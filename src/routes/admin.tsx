@@ -35,6 +35,7 @@ import {
   adminReviewCommunityKnowledge,
   adminUpdateCommunityKnowledge,
   adminDeleteCommunityKnowledge,
+  adminBackfillCommunityKnowledge,
 } from "@/lib/admin.functions";
 import {
   adminListErrorLogs,
@@ -405,7 +406,21 @@ function UsersPanel() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={backfill.isPending}
+            onClick={() => backfill.mutate()}
+          >
+            {backfill.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Brain className="mr-2 h-4 w-4" />
+            )}
+            Importar boletins antigos
+          </Button>
+          <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
           <SelectTrigger className="sm:w-48">
             <SelectValue />
           </SelectTrigger>
@@ -1083,6 +1098,7 @@ function CommunityKnowledgePanel() {
   const listFn = useServerFn(adminListCommunityKnowledge);
   const reviewFn = useServerFn(adminReviewCommunityKnowledge);
   const deleteFn = useServerFn(adminDeleteCommunityKnowledge);
+  const backfillFn = useServerFn(adminBackfillCommunityKnowledge);
   const updateFn = useServerFn(adminUpdateCommunityKnowledge);
   const [filter, setFilter] = useState<"pendente" | "aprovado" | "rejeitado" | "all">("pendente");
   const [openId, setOpenId] = useState<string | null>(null);
@@ -1121,6 +1137,19 @@ function CommunityKnowledgePanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const backfill = useMutation({
+    mutationFn: () => backfillFn({}),
+    onSuccess: (r: { scanned: number; inserted: number }) => {
+      toast.success(
+        r.inserted > 0
+          ? `${r.inserted} boletim(ns) antigo(s) enviado(s) para curadoria.`
+          : "Nenhum boletim novo para importar.",
+      );
+      qc.invalidateQueries({ queryKey: ["admin-community"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const items = data?.items ?? [];
 
   return (
@@ -1142,7 +1171,8 @@ function CommunityKnowledgePanel() {
             <SelectItem value="rejeitado">Rejeitados</SelectItem>
             <SelectItem value="all">Todos</SelectItem>
           </SelectContent>
-        </Select>
+          </Select>
+        </div>
       </div>
 
       <p className="text-xs text-muted-foreground">
