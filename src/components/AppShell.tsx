@@ -13,6 +13,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  usePresence();
+
 
   async function signOut() {
     try {
