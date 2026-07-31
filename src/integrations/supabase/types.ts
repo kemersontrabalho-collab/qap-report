@@ -205,6 +205,57 @@ export type Database = {
         }
         Relationships: []
       }
+      community_knowledge: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          bulletin_type: string
+          category: string | null
+          content: string
+          content_hash: string
+          context: string | null
+          created_at: string
+          id: string
+          keywords: string | null
+          search_tsv: unknown
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bulletin_type: string
+          category?: string | null
+          content: string
+          content_hash: string
+          context?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          search_tsv?: unknown
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bulletin_type?: string
+          category?: string | null
+          content?: string
+          content_hash?: string
+          context?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          search_tsv?: unknown
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coupon_redemptions: {
         Row: {
           coupon_id: string
@@ -619,6 +670,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anonymize_bulletin_text: { Args: { _txt: string }; Returns: string }
       approve_pix_payment_request: {
         Args: { _request_id: string }
         Returns: Json
@@ -664,12 +716,28 @@ export type Database = {
           title: string
         }[]
       }
+      match_community_knowledge: {
+        Args: { _bulletin_type?: string; _limit?: number; _query: string }
+        Returns: {
+          bulletin_type: string
+          category: string
+          content: string
+          id: string
+          occurrence_address: string
+          rank: number
+          title: string
+        }[]
+      }
       redeem_coupon: {
         Args: { _code: string; _user_id: string }
         Returns: Json
       }
       reject_pix_payment_request: {
         Args: { _reason?: string; _request_id: string }
+        Returns: Json
+      }
+      review_community_knowledge: {
+        Args: { _decision: string; _id: string }
         Returns: Json
       }
     }
