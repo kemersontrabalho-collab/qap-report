@@ -23,8 +23,8 @@ export function equalsCT(a: string, b: string) {
   return timingSafeEqual(ha, hb);
 }
 
-// eslint-disable-next-line react-hooks/rules-of-hooks -- useSession é utilitário de servidor do TanStack, não um hook React
 export async function getAdminSession() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- useSession é utilitário de servidor do TanStack, não um hook React
   return await useSession<AdminSession>(sessionConfig());
 }
 
