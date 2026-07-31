@@ -675,6 +675,7 @@ export type Database = {
         Args: { _request_id: string }
         Returns: Json
       }
+      backfill_community_knowledge: { Args: { _limit?: number }; Returns: Json }
       cancel_pix_payment_request: {
         Args: { _request_id: string; _user_id: string }
         Returns: Json
