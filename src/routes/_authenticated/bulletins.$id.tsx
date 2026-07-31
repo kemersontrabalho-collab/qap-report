@@ -538,11 +538,12 @@ function EditBulletin() {
                 value={b.keywords ?? ""}
                 onChange={(e) => update("keywords", e.target.value)}
                 rows={4}
-                placeholder="Fatos, ações, indivíduos, objetos apreendidos, etc."
+                placeholder="Escreva livremente: palavras soltas ou o relato completo dos fatos, ações, indivíduos e objetos apreendidos."
                 className="mt-1 w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                Liste fatos e ações. Nada será inventado.
+                Pode escrever em texto corrido ou em tópicos — a IA interpreta o conteúdo como um
+                todo. Nada será inventado.
               </p>
             </div>
             <div>
