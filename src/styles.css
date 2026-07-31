@@ -184,10 +184,30 @@
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    /* Tracking negativo proporcional ao peso: título display precisa fechar
+     * o espaço entre letras para ler como "editorial", não como texto de UI. */
+    letter-spacing: -0.02em;
+    text-wrap: balance;
     /* Evita palavras longas (ex.: "PROCEDIMENTO") estourarem o container. */
     overflow-wrap: break-word;
   }
+
+  p {
+    /* Evita a "linha órfã" de uma palavra no fim do parágrafo. */
+    text-wrap: pretty;
+  }
+
+  /* Foco visível consistente e elegante em todo o app (teclado apenas). */
+  :focus-visible {
+    outline: 2px solid var(--brand-bright);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--brand-bright) 26%, transparent);
+  }
+
 
   /* Mídia nunca ultrapassa o container pai, em nenhuma resolução. */
   img, svg, video, canvas {
