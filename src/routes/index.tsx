@@ -143,8 +143,7 @@ function Landing() {
       {/* Header da landing: marca elástica + navegação que quebra para a linha
           de baixo em telas muito estreitas, em vez de comprimir os links. */}
       <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-fluid py-4 sm:py-5">
-
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <img
             src={logoAsset.url}
             alt="QAP Report"
@@ -152,11 +151,13 @@ function Landing() {
             height={40}
             fetchPriority="high"
             decoding="async"
-            className="h-10 w-10 object-contain"
+            // aspect-square reserva a caixa antes do byte chegar → sem CLS.
+            className="aspect-square h-10 w-10 shrink-0 object-contain"
           />
-          <span className="text-lg font-semibold tracking-tight">QAP Report</span>
+          <span className="truncate text-fluid-lg font-semibold tracking-tight">QAP Report</span>
         </div>
-        <nav className="flex items-center gap-3">
+        <nav className="flex flex-wrap items-center gap-x-3 gap-y-2">
+
           <Link
             to="/guia-redacao-tecnica"
             className="text-sm text-muted-foreground hover:text-foreground"
