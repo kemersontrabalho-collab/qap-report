@@ -207,29 +207,48 @@ function DashboardView() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-semibold">Painel Administrativo</h1>
+        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-fluid py-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <Shield className="h-5 w-5 shrink-0 text-primary" />
+            <h1 className="truncate text-fluid-lg font-semibold">Painel Administrativo</h1>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
+          <Button variant="ghost" size="sm" className="shrink-0" onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" /> Sair
           </Button>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">
+      <main className="mx-auto max-w-6xl px-fluid py-6">
         <Tabs defaultValue="stats">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-7">
-            <TabsTrigger value="stats">Dashboard</TabsTrigger>
-            <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
-            <TabsTrigger value="users">Usuários</TabsTrigger>
-            <TabsTrigger value="pix">Pagamentos Pix</TabsTrigger>
-            <TabsTrigger value="notifications">Notificações</TabsTrigger>
-            <TabsTrigger value="coupons">Cupons</TabsTrigger>
-            <TabsTrigger value="knowledge">Base coletiva</TabsTrigger>
+          {/*
+           * 7 abas não cabem em 3 colunas sem truncar rótulos ("Monitoramento",
+           * "Pagamentos Pix"). Trocamos o grid rígido por uma faixa rolável com
+           * snap no mobile — padrão nativo iOS/Android — e só promovemos para
+           * grid de 7 colunas quando há largura real (lg+).
+           */}
+          <TabsList className="scroll-row -mx-2 flex h-auto w-[calc(100%+1rem)] justify-start gap-1 px-2 lg:mx-0 lg:grid lg:w-full lg:grid-cols-7">
+            {(
+              [
+                ["stats", "Dashboard"],
+                ["monitoring", "Monitoramento"],
+                ["users", "Usuários"],
+                ["pix", "Pagamentos Pix"],
+                ["notifications", "Notificações"],
+                ["coupons", "Cupons"],
+                ["knowledge", "Base coletiva"],
+              ] as const
+            ).map(([value, label]) => (
+              <TabsTrigger
+                key={value}
+                value={value}
+                className="min-h-11 shrink-0 scroll-ml-2 snap-start whitespace-nowrap lg:min-h-0 lg:shrink"
+              >
+                {label}
+              </TabsTrigger>
+            ))}
           </TabsList>
+
           <TabsContent value="stats" className="mt-6">
             <StatsPanel />
           </TabsContent>

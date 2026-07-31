@@ -139,9 +139,11 @@ function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <div className="flex items-center gap-2">
+    <div className="min-h-dvh bg-background text-foreground">
+      {/* Header da landing: marca elástica + navegação que quebra para a linha
+          de baixo em telas muito estreitas, em vez de comprimir os links. */}
+      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-fluid py-4 sm:py-5">
+        <div className="flex min-w-0 items-center gap-2">
           <img
             src={logoAsset.url}
             alt="QAP Report"
@@ -149,11 +151,13 @@ function Landing() {
             height={40}
             fetchPriority="high"
             decoding="async"
-            className="h-10 w-10 object-contain"
+            // aspect-square reserva a caixa antes do byte chegar → sem CLS.
+            className="aspect-square h-10 w-10 shrink-0 object-contain"
           />
-          <span className="text-lg font-semibold tracking-tight">QAP Report</span>
+          <span className="truncate text-fluid-lg font-semibold tracking-tight">QAP Report</span>
         </div>
-        <nav className="flex items-center gap-3">
+        <nav className="flex flex-wrap items-center gap-x-3 gap-y-2">
+
           <Link
             to="/guia-redacao-tecnica"
             className="text-sm text-muted-foreground hover:text-foreground"
@@ -173,45 +177,61 @@ function Landing() {
         </nav>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6">
-        <section className="grid gap-8 py-16 md:grid-cols-2 md:items-center md:py-24">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5" /> Assistente de redação policial
+      <main className="mx-auto max-w-6xl px-fluid">
+        {/*
+         * HERO — coluna única até md (o cartão de prévia embaixo funciona como
+         * prova social após a chamada). A partir de md as duas colunas ficam
+         * lado a lado e centradas verticalmente. O padding vertical é fluido,
+         * então não há salto de 16 para 24 unidades no breakpoint.
+         */}
+        <section className="grid gap-8 py-fluid-section md:grid-cols-2 md:items-center">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-fluid-xs text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5 shrink-0" /> Assistente de redação policial
             </div>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+            {/* text-fluid-hero: 28px no relógio → 60px no ultrawide, contínuo. */}
+            <h1 className="mt-4 text-fluid-hero font-bold">
               Boletins policiais bem redigidos, em segundos.
             </h1>
-            <p className="mt-4 max-w-xl text-muted-foreground">
+            {/* measure trava a linha em ~68 caracteres: legibilidade preservada
+                tanto no celular quanto num monitor de 32". */}
+            <p className="measure mt-4 text-fluid-base text-muted-foreground">
               Informe o tipo de ocorrência (BA, BO-COP, BO-TC ou BOAT) e as palavras-chave. O QAP
               Report produz um texto formal, técnico e fiel aos fatos — pronto para revisão.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
+
+            {/* CTAs: largura total no mobile (alvo de toque generoso e polegar
+                confortável), auto a partir de 480px. */}
+            <div className="mt-6 flex flex-col gap-3 xs:flex-row xs:flex-wrap">
               <Link
                 to="/auth"
                 search={{ mode: "signup" }}
-                className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground hover:opacity-90"
               >
                 Começar agora
               </Link>
               <Link
                 to="/auth"
-                className="inline-flex items-center justify-center rounded-lg border px-5 py-2.5 text-sm font-medium hover:bg-accent"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border px-5 text-sm font-medium hover:bg-accent"
               >
                 Já tenho conta
               </Link>
             </div>
           </div>
-          <div className="relative">
-            <div className="rounded-3xl border bg-card p-6 shadow-lg">
-              <div className="text-xs font-medium text-muted-foreground">Prévia · BO-COP</div>
-              <h2 className="mt-2 font-semibold">Comunicação de Ocorrência Policial</h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          <div className="relative min-w-0">
+            <div className="rounded-3xl border bg-card p-4 shadow-lg sm:p-6">
+              <div className="text-fluid-xs font-medium text-muted-foreground">Prévia · BO-COP</div>
+              <h2 className="mt-2 text-fluid-base font-semibold">
+                Comunicação de Ocorrência Policial
+              </h2>
+              <p className="mt-3 text-fluid-sm text-muted-foreground">
                 Aos vinte e três dias do mês corrente, esta guarnição composta pelos policiais
                 militares acima identificados, em patrulhamento pela viatura de prefixo indicado,
                 foi acionada via COPOM para atender ocorrência...
               </p>
-              <div className="mt-4 flex gap-2 text-xs">
+              {/* flex-wrap evita que as duas tags de fundamentação legal estourem
+                  o cartão em telas estreitas. */}
+              <div className="mt-4 flex flex-wrap gap-2 text-xs">
                 <span className="rounded-md bg-accent px-2 py-1 text-accent-foreground">
                   Súm. Vinc. 11
                 </span>
@@ -223,7 +243,9 @@ function Landing() {
           </div>
         </section>
 
-        <section className="grid gap-4 pb-20 md:grid-cols-3">
+        {/* Recursos: 1 → 2 (tablet retrato) → 3 (desktop). */}
+        <section className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 md:grid-cols-3 md:pb-20">
+
           <h2 className="sr-only">Recursos do QAP Report</h2>
           <Feature
             icon={Feather}
