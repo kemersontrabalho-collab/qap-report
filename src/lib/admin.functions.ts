@@ -409,3 +409,82 @@ export const adminRejectPixRequest = createServerFn({ method: "POST" })
     });
     return { ok: true as const };
   });
+
+// ---------------------------------------------------------------------------
+// Base de conhecimento coletiva (anônima) — curadoria do fundador
+// ---------------------------------------------------------------------------
+
+export const adminListCommunityKnowledge = createServerFn({ method: "POST" })
+  .inputValidator((d: { status?: "pendente" | "aprovado" | "rejeitado" | "all" }) => d)
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    let q = sb
+      .from("community_knowledge")
+      .select("id, bulletin_type, category, title, keywords, content, status, created_at, approved_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    const status = data.status ?? "pendente";
+    if (status !== "all") q = q.eq("status", status);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const { count: pendingCount } = await sb
+      .from("community_knowledge")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pendente");
+    const { count: approvedCount } = await sb
+      .from("community_knowledge")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "aprovado");
+
+    return {
+      items: rows ?? [],
+      pendingCount: pendingCount ?? 0,
+      approvedCount: approvedCount ?? 0,
+    };
+  });
+
+export const adminReviewCommunityKnowledge = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string; decision: "aprovado" | "rejeitado" }) => {
+    if (!["aprovado", "rejeitado"].includes(d.decision)) throw new Error("Decisão inválida.");
+    return d;
+  })
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    const { error } = await sb
+      .from("community_knowledge")
+      .update({
+        status: data.decision,
+        approved_at: data.decision === "aprovado" ? new Date().toISOString() : null,
+      })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const adminUpdateCommunityKnowledge = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string; title?: string; category?: string | null; content?: string }) => d)
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    const patch: Record<string, unknown> = {};
+    if (typeof data.title === "string") patch.title = data.title.slice(0, 300);
+    if (data.category !== undefined) patch.category = data.category;
+    if (typeof data.content === "string") patch.content = data.content.slice(0, 20000);
+    if (Object.keys(patch).length === 0) return { ok: true as const };
+    const { error } = await sb.from("community_knowledge").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+export const adminDeleteCommunityKnowledge = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string }) => d)
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    const { error } = await sb.from("community_knowledge").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
