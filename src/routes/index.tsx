@@ -16,13 +16,20 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "QAP Report — Assistente de Redação Policial com IA" },
       {
         property: "og:description",
-        content: "Redija boletins BA, BO-COP, BO-TC e BOAT com apoio de IA e terminologia técnica policial.",
+        content:
+          "Redija boletins BA, BO-COP, BO-TC e BOAT com apoio de IA e terminologia técnica policial.",
       },
       { property: "og:url", content: "https://qap-report.lovable.app/" },
     ],
     links: [
       { rel: "canonical", href: "https://qap-report.lovable.app/" },
-      { rel: "preload", as: "image", href: logoAsset.url, type: "image/webp", fetchPriority: "high" },
+      {
+        rel: "preload",
+        as: "image",
+        href: logoAsset.url,
+        type: "image/webp",
+        fetchPriority: "high",
+      },
     ],
     scripts: [
       {
@@ -153,10 +160,7 @@ function Landing() {
           >
             Guia
           </Link>
-          <Link
-            to="/auth"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
+          <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">
             Entrar
           </Link>
           <Link
@@ -179,8 +183,8 @@ function Landing() {
               Boletins policiais bem redigidos, em segundos.
             </h1>
             <p className="mt-4 max-w-xl text-muted-foreground">
-              Informe o tipo de ocorrência (BA, BO-COP, BO-TC ou BOAT) e as palavras-chave.
-              O QAP Report produz um texto formal, técnico e fiel aos fatos — pronto para revisão.
+              Informe o tipo de ocorrência (BA, BO-COP, BO-TC ou BOAT) e as palavras-chave. O QAP
+              Report produz um texto formal, técnico e fiel aos fatos — pronto para revisão.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
@@ -208,8 +212,12 @@ function Landing() {
                 foi acionada via COPOM para atender ocorrência...
               </p>
               <div className="mt-4 flex gap-2 text-xs">
-                <span className="rounded-md bg-accent px-2 py-1 text-accent-foreground">Súm. Vinc. 11</span>
-                <span className="rounded-md bg-accent px-2 py-1 text-accent-foreground">Art. 5º, LXIII CF</span>
+                <span className="rounded-md bg-accent px-2 py-1 text-accent-foreground">
+                  Súm. Vinc. 11
+                </span>
+                <span className="rounded-md bg-accent px-2 py-1 text-accent-foreground">
+                  Art. 5º, LXIII CF
+                </span>
               </div>
             </div>
           </div>

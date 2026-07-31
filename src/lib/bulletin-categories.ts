@@ -263,10 +263,7 @@ const SHARED: Category[] = [
   ["Morte Decorrente de Oposição à Intervenção Policial", false],
 ].map(([name, requiresTC]) => ({ name: name as string, requiresTC: requiresTC as boolean }));
 
-const BOAT: Category[] = [
-  { name: "Acidente de Trânsito" },
-  { name: "Infração de Trânsito" },
-];
+const BOAT: Category[] = [{ name: "Acidente de Trânsito" }, { name: "Infração de Trânsito" }];
 
 export const CATEGORIES_BY_TYPE: Record<string, Category[]> = {
   BA,

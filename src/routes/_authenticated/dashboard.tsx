@@ -26,7 +26,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
 type Bulletin = {
   id: string;
   bulletin_type: string;
@@ -60,7 +59,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { title: "Painel · QAP Report" },
       {
         name: "description",
-        content: "Área privada do QAP Report para criar, editar e gerenciar boletins policiais do usuário.",
+        content:
+          "Área privada do QAP Report para criar, editar e gerenciar boletins policiais do usuário.",
       },
       { property: "og:title", content: "Painel · QAP Report" },
       {
@@ -75,9 +75,16 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   errorComponent: ({ error, reset }) => (
     <AppShell>
       <div role="alert" className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6">
-        <h2 className="text-lg font-semibold text-destructive">Não foi possível carregar seus boletins</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{error instanceof Error ? error.message : "Erro desconhecido"}</p>
-        <button onClick={reset} className="mt-4 rounded-lg border px-3 py-1.5 text-sm hover:bg-accent">
+        <h2 className="text-lg font-semibold text-destructive">
+          Não foi possível carregar seus boletins
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {error instanceof Error ? error.message : "Erro desconhecido"}
+        </p>
+        <button
+          onClick={reset}
+          className="mt-4 rounded-lg border px-3 py-1.5 text-sm hover:bg-accent"
+        >
           Tentar novamente
         </button>
       </div>
@@ -129,7 +136,6 @@ function Dashboard() {
         if (!error) qc.invalidateQueries({ queryKey: ["bulletins"] });
       });
   }, [qc]);
-
 
   const filtered = useMemo(() => {
     const s = search.toLowerCase().trim();
@@ -226,7 +232,10 @@ function Dashboard() {
     const { error } = await supabase
       .from("bulletins")
       .delete()
-      .in("id", trashed.map((b) => b.id));
+      .in(
+        "id",
+        trashed.map((b) => b.id),
+      );
     if (error) {
       toast.error("Não foi possível esvaziar a lixeira. Tente novamente.");
       return;
@@ -235,7 +244,6 @@ function Dashboard() {
     toast.success("Lixeira esvaziada");
   };
 
-
   const tabs: { key: Tab; label: string; icon: typeof FileText }[] = [
     { key: "drafts", label: "Rascunhos", icon: ClipboardEdit },
     { key: "done", label: "Concluídos", icon: CheckCircle2 },
@@ -243,18 +251,21 @@ function Dashboard() {
     { key: "trash", label: "Lixeira", icon: Trash2 },
   ];
 
-  const counts = tabs.reduce<Record<Tab, number>>((acc, t) => {
-    acc[t.key] = bulletins.filter((b) => {
-      if (t.key === "trash") return !!b.deleted_at;
-      if (b.deleted_at) return false;
-      if (t.key === "drafts") return b.status === "draft" && !b.is_favorite;
-      if (t.key === "done") return b.status === "done" && !b.is_favorite;
-      if (t.key === "favorites") return b.is_favorite;
+  const counts = tabs.reduce<Record<Tab, number>>(
+    (acc, t) => {
+      acc[t.key] = bulletins.filter((b) => {
+        if (t.key === "trash") return !!b.deleted_at;
+        if (b.deleted_at) return false;
+        if (t.key === "drafts") return b.status === "draft" && !b.is_favorite;
+        if (t.key === "done") return b.status === "done" && !b.is_favorite;
+        if (t.key === "favorites") return b.is_favorite;
 
-      return true;
-    }).length;
-    return acc;
-  }, { drafts: 0, done: 0, favorites: 0, trash: 0 });
+        return true;
+      }).length;
+      return acc;
+    },
+    { drafts: 0, done: 0, favorites: 0, trash: 0 },
+  );
 
   const activeTab = tabs.find((t) => t.key === tab)!;
 
@@ -267,7 +278,6 @@ function Dashboard() {
           Selecione um tipo de boletim para criar, ou gerencie os existentes.
         </p>
       </div>
-
 
       <section data-tour="bulletin-types" className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {BULLETIN_TYPES.map((t) => (
@@ -352,7 +362,6 @@ function Dashboard() {
             </DropdownMenu>
           </div>
         </div>
-
 
         <ul className="divide-y">
           {filtered.length === 0 && (

@@ -37,8 +37,7 @@ export const sendSupportMessage = createServerFn({ method: "POST" })
       sugestao: "Sugestão",
       outro: "Mensagem",
     };
-    const senderName =
-      (profile as any)?.full_name || (profile as any)?.email || "Usuário";
+    const senderName = (profile as any)?.full_name || (profile as any)?.email || "Usuário";
     const senderEmail = (profile as any)?.email ?? "";
 
     const rows = founders.map((f: any) => ({

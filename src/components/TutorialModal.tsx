@@ -132,9 +132,6 @@ function useElementRect(selector: string | undefined, deps: unknown[]) {
   return rect;
 }
 
-
-
-
 export function TutorialModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [i, setI] = useState(0);
   const navigate = useNavigate();
@@ -173,7 +170,12 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
     }
   }, [open, step, navigate]);
 
-  const rect = useElementRect(open ? step?.target : undefined, [open, i, step?.target, step?.route]);
+  const rect = useElementRect(open ? step?.target : undefined, [
+    open,
+    i,
+    step?.target,
+    step?.route,
+  ]);
 
   // Measure real card size after render to position accurately on any screen
   useLayoutEffect(() => {
@@ -220,7 +222,10 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
     const above = spot.top - CARD_H - 12;
     const useBelow = below + CARD_H < vp.h - 12 || above < 12;
     const top = useBelow ? below : Math.max(above, 12);
-    const left = Math.min(Math.max(spot.left + spot.width / 2 - CARD_W / 2, 12), vp.w - CARD_W - 12);
+    const left = Math.min(
+      Math.max(spot.left + spot.width / 2 - CARD_W / 2, 12),
+      vp.w - CARD_W - 12,
+    );
     cardStyle = { top, left, transform: "none" };
   }
 
@@ -245,20 +250,24 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
         <div className="pointer-events-none absolute inset-0 bg-black/65" />
       )}
 
-
-
-
       {/* Floating card */}
       <div
         ref={cardRef}
         className="pointer-events-auto absolute animate-fade-in rounded-2xl border bg-card p-4 shadow-2xl sm:p-5"
-        style={{ ...cardStyle, width: CARD_W, maxHeight: `calc(100dvh - ${MARGIN * 2}px)`, overflowY: "auto" }}
+        style={{
+          ...cardStyle,
+          width: CARD_W,
+          maxHeight: `calc(100dvh - ${MARGIN * 2}px)`,
+          overflowY: "auto",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-2">
           <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-primary">
             <Sparkles className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">Passo {i + 1} de {STEPS.length}</span>
+            <span className="truncate">
+              Passo {i + 1} de {STEPS.length}
+            </span>
           </span>
           <button
             onClick={onClose}
@@ -269,7 +278,9 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
           </button>
         </div>
         <h3 className="mt-2 text-base font-semibold sm:text-lg">{step.title}</h3>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground sm:text-sm">{step.body}</p>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground sm:text-sm">
+          {step.body}
+        </p>
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-accent">
           <div
             className="h-full bg-primary transition-all duration-300"
@@ -307,7 +318,6 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
             </button>
           )}
         </div>
-
       </div>
     </div>
   );

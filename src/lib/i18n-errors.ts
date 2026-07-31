@@ -19,8 +19,14 @@ export function translateAuthError(input: unknown): string {
     [/invalid email/i, "Email inválido."],
     [/signup requires a valid password/i, "Cadastro requer uma senha válida."],
     [/signups not allowed/i, "Cadastros não estão habilitados no momento."],
-    [/rate limit|too many requests/i, "Muitas tentativas. Aguarde alguns instantes e tente novamente."],
-    [/email rate limit exceeded/i, "Limite de envios de email atingido. Tente novamente mais tarde."],
+    [
+      /rate limit|too many requests/i,
+      "Muitas tentativas. Aguarde alguns instantes e tente novamente.",
+    ],
+    [
+      /email rate limit exceeded/i,
+      "Limite de envios de email atingido. Tente novamente mais tarde.",
+    ],
     [/network|failed to fetch|networkerror/i, "Falha de conexão. Verifique sua internet."],
     [/new password should be different/i, "A nova senha deve ser diferente da atual."],
     [/same as the old password/i, "A nova senha deve ser diferente da atual."],
@@ -34,10 +40,12 @@ export function translateAuthError(input: unknown): string {
   // Suporta também `error.code` (Supabase v2 novo formato)
   const code = (input as any)?.code ? String((input as any).code).toLowerCase() : "";
   if (code === "invalid_credentials") return "Email ou senha inválidos.";
-  if (code === "email_not_confirmed") return "Email ainda não confirmado. Verifique sua caixa de entrada.";
+  if (code === "email_not_confirmed")
+    return "Email ainda não confirmado. Verifique sua caixa de entrada.";
   if (code === "user_banned") return "Sua conta está bloqueada. Contate o administrador.";
   if (code === "weak_password") return "Senha muito fraca. Escolha uma senha mais forte.";
-  if (code === "over_email_send_rate_limit") return "Limite de envios de email atingido. Tente novamente mais tarde.";
+  if (code === "over_email_send_rate_limit")
+    return "Limite de envios de email atingido. Tente novamente mais tarde.";
 
   for (const [re, pt] of map) {
     if (re.test(lower)) return msg.replace(re, pt);
@@ -58,16 +66,19 @@ export function translateDbError(input: unknown): string {
     "23502": "Campo obrigatório em falta.",
     "23514": "Valor não permitido para este campo.",
     "42501": "Sem permissão para esta operação.",
-    "PGRST116": "Registro não encontrado.",
-    "PGRST301": "Sessão expirada. Faça login novamente.",
-    "PGRST204": "Operação inválida.",
+    PGRST116: "Registro não encontrado.",
+    PGRST301: "Sessão expirada. Faça login novamente.",
+    PGRST204: "Operação inválida.",
   };
   if (code && codeMap[code]) return codeMap[code];
 
   const lower = msg.toLowerCase();
-  if (/jwt|not authenticated|unauthorized/i.test(lower)) return "Sessão expirada. Faça login novamente.";
-  if (/network|failed to fetch|networkerror/i.test(lower)) return "Falha de conexão. Verifique sua internet.";
-  if (/violates row-level security|permission denied/i.test(lower)) return "Sem permissão para esta operação.";
+  if (/jwt|not authenticated|unauthorized/i.test(lower))
+    return "Sessão expirada. Faça login novamente.";
+  if (/network|failed to fetch|networkerror/i.test(lower))
+    return "Falha de conexão. Verifique sua internet.";
+  if (/violates row-level security|permission denied/i.test(lower))
+    return "Sem permissão para esta operação.";
   if (/duplicate key/i.test(lower)) return "Registro duplicado. Este valor já está em uso.";
   if (/timeout|timed out/i.test(lower)) return "Tempo esgotado. Tente novamente.";
 

@@ -24,10 +24,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       navigate({ to: "/auth", replace: true });
     } catch (e) {
       // Não limpar o cache se o signOut falhou — o usuário ainda tem sessão.
-      toast.error(e instanceof Error ? e.message : "Não foi possível encerrar a sessão. Tente novamente.");
+      toast.error(
+        e instanceof Error ? e.message : "Não foi possível encerrar a sessão. Tente novamente.",
+      );
     }
   }
-
 
   const navItems = [
     { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
@@ -35,13 +36,20 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/settings", label: "Configurações", icon: Settings },
   ] as const;
 
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <img src={logoAsset.url} alt="QAP Report" width={32} height={32} decoding="async" loading="eager" className="h-8 w-8 object-contain" />
+            <img
+              src={logoAsset.url}
+              alt="QAP Report"
+              width={32}
+              height={32}
+              decoding="async"
+              loading="eager"
+              className="h-8 w-8 object-contain"
+            />
             <span className="font-semibold tracking-tight">QAP Report</span>
           </Link>
 
@@ -75,7 +83,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Novo</span>
             </Link>
-            <div data-tour="notifications"><NotificationBell /></div>
+            <div data-tour="notifications">
+              <NotificationBell />
+            </div>
 
             <button
               onClick={toggle}
@@ -118,7 +128,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </nav>
       <div className="h-16 md:hidden" />
-
     </div>
   );
 }

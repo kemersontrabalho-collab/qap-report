@@ -11,11 +11,23 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
 
     // Ordem respeita FKs. Falhas em tabelas dependentes abortam a exclusão do auth.user.
     const steps: Array<[string, PromiseLike<{ error: { message?: string } | null }>]> = [
-      ["bulletin_knowledge", supabaseAdmin.from("bulletin_knowledge").delete().eq("owner_id", userId)],
+      [
+        "bulletin_knowledge",
+        supabaseAdmin.from("bulletin_knowledge").delete().eq("owner_id", userId),
+      ],
       ["bulletins", supabaseAdmin.from("bulletins").delete().eq("user_id", userId)],
-      ["notification_reads", supabaseAdmin.from("notification_reads").delete().eq("user_id", userId)],
-      ["coupon_redemptions", supabaseAdmin.from("coupon_redemptions").delete().eq("user_id", userId)],
-      ["pix_payment_requests", supabaseAdmin.from("pix_payment_requests").delete().eq("user_id", userId)],
+      [
+        "notification_reads",
+        supabaseAdmin.from("notification_reads").delete().eq("user_id", userId),
+      ],
+      [
+        "coupon_redemptions",
+        supabaseAdmin.from("coupon_redemptions").delete().eq("user_id", userId),
+      ],
+      [
+        "pix_payment_requests",
+        supabaseAdmin.from("pix_payment_requests").delete().eq("user_id", userId),
+      ],
       ["payments", supabaseAdmin.from("payments").delete().eq("user_id", userId)],
       ["subscriptions", supabaseAdmin.from("subscriptions").delete().eq("user_id", userId)],
       ["user_roles", supabaseAdmin.from("user_roles").delete().eq("user_id", userId)],

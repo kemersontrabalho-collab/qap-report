@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Bell, Check, X, Eraser, Eye, EyeOff } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { listNotifications, markNotificationsRead, type NotificationRow } from "@/lib/notifications.functions";
+import {
+  listNotifications,
+  markNotificationsRead,
+  type NotificationRow,
+} from "@/lib/notifications.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export function NotificationBell() {
@@ -42,15 +46,11 @@ export function NotificationBell() {
   useEffect(() => {
     const channel = supabase
       .channel("notifications-bell")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "notifications" },
-        () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications" }, () =>
+        qc.invalidateQueries({ queryKey: ["notifications"] }),
       )
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "notifications" },
-        () => qc.invalidateQueries({ queryKey: ["notifications"] }),
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "notifications" }, () =>
+        qc.invalidateQueries({ queryKey: ["notifications"] }),
       )
       .subscribe();
     return () => {
@@ -87,9 +87,7 @@ export function NotificationBell() {
       const prev = qc.getQueryData<{ items: NotificationRow[]; unread: number }>(["notifications"]);
       if (prev) {
         const target = new Set(ids ?? prev.items.map((i) => i.id));
-        const nextItems = prev.items.map((n) =>
-          target.has(n.id) ? { ...n, read: true } : n,
-        );
+        const nextItems = prev.items.map((n) => (target.has(n.id) ? { ...n, read: true } : n));
         qc.setQueryData(["notifications"], {
           items: nextItems,
           unread: nextItems.filter((i) => !i.read).length,

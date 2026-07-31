@@ -93,10 +93,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "QAP Report — Assistente de Redação Policial" },
       { name: "twitter:title", content: "QAP Report — Assistente de Redação Policial" },
-      { property: "og:description", content: "Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT." },
-      { name: "twitter:description", content: "Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6369f9bf-252b-423f-9150-9587d3accd35/id-preview-c7994b66--483e5855-54d3-4735-b11e-9a2d8b9c3665.lovable.app-1784774470412.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6369f9bf-252b-423f-9150-9587d3accd35/id-preview-c7994b66--483e5855-54d3-4735-b11e-9a2d8b9c3665.lovable.app-1784774470412.png" },
+      {
+        property: "og:description",
+        content: "Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT.",
+      },
+      {
+        name: "twitter:description",
+        content: "Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6369f9bf-252b-423f-9150-9587d3accd35/id-preview-c7994b66--483e5855-54d3-4735-b11e-9a2d8b9c3665.lovable.app-1784774470412.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6369f9bf-252b-423f-9150-9587d3accd35/id-preview-c7994b66--483e5855-54d3-4735-b11e-9a2d8b9c3665.lovable.app-1784774470412.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

@@ -53,7 +53,10 @@ export function TrialBanner() {
   // Plano pago vigente (mensal/anual/premium) — só avisar quando estiver perto de vencer (<=7 dias).
   const isActivePaid =
     isPaidPlan &&
-    (sub.status === "active" || sub.status === "trialing" || sub.status === "past_due" || sub.status === "canceled") &&
+    (sub.status === "active" ||
+      sub.status === "trialing" ||
+      sub.status === "past_due" ||
+      sub.status === "canceled") &&
     hasFutureEnd;
 
   if (isActivePaid) {
@@ -68,11 +71,13 @@ export function TrialBanner() {
         <div className="flex items-start gap-3">
           <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
           <div>
-            <p className="text-sm font-semibold text-foreground">
-              Seu plano vence em breve
-            </p>
+            <p className="text-sm font-semibold text-foreground">Seu plano vence em breve</p>
             <p className="text-xs text-muted-foreground">
-              Restam <span className="font-medium text-foreground">{daysLeft} {daysLeft === 1 ? "dia" : "dias"}</span>. Renove para não perder o acesso.
+              Restam{" "}
+              <span className="font-medium text-foreground">
+                {daysLeft} {daysLeft === 1 ? "dia" : "dias"}
+              </span>
+              . Renove para não perder o acesso.
             </p>
           </div>
         </div>
@@ -94,11 +99,11 @@ export function TrialBanner() {
         <div className="flex items-start gap-3">
           <Clock className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
           <div>
-            <p className="text-sm font-semibold text-foreground">
-              Período de teste gratuito ativo
-            </p>
+            <p className="text-sm font-semibold text-foreground">Período de teste gratuito ativo</p>
             <p className="text-xs text-muted-foreground">
-              Tempo restante: <span className="font-medium text-foreground">{formatRemaining(endMs - now)}</span>. Assine para não perder acesso.
+              Tempo restante:{" "}
+              <span className="font-medium text-foreground">{formatRemaining(endMs - now)}</span>.
+              Assine para não perder acesso.
             </p>
           </div>
         </div>

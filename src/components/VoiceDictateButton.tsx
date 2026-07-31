@@ -14,11 +14,7 @@ type SR = any;
 
 function getRecognitionCtor(): any | null {
   if (typeof window === "undefined") return null;
-  return (
-    (window as any).SpeechRecognition ||
-    (window as any).webkitSpeechRecognition ||
-    null
-  );
+  return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null;
 }
 
 export function VoiceDictateButton({ value, onChange, label = "Ditar", className = "" }: Props) {
@@ -101,9 +97,7 @@ export function VoiceDictateButton({ value, onChange, label = "Ditar", className
       title={listening ? "Parar ditado" : "Ditar por voz"}
       aria-label={listening ? "Parar ditado" : "Ditar por voz"}
       className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs transition ${
-        listening
-          ? "border-red-500 bg-red-500/10 text-red-600 animate-pulse"
-          : "hover:bg-accent"
+        listening ? "border-red-500 bg-red-500/10 text-red-600 animate-pulse" : "hover:bg-accent"
       } ${className}`}
     >
       {listening ? <MicOff className="h-3 w-3" /> : <Mic className="h-3 w-3" />}

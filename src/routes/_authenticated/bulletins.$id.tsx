@@ -20,12 +20,12 @@ import {
   Trash2,
   MapPin,
   ExternalLink,
-  
 } from "lucide-react";
 
-
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
-  head: () => ({ meta: [{ title: "Editar boletim · QAP Report" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Editar boletim · QAP Report" }, { name: "robots", content: "noindex" }],
+  }),
   component: EditBulletin,
 });
 
@@ -67,19 +67,21 @@ function fromLocalInput(v: string): string | null {
 // markdown (# de títulos e * de negrito/itálico/listas) que não pertencem
 // ao histórico final do boletim.
 function stripBraces(text: string): string {
-  return text
-    .replace(/\{[^{}]*\}/g, "")
-    // Remove marcadores de título markdown no início de linha (# até ######)
-    .replace(/^\s{0,3}#{1,6}\s*/gm, "")
-    // Remove ênfase markdown: **negrito**, __negrito__, *itálico*, _itálico_
-    .replace(/(\*\*|__)(.*?)\1/g, "$2")
-    .replace(/(\*|_)(?=\S)(.+?)(?<=\S)\1/g, "$2")
-    // Remove asteriscos remanescentes (bullets soltos, ênfases mal formadas)
-    .replace(/\*+/g, "")
-    // Limpa espaços/linhas em excesso
-    .replace(/[ \t]+\n/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+  return (
+    text
+      .replace(/\{[^{}]*\}/g, "")
+      // Remove marcadores de título markdown no início de linha (# até ######)
+      .replace(/^\s{0,3}#{1,6}\s*/gm, "")
+      // Remove ênfase markdown: **negrito**, __negrito__, *itálico*, _itálico_
+      .replace(/(\*\*|__)(.*?)\1/g, "$2")
+      .replace(/(\*|_)(?=\S)(.+?)(?<=\S)\1/g, "$2")
+      // Remove asteriscos remanescentes (bullets soltos, ênfases mal formadas)
+      .replace(/\*+/g, "")
+      // Limpa espaços/linhas em excesso
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+  );
 }
 
 // Extrai a seção "PERGUNTAS COMPLEMENTARES" e os marcadores {DADO AUSENTE}
@@ -89,7 +91,10 @@ function extractImprovementSuggestions(content: string | null | undefined): stri
   const suggestions: string[] = [];
   const seen = new Set<string>();
   const push = (s: string) => {
-    const t = s.trim().replace(/^[-•*\d.)\s]+/, "").trim();
+    const t = s
+      .trim()
+      .replace(/^[-•*\d.)\s]+/, "")
+      .trim();
     if (t.length < 2) return;
     const key = t.toLowerCase();
     if (seen.has(key)) return;
@@ -98,7 +103,9 @@ function extractImprovementSuggestions(content: string | null | undefined): stri
   };
 
   // 1) Seção "PERGUNTAS COMPLEMENTARES:" até o fim ou próxima seção em caixa alta
-  const m = content.match(/PERGUNTAS\s+COMPLEMENTARES\s*:?\s*([\s\S]*?)(?:\n\s*[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-ZÁÉÍÓÚÂÊÔÃÕÇ\s/]{3,}:|\s*$)/i);
+  const m = content.match(
+    /PERGUNTAS\s+COMPLEMENTARES\s*:?\s*([\s\S]*?)(?:\n\s*[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-ZÁÉÍÓÚÂÊÔÃÕÇ\s/]{3,}:|\s*$)/i,
+  );
   if (m && m[1]) {
     m[1]
       .split(/\n+/)
@@ -117,9 +124,6 @@ function extractImprovementSuggestions(content: string | null | undefined): stri
   return suggestions;
 }
 
-
-
-
 function EditBulletin() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
@@ -136,14 +140,15 @@ function EditBulletin() {
   bRef.current = b;
 
   const typeInfo = useMemo(() => BULLETIN_TYPES.find((t) => t.code === b?.bulletin_type), [b]);
-  const categories = useMemo(
-    () => (b ? CATEGORIES_BY_TYPE[b.bulletin_type] ?? [] : []),
-    [b],
-  );
+  const categories = useMemo(() => (b ? (CATEGORIES_BY_TYPE[b.bulletin_type] ?? []) : []), [b]);
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("bulletins").select("*").eq("id", id).maybeSingle();
+      const { data, error } = await supabase
+        .from("bulletins")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
       if (data) {
         const loaded = data as Bulletin;
         if (!loaded.occurrence_at) loaded.occurrence_at = new Date().toISOString();
@@ -228,7 +233,8 @@ function EditBulletin() {
   // antes de fechar a aba com alterações pendentes.
   useEffect(() => {
     const id = window.setInterval(() => {
-      if (dirtyRef.current && !savingRef.current && bRef.current) void save(undefined, { silent: true });
+      if (dirtyRef.current && !savingRef.current && bRef.current)
+        void save(undefined, { silent: true });
     }, 15_000);
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
       if (!dirtyRef.current) return;
@@ -243,8 +249,6 @@ function EditBulletin() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-
 
   async function generate() {
     if (!b) return;
@@ -301,7 +305,10 @@ function EditBulletin() {
           } else {
             update("occurrence_lat", latitude);
             update("occurrence_lng", longitude);
-            update("occurrence_address", address || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+            update(
+              "occurrence_address",
+              address || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+            );
           }
           toast.success("Localização preenchida");
         } catch (e) {
@@ -318,18 +325,17 @@ function EditBulletin() {
     );
   }
 
-
   function openMap(lat: number | null, lng: number | null, address: string | null) {
     let url: string;
     if (lat != null && lng != null) url = `https://www.google.com/maps?q=${lat},${lng}`;
-    else if (address) url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+    else if (address)
+      url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
     else {
       toast.error("Preencha o endereço primeiro.");
       return;
     }
     window.open(url, "_blank", "noopener,noreferrer");
   }
-
 
   async function trash() {
     if (!b) return;
@@ -343,9 +349,7 @@ function EditBulletin() {
       return;
     }
     navigate({ to: "/dashboard" });
-
   }
-
 
   if (loading || !b) {
     return (
@@ -367,7 +371,6 @@ function EditBulletin() {
           <ArrowLeft className="h-4 w-4" /> Voltar
         </Link>
         <div className="flex items-center gap-2">
-
           <button
             onClick={() => update("is_favorite", !b.is_favorite)}
             className="grid h-9 w-9 place-items-center rounded-lg border hover:bg-accent"
@@ -386,7 +389,6 @@ function EditBulletin() {
       </div>
 
       <h1 className="sr-only">{b.title || `Editar ${b.bulletin_type}`}</h1>
-
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <aside className="space-y-4">
@@ -548,7 +550,8 @@ function EditBulletin() {
                 if (!b.content) {
                   return (
                     <p className="mt-1 rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-                      Gere o texto para ver aqui as perguntas complementares e dados faltantes identificados pela IA.
+                      Gere o texto para ver aqui as perguntas complementares e dados faltantes
+                      identificados pela IA.
                     </p>
                   );
                 }
@@ -572,14 +575,16 @@ function EditBulletin() {
               })()}
             </div>
 
-
-
             <button
               onClick={generate}
               disabled={generating}
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
             >
-              {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {generating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
               {generating ? "Gerando..." : b.content ? "Regerar texto" : "Gerar texto"}
             </button>
           </div>
@@ -612,7 +617,11 @@ function EditBulletin() {
                 disabled={saving}
                 className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent disabled:opacity-60"
               >
-                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                {saving ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Save className="h-3.5 w-3.5" />
+                )}
                 Salvar
               </button>
               <button
@@ -660,11 +669,12 @@ function CategorySearch({
   }, []);
 
   const normalize = (s: string) =>
-    s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    s
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
   const q = normalize(query.trim());
-  const filtered = q
-    ? categories.filter((c) => normalize(c.name).includes(q))
-    : categories;
+  const filtered = q ? categories.filter((c) => normalize(c.name).includes(q)) : categories;
 
   const select = (name: string) => {
     onChange(name);
@@ -676,7 +686,7 @@ function CategorySearch({
     <div ref={containerRef} className="relative mt-1">
       <div className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2">
         <input
-          value={open ? query : value ?? ""}
+          value={open ? query : (value ?? "")}
           onChange={(e) => {
             setQuery(e.target.value);
             setOpen(true);
@@ -730,4 +740,3 @@ function CategorySearch({
     </div>
   );
 }
-
