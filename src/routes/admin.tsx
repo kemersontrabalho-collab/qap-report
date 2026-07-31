@@ -35,6 +35,10 @@ import {
   adminListPixRequests,
   adminApprovePixRequest,
   adminRejectPixRequest,
+  adminListCommunityKnowledge,
+  adminReviewCommunityKnowledge,
+  adminUpdateCommunityKnowledge,
+  adminDeleteCommunityKnowledge,
 } from "@/lib/admin.functions";
 import {
   adminListErrorLogs,
