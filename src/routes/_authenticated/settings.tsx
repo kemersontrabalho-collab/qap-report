@@ -221,7 +221,7 @@ function SettingsPage() {
           <h2 className="font-semibold">Aparência</h2>
 
           <p className="mt-1 text-sm text-muted-foreground">Alterne entre tema claro e escuro.</p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 xs:grid-cols-2">
             <button
               onClick={() => setTheme("light")}
               className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
