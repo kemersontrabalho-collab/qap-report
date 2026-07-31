@@ -198,7 +198,7 @@ export const generateBulletin = createServerFn({ method: "POST" })
 Dados padronizados do boletim (use EXATAMENTE estes rótulos ao mencioná-los DENTRO do texto do histórico):
 ${structured}
 
-Palavras-chave:
+Relato/palavras-chave informados pelo policial (INTERPRETE COMO TEXTO ÚNICO E CONTÍNUO):
 ${data.keywords}
 ${data.context ? `\nContexto adicional:\n${data.context}` : ""}
 
