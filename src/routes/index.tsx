@@ -93,7 +93,6 @@ function Feature({
   );
 }
 
-
 function hasStoredSession() {
   if (typeof window === "undefined") return false;
   try {
@@ -281,7 +280,6 @@ function Landing() {
                 </div>
               ))}
             </dl>
-
           </div>
 
           {/* Prévia: cartão flutuante levemente rotacionado no desktop para
@@ -437,4 +435,3 @@ function Landing() {
     </div>
   );
 }
-

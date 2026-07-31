@@ -125,7 +125,6 @@ export const adminListUsers = createServerFn({ method: "POST" })
           subscription: sub ?? null,
           inactive_days: inactiveDays,
         };
-
       });
 
     const q = (data.search ?? "").trim().toLowerCase();

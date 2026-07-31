@@ -372,7 +372,6 @@ function UsersPanel() {
     refetchInterval: 60_000,
   });
 
-
   const block = useMutation({
     mutationFn: (v: { userId: string; blocked: boolean }) => blockFn({ data: v }),
     onSuccess: () => {
@@ -410,7 +409,6 @@ function UsersPanel() {
           onChange={(e) => setSearch(e.target.value)}
         />
         <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-
           <SelectTrigger className="sm:w-48">
             <SelectValue />
           </SelectTrigger>
@@ -462,7 +460,6 @@ function UsersPanel() {
                       ? `último acesso ${new Date(u.last_sign_in_at).toLocaleDateString("pt-BR")}`
                       : "nunca acessou"}
                   </p>
-
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Dialog>
@@ -1192,7 +1189,6 @@ function CommunityKnowledgePanel() {
             </SelectContent>
           </Select>
         </div>
-
       </div>
 
       <p className="text-xs text-muted-foreground">

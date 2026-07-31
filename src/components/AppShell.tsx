@@ -17,7 +17,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   usePresence();
 
-
   async function signOut() {
     try {
       await qc.cancelQueries();
@@ -165,7 +164,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
 
 export const BULLETIN_TYPES = [
   {
