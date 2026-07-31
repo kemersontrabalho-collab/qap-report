@@ -368,7 +368,10 @@ function UsersPanel() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-users", search, filter],
     queryFn: () => listFn({ data: { search, filter } }),
+    // Presença é volátil: recarrega a cada 60s para o status ficar atualizado.
+    refetchInterval: 60_000,
   });
+
 
   const block = useMutation({
     mutationFn: (v: { userId: string; blocked: boolean }) => blockFn({ data: v }),
