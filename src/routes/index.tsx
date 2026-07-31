@@ -200,32 +200,38 @@ function Landing() {
               Report produz um texto formal, técnico e fiel aos fatos — pronto para revisão.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            {/* CTAs: largura total no mobile (alvo de toque generoso e polegar
+                confortável), auto a partir de 480px. */}
+            <div className="mt-6 flex flex-col gap-3 xs:flex-row xs:flex-wrap">
               <Link
                 to="/auth"
                 search={{ mode: "signup" }}
-                className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground hover:opacity-90"
               >
                 Começar agora
               </Link>
               <Link
                 to="/auth"
-                className="inline-flex items-center justify-center rounded-lg border px-5 py-2.5 text-sm font-medium hover:bg-accent"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border px-5 text-sm font-medium hover:bg-accent"
               >
                 Já tenho conta
               </Link>
             </div>
           </div>
-          <div className="relative">
-            <div className="rounded-3xl border bg-card p-6 shadow-lg">
-              <div className="text-xs font-medium text-muted-foreground">Prévia · BO-COP</div>
-              <h2 className="mt-2 font-semibold">Comunicação de Ocorrência Policial</h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          <div className="relative min-w-0">
+            <div className="rounded-3xl border bg-card p-4 shadow-lg sm:p-6">
+              <div className="text-fluid-xs font-medium text-muted-foreground">Prévia · BO-COP</div>
+              <h2 className="mt-2 text-fluid-base font-semibold">
+                Comunicação de Ocorrência Policial
+              </h2>
+              <p className="mt-3 text-fluid-sm text-muted-foreground">
                 Aos vinte e três dias do mês corrente, esta guarnição composta pelos policiais
                 militares acima identificados, em patrulhamento pela viatura de prefixo indicado,
                 foi acionada via COPOM para atender ocorrência...
               </p>
-              <div className="mt-4 flex gap-2 text-xs">
+              {/* flex-wrap evita que as duas tags de fundamentação legal estourem
+                  o cartão em telas estreitas. */}
+              <div className="mt-4 flex flex-wrap gap-2 text-xs">
                 <span className="rounded-md bg-accent px-2 py-1 text-accent-foreground">
                   Súm. Vinc. 11
                 </span>
@@ -237,7 +243,9 @@ function Landing() {
           </div>
         </section>
 
-        <section className="grid gap-4 pb-20 md:grid-cols-3">
+        {/* Recursos: 1 → 2 (tablet retrato) → 3 (desktop). */}
+        <section className="grid grid-cols-1 gap-4 pb-16 sm:grid-cols-2 md:grid-cols-3 md:pb-20">
+
           <h2 className="sr-only">Recursos do QAP Report</h2>
           <Feature
             icon={Feather}
