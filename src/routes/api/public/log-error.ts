@@ -6,7 +6,7 @@ import { logError } from "@/lib/monitoring.server";
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 } as const;
 
 const bodySchema = z.object({

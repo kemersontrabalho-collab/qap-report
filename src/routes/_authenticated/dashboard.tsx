@@ -170,6 +170,7 @@ function Dashboard() {
       qc.invalidateQueries({ queryKey: ["bulletins"] });
       navigate({ to: "/bulletins/$id", params: { id: data.id } });
     },
+    onSettled: () => setCreatingType(null),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erro"),
   });
 
@@ -272,8 +273,10 @@ function Dashboard() {
         {BULLETIN_TYPES.map((t) => (
           <button
             key={t.code}
-            disabled={createMut.isPending && creatingType === t.code}
+            disabled={createMut.isPending}
+            aria-busy={createMut.isPending && creatingType === t.code}
             onClick={() => {
+              if (createMut.isPending) return;
               setCreatingType(t.code);
               createMut.mutate(t.code);
             }}
