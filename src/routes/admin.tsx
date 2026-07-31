@@ -1148,18 +1148,33 @@ function CommunityKnowledgePanel() {
           <Badge variant="secondary">{data?.pendingCount ?? 0} pendentes</Badge>
           <Badge>{data?.approvedCount ?? 0} aprovados</Badge>
         </div>
-        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-          <SelectTrigger className="w-52">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pendente">Pendentes</SelectItem>
-            <SelectItem value="aprovado">Aprovados</SelectItem>
-            <SelectItem value="rejeitado">Rejeitados</SelectItem>
-            <SelectItem value="all">Todos</SelectItem>
-          </SelectContent>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={backfill.isPending}
+            onClick={() => backfill.mutate()}
+          >
+            {backfill.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Brain className="mr-2 h-4 w-4" />
+            )}
+            Importar boletins antigos
+          </Button>
+          <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+            <SelectTrigger className="w-52">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pendente">Pendentes</SelectItem>
+              <SelectItem value="aprovado">Aprovados</SelectItem>
+              <SelectItem value="rejeitado">Rejeitados</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
+            </SelectContent>
           </Select>
         </div>
+
       </div>
 
       <p className="text-xs text-muted-foreground">
