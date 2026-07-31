@@ -475,3 +475,8 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+
+/* Variante só-inferior do espaçamento fluido de seção. */
+@utility pb-fluid-section {
+  padding-bottom: clamp(2.5rem, 1.5rem + 5vw, 6rem);
+}
