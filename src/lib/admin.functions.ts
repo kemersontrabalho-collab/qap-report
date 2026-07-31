@@ -64,7 +64,8 @@ export const adminListUsers = createServerFn({ method: "POST" })
     const sb = await admin();
     const { data: profiles, error } = await sb
       .from("profiles")
-      .select("id, email, full_name, created_at, updated_at")
+      .select("id, email, full_name, created_at, updated_at, last_seen_at")
+
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);
