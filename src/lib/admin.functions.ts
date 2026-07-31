@@ -501,3 +501,16 @@ export const adminDeleteCommunityKnowledge = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+// Importa retroativamente boletins concluídos antigos para a fila de curadoria
+// (versão anonimizada, status "pendente"). Idempotente via content_hash.
+export const adminBackfillCommunityKnowledge = createServerFn({ method: "POST" }).handler(
+  async () => {
+    await requireAdminSession();
+    const sb = await admin();
+    const { data, error } = await sb.rpc("backfill_community_knowledge", { _limit: 500 });
+    if (error) throw new Error(error.message);
+    const r = (data ?? {}) as { scanned?: number; inserted?: number };
+    return { scanned: r.scanned ?? 0, inserted: r.inserted ?? 0 };
+  },
+);
