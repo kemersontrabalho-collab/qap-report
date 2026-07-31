@@ -89,7 +89,7 @@ function extractImprovementSuggestions(content: string | null | undefined): stri
   const suggestions: string[] = [];
   const seen = new Set<string>();
   const push = (s: string) => {
-    const t = s.trim().replace(/^[-•*\d.\)\s]+/, "").trim();
+    const t = s.trim().replace(/^[-•*\d.)\s]+/, "").trim();
     if (t.length < 2) return;
     const key = t.toLowerCase();
     if (seen.has(key)) return;
@@ -283,7 +283,7 @@ function EditBulletin() {
     toast.success("Copiado");
   }
 
-  async function useCurrentLocation(kind: "crew" | "occ") {
+  async function fillCurrentLocation(kind: "crew" | "occ") {
     if (!navigator.geolocation) {
       toast.error("Geolocalização indisponível neste dispositivo.");
       return;
@@ -469,7 +469,7 @@ function EditBulletin() {
               />
               <div className="mt-1.5 flex gap-2">
                 <button
-                  onClick={() => useCurrentLocation("crew")}
+                  onClick={() => fillCurrentLocation("crew")}
                   disabled={locating === "crew"}
                   className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent disabled:opacity-60"
                 >
@@ -500,7 +500,7 @@ function EditBulletin() {
               />
               <div className="mt-1.5 flex gap-2">
                 <button
-                  onClick={() => useCurrentLocation("occ")}
+                  onClick={() => fillCurrentLocation("occ")}
                   disabled={locating === "occ"}
                   className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-accent disabled:opacity-60"
                 >
