@@ -406,21 +406,8 @@ function UsersPanel() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={backfill.isPending}
-            onClick={() => backfill.mutate()}
-          >
-            {backfill.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Brain className="mr-2 h-4 w-4" />
-            )}
-            Importar boletins antigos
-          </Button>
-          <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+
           <SelectTrigger className="sm:w-48">
             <SelectValue />
           </SelectTrigger>
