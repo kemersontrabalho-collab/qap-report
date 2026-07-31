@@ -316,32 +316,44 @@ function Dashboard() {
       </section>
 
       <section className="rounded-2xl border bg-card">
-        <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            <activeTab.icon className="h-5 w-5 text-primary shrink-0" />
+        {/*
+         * TOOLBAR — no mobile é um grid de 2 linhas:
+         *   linha 1: [título elástico | ações fixas]
+         *   linha 2: busca ocupando 100% (campo de texto precisa de largura)
+         * A partir de sm vira uma linha só. O antigo `flex-col` empilhava a
+         * busca junto das ações, deixando "Esvaziar" e o menu espremidos.
+         */}
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b p-4 sm:flex sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2">
+            <activeTab.icon className="h-5 w-5 shrink-0 text-primary" />
             <h2 className="truncate text-base font-semibold">{activeTab.label}</h2>
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+            <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
               {counts[activeTab.key]}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <div data-tour="dashboard-search" className="relative flex-1 sm:w-64 sm:flex-none">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por título, texto ou data..."
-                className="w-full rounded-lg border bg-background py-1.5 pl-8 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-              />
-            </div>
+          <div
+            data-tour="dashboard-search"
+            className="relative order-last col-span-2 w-full sm:order-none sm:col-span-1 sm:w-64"
+          >
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por título, texto ou data..."
+              aria-label="Buscar boletins"
+              className="min-h-11 w-full rounded-lg border bg-background py-1.5 pl-8 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring sm:min-h-9"
+            />
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
             {tab === "trash" && bulletins.some((b) => b.deleted_at) && (
               <button
                 onClick={emptyTrash}
-                className="rounded-lg border border-destructive/50 px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10"
+                className="min-h-11 whitespace-nowrap rounded-lg border border-destructive/50 px-3 text-sm text-destructive hover:bg-destructive/10 sm:min-h-9 sm:py-1.5"
               >
                 Esvaziar
               </button>
             )}
+
             <DropdownMenu>
               <DropdownMenuTrigger
                 data-tour="tabs-menu"
