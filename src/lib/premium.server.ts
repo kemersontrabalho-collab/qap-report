@@ -9,7 +9,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * funções de servidor continuava funcionando com o trial vencido.
  */
 export async function assertPremium(
-  supabase: SupabaseClient<any, any, any>,
+  supabase: SupabaseClient<never, never, never>,
   userId: string,
 ): Promise<void> {
   const { data, error } = await supabase.rpc("is_premium_user", { _user_id: userId });

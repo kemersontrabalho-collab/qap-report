@@ -38,7 +38,8 @@ export function translateAuthError(input: unknown): string {
   ];
 
   // Suporta também `error.code` (Supabase v2 novo formato)
-  const code = (input as any)?.code ? String((input as any).code).toLowerCase() : "";
+  const rawCode = (input as { code?: unknown } | null)?.code;
+  const code = rawCode ? String(rawCode).toLowerCase() : "";
   if (code === "invalid_credentials") return "Email ou senha inválidos.";
   if (code === "email_not_confirmed")
     return "Email ainda não confirmado. Verifique sua caixa de entrada.";
