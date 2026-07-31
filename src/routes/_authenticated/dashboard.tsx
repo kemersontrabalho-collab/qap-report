@@ -273,13 +273,24 @@ function Dashboard() {
     <AppShell>
       <TrialBanner />
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Painel</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h1 className="text-fluid-2xl font-bold tracking-tight">Painel</h1>
+        <p className="measure mt-1 text-fluid-sm text-muted-foreground">
           Selecione um tipo de boletim para criar, ou gerencie os existentes.
         </p>
       </div>
 
-      <section data-tour="bulletin-types" className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/*
+       * GRID DE TIPOS — escada de densidade guiada pelo conteúdo, não pelo
+       * aparelho: 1 coluna (a descrição precisa de ~30ch), 2 a partir de 480px,
+       * 2 confortáveis no tablet retrato, 4 no desktop. `auto-rows-fr` mantém
+       * todos os cartões da mesma altura mesmo com descrições de tamanhos
+       * diferentes, evitando serrilhado visual.
+       */}
+      <section
+        data-tour="bulletin-types"
+        className="mb-8 grid auto-rows-fr grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4"
+      >
+
         {BULLETIN_TYPES.map((t) => (
           <button
             key={t.code}
