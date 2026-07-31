@@ -160,21 +160,23 @@ function EditBulletin() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Atualização funcional: várias chamadas seguidas (ex.: lat, lng e endereço
+  // ao usar o GPS) não podem partir do mesmo snapshot `b`, senão só a última
+  // sobrevive e as anteriores são descartadas.
   function update<K extends keyof Bulletin>(key: K, value: Bulletin[K]) {
-    if (!b) return;
     dirtyRef.current = true;
-    setB({ ...b, [key]: value });
+    setB((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
 
+  const savingRef = useRef(false);
 
-
-  async function save(nextStatus?: "draft" | "done") {
+  async function save(nextStatus?: "draft" | "done", opts?: { silent?: boolean }) {
     const current = bRef.current;
-    if (!current) return;
+    if (!current || savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     try {
       // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
-
       // o autosave enquanto o usuário ainda está digitando.
       const finalContent = nextStatus === "done" ? stripBraces(current.content) : current.content;
       const patch: Partial<Bulletin> = {
@@ -199,14 +201,49 @@ function EditBulletin() {
       if (error) throw error;
       dirtyRef.current = false;
 
-      setB({ ...current, content: finalContent, ...(nextStatus ? { status: nextStatus } : {}) });
-      toast.success(nextStatus === "done" ? "Boletim concluído" : "Salvo");
+      // Mescla apenas o que o servidor alterou; o que o usuário digitou
+      // durante a requisição é preservado.
+      setB((prev) =>
+        prev
+          ? {
+              ...prev,
+              ...(nextStatus === "done" ? { content: finalContent } : {}),
+              ...(nextStatus ? { status: nextStatus } : {}),
+            }
+          : prev,
+      );
+      if (!opts?.silent) {
+        toast.success(nextStatus === "done" ? "Boletim concluído" : "Salvo");
+      }
     } catch (e) {
       toast.error(translateDbError(e));
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
+
+  // Autosave: o `dirtyRef` era marcado mas nunca consumido — sair da tela
+  // sem clicar em "Salvar" perdia o texto. Agora grava a cada 15s e avisa
+  // antes de fechar a aba com alterações pendentes.
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (dirtyRef.current && !savingRef.current && bRef.current) void save(undefined, { silent: true });
+    }, 15_000);
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!dirtyRef.current) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      if (dirtyRef.current && bRef.current) void save(undefined, { silent: true });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
 
   async function generate() {
