@@ -261,24 +261,27 @@ function Landing() {
               </Link>
             </div>
 
-            {/* Prova de escopo: 8pt entre itens, divisores de 1px hairline. */}
+            {/* Prova de escopo: 3 colunas fixas separadas por hairline vertical.
+                O grid (em vez de flex-wrap) impede que o terceiro item caia
+                sozinho para a linha de baixo em larguras intermediárias. */}
             <dl
-              className="reveal mt-10 flex flex-wrap items-center gap-x-8 gap-y-4"
+              className="reveal mt-10 grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-[var(--surface-line)] bg-[var(--surface-line)]"
               style={{ "--d": "330ms" } as React.CSSProperties}
             >
               {[
                 ["4", "tipos de boletim"],
-                ["24h", "de teste gratuito"],
-                ["100%", "dados isolados por usuário"],
+                ["24h", "de teste"],
+                ["100%", "dados isolados"],
               ].map(([value, label]) => (
-                <div key={label} className="stack-8">
+                <div key={label} className="stack-8 bg-card px-4 py-4 sm:px-5">
                   <dt className="text-fluid-xl font-bold tracking-tight">{value}</dt>
-                  <dd className="text-fluid-xs uppercase tracking-[0.12em] text-muted-foreground">
+                  <dd className="text-[0.625rem] uppercase leading-tight tracking-[0.14em] text-muted-foreground sm:text-[0.6875rem]">
                     {label}
                   </dd>
                 </div>
               ))}
             </dl>
+
           </div>
 
           {/* Prévia: cartão flutuante levemente rotacionado no desktop para
