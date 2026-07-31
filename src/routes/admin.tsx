@@ -59,7 +59,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift, AlertTriangle, CheckCircle2, RefreshCcw, QrCode, XCircle } from "lucide-react";
+import { Loader2, LogOut, Shield, UserX, Trash2, Send, Ticket, Gift, AlertTriangle, CheckCircle2, RefreshCcw, QrCode, XCircle, Brain } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -172,13 +172,14 @@ function DashboardView() {
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">
         <Tabs defaultValue="stats">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-7">
             <TabsTrigger value="stats">Dashboard</TabsTrigger>
             <TabsTrigger value="monitoring">Monitoramento</TabsTrigger>
             <TabsTrigger value="users">Usuários</TabsTrigger>
             <TabsTrigger value="pix">Pagamentos Pix</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="coupons">Cupons</TabsTrigger>
+            <TabsTrigger value="knowledge">Base coletiva</TabsTrigger>
           </TabsList>
           <TabsContent value="stats" className="mt-6"><StatsPanel /></TabsContent>
           <TabsContent value="monitoring" className="mt-6"><MonitoringPanel /></TabsContent>
@@ -186,6 +187,7 @@ function DashboardView() {
           <TabsContent value="pix" className="mt-6"><PixPanel /></TabsContent>
           <TabsContent value="notifications" className="mt-6"><NotifPanel /></TabsContent>
           <TabsContent value="coupons" className="mt-6"><CouponsPanel /></TabsContent>
+          <TabsContent value="knowledge" className="mt-6"><CommunityKnowledgePanel /></TabsContent>
         </Tabs>
       </main>
     </div>
@@ -836,6 +838,140 @@ function PixPanel() {
                     </Button>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CommunityKnowledgePanel() {
+  const qc = useQueryClient();
+  const listFn = useServerFn(adminListCommunityKnowledge);
+  const reviewFn = useServerFn(adminReviewCommunityKnowledge);
+  const deleteFn = useServerFn(adminDeleteCommunityKnowledge);
+  const updateFn = useServerFn(adminUpdateCommunityKnowledge);
+  const [filter, setFilter] = useState<"pendente" | "aprovado" | "rejeitado" | "all">("pendente");
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-community", filter],
+    queryFn: () => listFn({ data: { status: filter } }),
+  });
+
+  const review = useMutation({
+    mutationFn: (v: { id: string; decision: "aprovado" | "rejeitado" }) => reviewFn({ data: v }),
+    onSuccess: (_r, v) => {
+      toast.success(v.decision === "aprovado" ? "Caso liberado para a comunidade." : "Caso rejeitado.");
+      qc.invalidateQueries({ queryKey: ["admin-community"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Registro apagado da base coletiva.");
+      qc.invalidateQueries({ queryKey: ["admin-community"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const edit = useMutation({
+    mutationFn: (v: { id: string; content: string }) => updateFn({ data: v }),
+    onSuccess: () => {
+      toast.success("Texto atualizado.");
+      qc.invalidateQueries({ queryKey: ["admin-community"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const items = data?.items ?? [];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Brain className="h-5 w-5 text-primary" />
+          <h2 className="text-base font-semibold">Base de conhecimento coletiva</h2>
+          <Badge variant="secondary">{data?.pendingCount ?? 0} pendentes</Badge>
+          <Badge>{data?.approvedCount ?? 0} aprovados</Badge>
+        </div>
+        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+          <SelectTrigger className="w-52"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pendente">Pendentes</SelectItem>
+            <SelectItem value="aprovado">Aprovados</SelectItem>
+            <SelectItem value="rejeitado">Rejeitados</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        Textos anonimizados de boletins concluídos. Confira se não restou nenhum dado pessoal antes de
+        aprovar. Aprovados passam a aparecer nas sugestões de casos semelhantes de todos os usuários.
+      </p>
+
+      {isLoading ? (
+        <Loader2 className="h-5 w-5 animate-spin" />
+      ) : items.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Nenhum registro no filtro atual.</p>
+      ) : (
+        <div className="space-y-2">
+          {items.map((k) => (
+            <Card key={k.id}>
+              <CardContent className="space-y-3 p-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline">{k.bulletin_type}</Badge>
+                  <Badge variant="secondary">{k.category || "sem categoria"}</Badge>
+                  <Badge>{k.status}</Badge>
+                  <p className="min-w-0 flex-1 truncate font-medium">{k.title}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Recebido em {new Date(k.created_at).toLocaleString("pt-BR")}
+                </p>
+
+                {openId === k.id ? (
+                  <Textarea
+                    defaultValue={k.content}
+                    rows={14}
+                    className="text-xs"
+                    onBlur={(e) => {
+                      if (e.target.value !== k.content) edit.mutate({ id: k.id, content: e.target.value });
+                    }}
+                  />
+                ) : (
+                  <p className="line-clamp-4 whitespace-pre-wrap text-xs text-muted-foreground">{k.content}</p>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setOpenId(openId === k.id ? null : k.id)}>
+                    {openId === k.id ? "Fechar" : "Revisar texto"}
+                  </Button>
+                  {k.status !== "aprovado" && (
+                    <Button size="sm" disabled={review.isPending} onClick={() => review.mutate({ id: k.id, decision: "aprovado" })}>
+                      <CheckCircle2 className="mr-1 h-4 w-4" /> Aprovar
+                    </Button>
+                  )}
+                  {k.status !== "rejeitado" && (
+                    <Button variant="outline" size="sm" disabled={review.isPending} onClick={() => review.mutate({ id: k.id, decision: "rejeitado" })}>
+                      <XCircle className="mr-1 h-4 w-4" /> Rejeitar
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive"
+                    onClick={() => {
+                      if (window.confirm("Apagar definitivamente este registro da base coletiva?")) remove.mutate(k.id);
+                    }}
+                  >
+                    <Trash2 className="mr-1 h-4 w-4" /> Apagar
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

@@ -56,7 +56,8 @@ export function SimilarCases({ bulletinType, keywords, category, context, onUseR
         {loading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        Boletins concluídos anteriormente que se parecem com o que você está redigindo.
+        Boletins concluídos anteriormente e casos anônimos aprovados da comunidade que se parecem com o
+        que você está redigindo.
       </p>
 
       {err && <div className="mt-3 text-xs text-destructive">{err}</div>}
@@ -76,6 +77,11 @@ export function SimilarCases({ bulletinType, keywords, category, context, onUseR
                   <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                     {it.bulletin_type}
                   </span>
+                  {it.source === "community" && (
+                    <span className="rounded bg-success/10 px-1.5 py-0.5 text-[10px] font-semibold text-success">
+                      Comunidade
+                    </span>
+                  )}
                   <p className="truncate text-sm font-medium">{it.title}</p>
                 </div>
                 <p className="mt-0.5 truncate text-xs text-muted-foreground">
