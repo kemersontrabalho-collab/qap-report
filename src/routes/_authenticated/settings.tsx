@@ -224,8 +224,6 @@ function SettingsPage() {
 
         <SavedBulletinsSection />
 
-
-
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Aparência</h2>
 
@@ -674,11 +672,7 @@ function SavedBulletinsSection() {
               disabled={saving}
               className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
             >
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Salvar boletim
             </button>
           </div>
@@ -689,7 +683,6 @@ function SavedBulletinsSection() {
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-
   return (
     <label className="block">
       <span className="text-sm font-medium">{label}</span>
