@@ -20,6 +20,9 @@ import {
   BellRing,
   Send,
   Crown,
+  Library,
+  Save,
+  Users,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
@@ -27,6 +30,8 @@ import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
 import { deleteMyAccount } from "@/lib/account.functions";
+import { saveExistingBulletin, listSavedBulletins } from "@/lib/library.functions";
+import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
@@ -216,6 +221,10 @@ function SettingsPage() {
             <Crown className="h-4 w-4" /> Gerenciar assinatura
           </Link>
         </section>
+
+        <SavedBulletinsSection />
+
+
 
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Aparência</h2>
@@ -538,7 +547,187 @@ function SettingsPage() {
   );
 }
 
+const BULLETIN_TYPES = ["BA", "BO-COP", "BO-TC", "BOAT"] as const;
+
+function SavedBulletinsSection() {
+  const qc = useQueryClient();
+  const saveFn = useServerFn(saveExistingBulletin);
+  const listFn = useServerFn(listSavedBulletins);
+
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState<(typeof BULLETIN_TYPES)[number]>("BA");
+  const [category, setCategory] = useState("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const { data: saved, isLoading } = useQuery({
+    queryKey: ["saved-bulletins"],
+    queryFn: () => listFn(),
+  });
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (title.trim().length < 3) {
+      toast.error("Informe um título com pelo menos 3 caracteres.");
+      return;
+    }
+    if (content.trim().length < 200) {
+      toast.error("Cole o boletim completo (mínimo de 200 caracteres).");
+      return;
+    }
+    setSaving(true);
+    try {
+      await saveFn({
+        data: {
+          bulletinType: type,
+          category: category || undefined,
+          title: title.trim(),
+          content: content.trim(),
+        },
+      });
+      toast.success("Boletim salvo e enviado para a base coletiva.");
+      setTitle("");
+      setContent("");
+      setCategory("");
+      setOpen(false);
+      qc.invalidateQueries({ queryKey: ["saved-bulletins"] });
+      qc.invalidateQueries({ queryKey: ["bulletins"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não foi possível salvar");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="rounded-2xl border bg-card p-5">
+      <h2 className="flex items-center gap-2 font-semibold">
+        <Library className="h-4 w-4" /> Meus boletins salvos
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Guarde boletins que você já redigiu. Eles ficam na sua biblioteca pessoal como referência da
+        IA e, de forma anonimizada, ajudam a alimentar a base coletiva do QAP Report.
+      </p>
+
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+      >
+        <Save className="h-4 w-4" /> {open ? "Fechar formulário" : "Salvar um boletim"}
+      </button>
+
+      {open && (
+        <form onSubmit={submit} className="mt-4 space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Tipo de boletim">
+              <select
+                value={type}
+                onChange={(e) => {
+                  setType(e.target.value as typeof type);
+                  setCategory("");
+                }}
+                className="input"
+              >
+                {BULLETIN_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Categoria (opcional)">
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="input"
+              >
+                <option value="">Selecione...</option>
+                {(CATEGORIES_BY_TYPE[type] ?? []).map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          <Field label="Título">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="input"
+              maxLength={160}
+              placeholder="Ex.: Tráfico de drogas — flagrante em via pública"
+            />
+          </Field>
+          <Field label="Texto do boletim">
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={10}
+              maxLength={20000}
+              placeholder="Cole aqui o histórico/versão policial já redigido..."
+              className="input resize-y"
+            />
+          </Field>
+          <div className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+              <Users className="h-3 w-3" /> Dados pessoais são removidos automaticamente antes de ir
+              para a base coletiva.
+            </span>
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Salvar boletim
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="mt-5 border-t pt-4">
+        <h3 className="text-sm font-medium">Biblioteca</h3>
+        {isLoading ? (
+          <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Carregando...
+          </div>
+        ) : !saved || saved.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            Nenhum boletim salvo ainda. Salve o primeiro para começar sua biblioteca.
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {saved.map((b) => (
+              <li key={b.id} className="rounded-lg border p-3">
+                <Link
+                  to="/bulletins/$id"
+                  params={{ id: b.id }}
+                  className="text-sm font-medium hover:underline"
+                >
+                  {b.title}
+                </Link>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {b.bulletin_type}
+                  {b.category ? ` · ${b.category}` : ""} ·{" "}
+                  {new Date(b.created_at).toLocaleDateString("pt-BR")}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+
   return (
     <label className="block">
       <span className="text-sm font-medium">{label}</span>
