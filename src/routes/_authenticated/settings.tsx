@@ -552,7 +552,6 @@ const BULLETIN_TYPES = ["BA", "BO-COP", "BO-TC", "BOAT"] as const;
 function SavedBulletinsSection() {
   const qc = useQueryClient();
   const saveFn = useServerFn(saveExistingBulletin);
-  const listFn = useServerFn(listSavedBulletins);
 
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<(typeof BULLETIN_TYPES)[number]>("BA");
@@ -560,11 +559,6 @@ function SavedBulletinsSection() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [saving, setSaving] = useState(false);
-
-  const { data: saved, isLoading } = useQuery({
-    queryKey: ["saved-bulletins"],
-    queryFn: () => listFn(),
-  });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -690,38 +684,6 @@ function SavedBulletinsSection() {
           </div>
         </form>
       )}
-
-      <div className="mt-5 border-t pt-4">
-        <h3 className="text-sm font-medium">Biblioteca</h3>
-        {isLoading ? (
-          <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Carregando...
-          </div>
-        ) : !saved || saved.length === 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">
-            Nenhum boletim salvo ainda. Salve o primeiro para começar sua biblioteca.
-          </p>
-        ) : (
-          <ul className="mt-3 space-y-2">
-            {saved.map((b) => (
-              <li key={b.id} className="rounded-lg border p-3">
-                <Link
-                  to="/bulletins/$id"
-                  params={{ id: b.id }}
-                  className="text-sm font-medium hover:underline"
-                >
-                  {b.title}
-                </Link>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  {b.bulletin_type}
-                  {b.category ? ` · ${b.category}` : ""} ·{" "}
-                  {new Date(b.created_at).toLocaleDateString("pt-BR")}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
     </section>
   );
 }
