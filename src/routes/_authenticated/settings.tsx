@@ -222,6 +222,10 @@ function SettingsPage() {
           </Link>
         </section>
 
+        <SavedBulletinsSection />
+
+
+
         <section className="rounded-2xl border bg-card p-5">
           <h2 className="font-semibold">Aparência</h2>
 
