@@ -30,7 +30,7 @@ import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
 import { deleteMyAccount } from "@/lib/account.functions";
-import { saveExistingBulletin, listSavedBulletins } from "@/lib/library.functions";
+import { saveExistingBulletin } from "@/lib/library.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 
 export const Route = createFileRoute("/_authenticated/settings")({
