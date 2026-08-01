@@ -1046,7 +1046,7 @@ function PixPanel() {
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium">{r.full_name || "(sem nome)"}</p>
                     <Badge variant={r.plan === "anual" ? "default" : "secondary"}>
-                      {r.plan === "anual" ? "Anual · R$ 90,00" : "Mensal · R$ 10,00"}
+                      {r.plan === "anual" ? "Anual · R$ 50,00" : "Mensal · R$ 5,00"}
                     </Badge>
                     <Badge variant="outline">{r.status}</Badge>
                   </div>
