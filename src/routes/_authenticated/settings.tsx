@@ -20,6 +20,9 @@ import {
   BellRing,
   Send,
   Crown,
+  Library,
+  Save,
+  Users,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { InstallAppButton } from "@/components/InstallAppButton";
@@ -27,6 +30,8 @@ import { tutorialStore } from "@/lib/tutorial-store";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
 import { deleteMyAccount } from "@/lib/account.functions";
+import { saveExistingBulletin, listSavedBulletins } from "@/lib/library.functions";
+import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
