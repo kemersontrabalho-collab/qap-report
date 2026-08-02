@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Loader2, Check, X } from "lucide-react";
 import { translateAuthError } from "@/lib/i18n-errors";
 import { setSessionLifetime, getKeepSignedInPreference } from "@/lib/session-lifetime";
+import { storeOAuthRedirect, consumeOAuthRedirect } from "@/lib/oauth-redirect";
 import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 
 const search = z.object({
@@ -103,19 +104,22 @@ function AuthPage() {
     }
   }
 
-  async function handleGoogle() {
+  async function signInWithProvider(provider: "google" | "apple") {
     setLoading(true);
     try {
-      // Grava a preferência ANTES de iniciar o OAuth: em fluxo com redirect
+      // Grava preferências ANTES de iniciar o OAuth: em fluxo com redirect
       // completo a página é descarregada e o código abaixo nunca roda.
       setSessionLifetime(keepSignedIn);
-      const result = await lovable.auth.signInWithOAuth("google", {
+      storeOAuthRedirect(safeRedirect());
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        // Precisa ser uma URL pública da mesma origem — nunca uma rota protegida.
         redirect_uri: window.location.origin,
       });
       if (result.error) throw result.error;
-      if (result.redirected) return;
+      if (result.redirected) return; // navegador vai sair da página
+      // Fluxo em popup/iframe: sessão já definida pelo helper.
       toast.success("Bem-vindo(a)!");
-      navigate({ to: safeRedirect(), replace: true });
+      navigate({ to: consumeOAuthRedirect(safeRedirect()), replace: true });
     } catch (err) {
       toast.error(translateAuthError(err));
     } finally {
@@ -123,25 +127,8 @@ function AuthPage() {
     }
   }
 
-  async function handleApple() {
-    setLoading(true);
-    try {
-      // Grava a preferência ANTES de iniciar o OAuth: em fluxo com redirect
-      // completo a página é descarregada e o código abaixo nunca roda.
-      setSessionLifetime(keepSignedIn);
-      const result = await lovable.auth.signInWithOAuth("apple", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) throw result.error;
-      if (result.redirected) return;
-      toast.success("Bem-vindo(a)!");
-      navigate({ to: safeRedirect(), replace: true });
-    } catch (err) {
-      toast.error(translateAuthError(err));
-    } finally {
-      setLoading(false);
-    }
-  }
+  const handleGoogle = () => signInWithProvider("google");
+  const handleApple = () => signInWithProvider("apple");
 
   return (
     <div className="min-h-screen bg-background">
