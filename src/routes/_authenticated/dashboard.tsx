@@ -267,8 +267,8 @@ function Dashboard() {
       acc[t.key] = bulletins.filter((b) => {
         if (t.key === "trash") return !!b.deleted_at;
         if (b.deleted_at) return false;
-        if (t.key === "drafts") return b.status === "draft" && !b.is_favorite;
-        if (t.key === "done") return b.status === "done" && !b.is_favorite;
+        if (t.key === "drafts") return b.status === "draft";
+        if (t.key === "done") return b.status === "done";
         if (t.key === "favorites") return b.is_favorite;
 
         return true;
