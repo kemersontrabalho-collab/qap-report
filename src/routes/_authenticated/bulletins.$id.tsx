@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { SimilarCases } from "@/components/SimilarCases";
 import { VoiceDictateButton } from "@/components/VoiceDictateButton";
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
+import { copyWithFeedback } from "@/lib/clipboard";
+import { printBulletin } from "@/lib/print-bulletin";
 import {
   ArrowLeft,
   Sparkles,
@@ -20,6 +22,7 @@ import {
   Trash2,
   MapPin,
   ExternalLink,
+  Printer,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
@@ -281,9 +284,31 @@ function EditBulletin() {
   }
 
   async function copyText() {
-    if (!b?.content) return;
-    await navigator.clipboard.writeText(stripBraces(b.content));
-    toast.success("Copiado");
+    if (!b?.content) {
+      toast.error("Não há texto para copiar.");
+      return;
+    }
+    await copyWithFeedback(stripBraces(b.content));
+  }
+
+  function exportPdf() {
+    if (!b) return;
+    if (!b.content?.trim()) {
+      toast.error("Gere ou escreva o histórico antes de exportar.");
+      return;
+    }
+    const ok = printBulletin({
+      title: b.title,
+      bulletinType: b.bulletin_type,
+      category: b.category,
+      crewComposition: b.crew_composition,
+      vehiclePrefix: b.vehicle_prefix,
+      occurrenceAt: b.occurrence_at,
+      crewAddress: b.crew_address,
+      occurrenceAddress: b.occurrence_address,
+      content: stripBraces(b.content),
+    });
+    if (!ok) toast.error("Libere os pop-ups deste site para exportar em PDF.");
   }
 
   async function fillCurrentLocation(kind: "crew" | "occ") {
@@ -616,6 +641,12 @@ function EditBulletin() {
                 <Copy className="h-3.5 w-3.5" /> Copiar
               </button>
               <button
+                onClick={exportPdf}
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent"
+              >
+                <Printer className="h-3.5 w-3.5" /> PDF
+              </button>
+              <button
                 onClick={() => save()}
                 disabled={saving}
                 className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent disabled:opacity-60"
@@ -629,7 +660,8 @@ function EditBulletin() {
               </button>
               <button
                 onClick={() => save("done")}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:opacity-90"
+                disabled={saving}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:opacity-90 disabled:opacity-60"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" /> Concluir
               </button>

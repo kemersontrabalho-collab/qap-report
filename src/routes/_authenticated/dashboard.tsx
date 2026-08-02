@@ -142,8 +142,10 @@ function Dashboard() {
     return bulletins.filter((b) => {
       if (tab === "trash" && !b.deleted_at) return false;
       if (tab !== "trash" && b.deleted_at) return false;
-      if (tab === "drafts" && (b.status !== "draft" || b.is_favorite)) return false;
-      if (tab === "done" && (b.status !== "done" || b.is_favorite)) return false;
+      // Favoritar NÃO remove o boletim da aba de origem — antes um rascunho
+      // favoritado sumia de "Rascunhos" e parecia ter sido perdido.
+      if (tab === "drafts" && b.status !== "draft") return false;
+      if (tab === "done" && b.status !== "done") return false;
       if (tab === "favorites" && !b.is_favorite) return false;
 
       if (!s) return true;
@@ -192,6 +194,8 @@ function Dashboard() {
       qc.invalidateQueries({ queryKey: ["bulletins"] });
       toast.success("Movido para a lixeira");
     },
+    onError: (e) =>
+      toast.error(e instanceof Error ? e.message : "Não foi possível mover para a lixeira"),
   });
 
   const restore = useMutation({
@@ -199,7 +203,11 @@ function Dashboard() {
       const { error } = await supabase.from("bulletins").update({ deleted_at: null }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["bulletins"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["bulletins"] });
+      toast.success("Boletim restaurado");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível restaurar"),
   });
 
   const hardDelete = useMutation({
@@ -211,6 +219,7 @@ function Dashboard() {
       qc.invalidateQueries({ queryKey: ["bulletins"] });
       toast.success("Excluído definitivamente");
     },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível excluir"),
   });
 
   const toggleFav = useMutation({
@@ -222,7 +231,9 @@ function Dashboard() {
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["bulletins"] }),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível favoritar"),
   });
+
 
   const emptyTrash = async () => {
     if (!confirm("Esvaziar a lixeira? Esta ação é definitiva.")) return;
@@ -256,8 +267,8 @@ function Dashboard() {
       acc[t.key] = bulletins.filter((b) => {
         if (t.key === "trash") return !!b.deleted_at;
         if (b.deleted_at) return false;
-        if (t.key === "drafts") return b.status === "draft" && !b.is_favorite;
-        if (t.key === "done") return b.status === "done" && !b.is_favorite;
+        if (t.key === "drafts") return b.status === "draft";
+        if (t.key === "done") return b.status === "done";
         if (t.key === "favorites") return b.is_favorite;
 
         return true;
