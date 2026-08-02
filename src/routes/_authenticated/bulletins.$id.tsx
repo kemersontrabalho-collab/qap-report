@@ -22,6 +22,7 @@ import {
   Trash2,
   MapPin,
   ExternalLink,
+  Printer,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
@@ -640,6 +641,12 @@ function EditBulletin() {
                 <Copy className="h-3.5 w-3.5" /> Copiar
               </button>
               <button
+                onClick={exportPdf}
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent"
+              >
+                <Printer className="h-3.5 w-3.5" /> PDF
+              </button>
+              <button
                 onClick={() => save()}
                 disabled={saving}
                 className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent disabled:opacity-60"
@@ -653,7 +660,8 @@ function EditBulletin() {
               </button>
               <button
                 onClick={() => save("done")}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:opacity-90"
+                disabled={saving}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:opacity-90 disabled:opacity-60"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" /> Concluir
               </button>
