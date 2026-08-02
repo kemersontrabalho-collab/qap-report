@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Loader2, Check, X } from "lucide-react";
 import { translateAuthError } from "@/lib/i18n-errors";
 import { setSessionLifetime, getKeepSignedInPreference } from "@/lib/session-lifetime";
+import { storeOAuthRedirect, consumeOAuthRedirect } from "@/lib/oauth-redirect";
 import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 
 const search = z.object({
