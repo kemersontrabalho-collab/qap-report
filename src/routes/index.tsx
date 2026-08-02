@@ -119,21 +119,24 @@ function Landing() {
 
   useEffect(() => {
     let cancelled = false;
-    // Após retorno de OAuth (Google/Apple), o Supabase processa os tokens do hash da URL
-    // e dispara SIGNED_IN. Nesse momento, redirecionamos automaticamente para o dashboard.
+    let navigated = false;
+    // Após retorno de OAuth (Google/Apple), o Supabase processa os tokens da URL
+    // e dispara SIGNED_IN. Redirecionamos para o destino pretendido (ou dashboard).
+    const go = () => {
+      if (cancelled || navigated) return;
+      navigated = true;
+      setRedirecting(true);
+      navigate({ to: consumeOAuthRedirect(), replace: true });
+    };
+
     supabase.auth.getSession().then(({ data }) => {
-      if (!cancelled && data.session) {
-        navigate({ to: "/dashboard", replace: true });
-      }
+      if (cancelled) return;
+      if (data.session) go();
+      else setRedirecting(false);
     });
-    supabase.auth.getSession().then(({ data }) => {
-      if (!cancelled && !data.session) setRedirecting(false);
-    });
+
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        setRedirecting(true);
-        navigate({ to: "/dashboard", replace: true });
-      }
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) go();
     });
     return () => {
       cancelled = true;
