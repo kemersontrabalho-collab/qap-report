@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { SimilarCases } from "@/components/SimilarCases";
 import { VoiceDictateButton } from "@/components/VoiceDictateButton";
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
+import { copyWithFeedback } from "@/lib/clipboard";
+import { printBulletin } from "@/lib/print-bulletin";
 import {
   ArrowLeft,
   Sparkles,
@@ -281,9 +283,31 @@ function EditBulletin() {
   }
 
   async function copyText() {
-    if (!b?.content) return;
-    await navigator.clipboard.writeText(stripBraces(b.content));
-    toast.success("Copiado");
+    if (!b?.content) {
+      toast.error("Não há texto para copiar.");
+      return;
+    }
+    await copyWithFeedback(stripBraces(b.content));
+  }
+
+  function exportPdf() {
+    if (!b) return;
+    if (!b.content?.trim()) {
+      toast.error("Gere ou escreva o histórico antes de exportar.");
+      return;
+    }
+    const ok = printBulletin({
+      title: b.title,
+      bulletinType: b.bulletin_type,
+      category: b.category,
+      crewComposition: b.crew_composition,
+      vehiclePrefix: b.vehicle_prefix,
+      occurrenceAt: b.occurrence_at,
+      crewAddress: b.crew_address,
+      occurrenceAddress: b.occurrence_address,
+      content: stripBraces(b.content),
+    });
+    if (!ok) toast.error("Libere os pop-ups deste site para exportar em PDF.");
   }
 
   async function fillCurrentLocation(kind: "crew" | "occ") {
