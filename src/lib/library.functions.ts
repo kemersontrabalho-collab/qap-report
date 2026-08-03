@@ -6,7 +6,7 @@ const saveInput = z.object({
   bulletinType: z.enum(["BA", "BO-COP", "BO-TC", "BOAT"]),
   category: z.string().trim().max(160).optional(),
   title: z.string().trim().min(3).max(160),
-  content: z.string().trim().min(200).max(20000),
+  content: z.string().trim().min(100).max(20000),
 });
 
 export type SavedBulletin = {
