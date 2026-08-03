@@ -564,8 +564,8 @@ function SavedBulletinsSection() {
       toast.error("Informe um título com pelo menos 3 caracteres.");
       return;
     }
-    if (content.trim().length < 200) {
-      toast.error("Cole o boletim completo (mínimo de 200 caracteres).");
+    if (content.trim().length < 100) {
+      toast.error("Cole o boletim completo (mínimo de 100 caracteres).");
       return;
     }
     setSaving(true);
