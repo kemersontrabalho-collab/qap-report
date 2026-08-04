@@ -629,17 +629,23 @@ function EditBulletin() {
             </button>
           </div>
 
-          <SimilarCases
-            bulletinType={b.bulletin_type}
-            keywords={b.keywords}
-            category={b.category}
-            context={b.context}
-            onUseReference={(text) => {
-              const prefix = b.context ? `${b.context}\n\n` : "";
-              update("context", `${prefix}[Referência de caso semelhante]\n${text.slice(0, 800)}`);
-              toast.success("Referência adicionada ao contexto");
-            }}
-          />
+          <Suspense fallback={null}>
+            <SimilarCases
+              bulletinType={b.bulletin_type}
+              keywords={b.keywords}
+              category={b.category}
+              context={b.context}
+              onUseReference={(text) => {
+                const prefix = b.context ? `${b.context}\n\n` : "";
+                update(
+                  "context",
+                  `${prefix}[Referência de caso semelhante]\n${text.slice(0, 800)}`,
+                );
+                toast.success("Referência adicionada ao contexto");
+              }}
+            />
+          </Suspense>
+
         </aside>
 
         <section className="rounded-2xl border bg-card">
