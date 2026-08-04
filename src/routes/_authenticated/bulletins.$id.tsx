@@ -1,13 +1,22 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, BULLETIN_TYPES } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { toast } from "sonner";
-import { SimilarCases } from "@/components/SimilarCases";
-import { VoiceDictateButton } from "@/components/VoiceDictateButton";
+
+// Recursos secundários do editor: nenhum é necessário para o primeiro paint do
+// documento, então saem do bundle da rota e são buscados em paralelo depois da
+// hidratação (Web Speech API e busca semântica de casos semelhantes).
+const SimilarCases = lazy(() =>
+  import("@/components/SimilarCases").then((m) => ({ default: m.SimilarCases })),
+);
+const VoiceDictateButton = lazy(() =>
+  import("@/components/VoiceDictateButton").then((m) => ({ default: m.VoiceDictateButton })),
+);
+
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import { copyWithFeedback } from "@/lib/clipboard";
 import { printBulletin } from "@/lib/print-bulletin";
