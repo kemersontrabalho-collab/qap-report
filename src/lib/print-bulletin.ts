@@ -51,10 +51,12 @@ export function printBulletin(data: PrintData): boolean {
   <tr><td class="k">Localização da ocorrência</td><td>${esc(data.occurrenceAddress)}</td></tr>
 </table>
 <pre>${esc(data.content)}</pre>
-<script>window.onload=function(){window.focus();window.print();}<\/script>
+<script>window.onload=function(){window.focus();window.print();}${"<"}/script>
 </body></html>`;
 
-  const w = window.open("", "_blank", "noopener,noreferrer,width=900,height=1000");
+  // Não usar "noopener": com essa flag window.open retorna null e o documento
+  // nunca pode ser escrito, quebrando a geração do PDF.
+  const w = window.open("", "_blank", "width=900,height=1000");
   if (!w) return false; // bloqueado por popup blocker
   w.document.open();
   w.document.write(html);
