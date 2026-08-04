@@ -1,21 +1,13 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+
+// Chunk separado: recharts só entra na rede quando a aba de estatísticas abre.
+const AdminCharts = lazy(() => import("@/components/admin/AdminCharts"));
+
 import { adminLogin, adminLogout, adminSessionStatus } from "@/lib/admin-gate.functions";
 import {
   adminGetStats,
@@ -98,16 +90,8 @@ export const Route = createFileRoute("/admin")({
   component: AdminPanel,
 });
 
-const COLORS = [
-  "#3b82f6",
-  "#8b5cf6",
-  "#ec4899",
-  "#f59e0b",
-  "#10b981",
-  "#ef4444",
-  "#06b6d4",
-  "#84cc16",
-];
+
+
 
 function AdminPanel() {
   const sessionFn = useServerFn(adminSessionStatus);
@@ -291,56 +275,16 @@ function StatsPanel() {
         <StatCard label="Notificações enviadas" value={data.notifications} />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Boletins por dia (últimos 14)</CardTitle>
-        </CardHeader>
-        <CardContent className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data.byDay}>
-              <XAxis dataKey="day" fontSize={11} />
-              <YAxis fontSize={11} />
-              <Tooltip />
-              <Line type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <Suspense
+        fallback={
+          <div className="grid h-64 place-items-center rounded-xl border">
+            <Loader2 className="h-5 w-5 animate-spin" />
+          </div>
+        }
+      >
+        <AdminCharts data={data} />
+      </Suspense>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Categorias mais usadas</CardTitle>
-          </CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={data.byCategory} dataKey="count" nameKey="name" outerRadius={80}>
-                  {data.byCategory.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Horários de pico</CardTitle>
-          </CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.byHour}>
-                <XAxis dataKey="hour" fontSize={10} interval={2} />
-                <YAxis fontSize={11} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#8b5cf6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
@@ -364,13 +308,20 @@ function UsersPanel() {
   const grantFn = useServerFn(adminGrantSubscription);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "blocked" | "active" | "inactive">("all");
+  // 300ms de debounce: 1 requisição por pausa de digitação em vez de 1 por tecla.
+  const debouncedSearch = useDebouncedValue(search, 300);
+  // Janela de renderização: listas de milhares de contas travavam o main thread.
+  const [visible, setVisible] = useState(30);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-users", search, filter],
-    queryFn: () => listFn({ data: { search, filter } }),
+    queryKey: ["admin-users", debouncedSearch, filter],
+    queryFn: () => listFn({ data: { search: debouncedSearch, filter } }),
+    // Mantém a lista anterior visível enquanto a nova chega → zero CLS na busca.
+    placeholderData: keepPreviousData,
     // Presença é volátil: recarrega a cada 60s para o status ficar atualizado.
     refetchInterval: 60_000,
   });
+
 
   const block = useMutation({
     mutationFn: (v: { userId: string; blocked: boolean }) => blockFn({ data: v }),
@@ -406,9 +357,18 @@ function UsersPanel() {
         <Input
           placeholder="Buscar por email ou nome..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setVisible(30);
+          }}
         />
-        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+        <Select
+          value={filter}
+          onValueChange={(v) => {
+            setFilter(v as typeof filter);
+            setVisible(30);
+          }}
+        >
           <SelectTrigger className="sm:w-48">
             <SelectValue />
           </SelectTrigger>
@@ -426,7 +386,8 @@ function UsersPanel() {
       ) : (
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">{data?.users.length ?? 0} usuário(s)</p>
-          {data?.users.map((u) => (
+          {(data?.users ?? []).slice(0, visible).map((u) => (
+
             <Card key={u.id}>
               <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
@@ -527,7 +488,17 @@ function UsersPanel() {
               </CardContent>
             </Card>
           ))}
+          {(data?.users.length ?? 0) > visible && (
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setVisible((v) => v + 30)}
+            >
+              Carregar mais ({(data?.users.length ?? 0) - visible} restantes)
+            </Button>
+          )}
         </div>
+
       )}
     </div>
   );

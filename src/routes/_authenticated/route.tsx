@@ -1,7 +1,14 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { TutorialModal } from "@/components/TutorialModal";
 import { tutorialStore, useTutorialOpen } from "@/lib/tutorial-store";
+
+// O tutorial é montado em TODA página autenticada, mas só é visto uma vez por
+// usuário. Carregá-lo sob demanda tira ~10 KB do caminho crítico de cada rota
+// interna sem alterar o comportamento percebido (abre em milissegundos).
+const TutorialModal = lazy(() =>
+  import("@/components/TutorialModal").then((m) => ({ default: m.TutorialModal })),
+);
 
 // Rotas que NÃO exigem assinatura ativa (usuário sem plano ainda pode acessar).
 const FREE_PATHS = ["/assinar", "/settings"];
@@ -11,10 +18,15 @@ function AuthenticatedLayout() {
   return (
     <>
       <Outlet />
-      <TutorialModal open={open} onClose={tutorialStore.close} />
+      {open && (
+        <Suspense fallback={null}>
+          <TutorialModal open onClose={tutorialStore.close} />
+        </Suspense>
+      )}
     </>
   );
 }
+
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,

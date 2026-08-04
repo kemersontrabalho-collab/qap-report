@@ -26,8 +26,13 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+    // Pré-carrega o chunk da rota no hover/foco do link (~50ms de intenção):
+    // a navegação passa a ser instantânea sem custo no carregamento inicial.
+    defaultPreload: "intent",
+    defaultPreloadDelay: 50,
     defaultPreloadStaleTime: 0,
   });
+
 
   return router;
 };

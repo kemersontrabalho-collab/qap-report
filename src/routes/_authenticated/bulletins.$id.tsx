@@ -1,13 +1,22 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, BULLETIN_TYPES } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { toast } from "sonner";
-import { SimilarCases } from "@/components/SimilarCases";
-import { VoiceDictateButton } from "@/components/VoiceDictateButton";
+
+// Recursos secundários do editor: nenhum é necessário para o primeiro paint do
+// documento, então saem do bundle da rota e são buscados em paralelo depois da
+// hidratação (Web Speech API e busca semântica de casos semelhantes).
+const SimilarCases = lazy(() =>
+  import("@/components/SimilarCases").then((m) => ({ default: m.SimilarCases })),
+);
+const VoiceDictateButton = lazy(() =>
+  import("@/components/VoiceDictateButton").then((m) => ({ default: m.VoiceDictateButton })),
+);
+
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import { copyWithFeedback } from "@/lib/clipboard";
 import { printBulletin } from "@/lib/print-bulletin";
@@ -554,10 +563,13 @@ function EditBulletin() {
             <div>
               <div className="flex items-center justify-between gap-2">
                 <label className="text-sm font-medium">Palavras-chave *</label>
-                <VoiceDictateButton
-                  value={b.keywords ?? ""}
-                  onChange={(v) => update("keywords", v)}
-                />
+                <Suspense fallback={<div className="h-8 w-8" aria-hidden />}>
+                  <VoiceDictateButton
+                    value={b.keywords ?? ""}
+                    onChange={(v) => update("keywords", v)}
+                  />
+                </Suspense>
+
               </div>
               <textarea
                 value={b.keywords ?? ""}
@@ -617,17 +629,23 @@ function EditBulletin() {
             </button>
           </div>
 
-          <SimilarCases
-            bulletinType={b.bulletin_type}
-            keywords={b.keywords}
-            category={b.category}
-            context={b.context}
-            onUseReference={(text) => {
-              const prefix = b.context ? `${b.context}\n\n` : "";
-              update("context", `${prefix}[Referência de caso semelhante]\n${text.slice(0, 800)}`);
-              toast.success("Referência adicionada ao contexto");
-            }}
-          />
+          <Suspense fallback={null}>
+            <SimilarCases
+              bulletinType={b.bulletin_type}
+              keywords={b.keywords}
+              category={b.category}
+              context={b.context}
+              onUseReference={(text) => {
+                const prefix = b.context ? `${b.context}\n\n` : "";
+                update(
+                  "context",
+                  `${prefix}[Referência de caso semelhante]\n${text.slice(0, 800)}`,
+                );
+                toast.success("Referência adicionada ao contexto");
+              }}
+            />
+          </Suspense>
+
         </aside>
 
         <section className="rounded-2xl border bg-card">
