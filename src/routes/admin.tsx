@@ -357,9 +357,18 @@ function UsersPanel() {
         <Input
           placeholder="Buscar por email ou nome..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setVisible(30);
+          }}
         />
-        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+        <Select
+          value={filter}
+          onValueChange={(v) => {
+            setFilter(v as typeof filter);
+            setVisible(30);
+          }}
+        >
           <SelectTrigger className="sm:w-48">
             <SelectValue />
           </SelectTrigger>
@@ -377,7 +386,8 @@ function UsersPanel() {
       ) : (
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">{data?.users.length ?? 0} usuário(s)</p>
-          {data?.users.map((u) => (
+          {(data?.users ?? []).slice(0, visible).map((u) => (
+
             <Card key={u.id}>
               <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
