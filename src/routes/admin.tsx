@@ -1,21 +1,13 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+
+// Chunk separado: recharts só entra na rede quando a aba de estatísticas abre.
+const AdminCharts = lazy(() => import("@/components/admin/AdminCharts"));
+
 import { adminLogin, adminLogout, adminSessionStatus } from "@/lib/admin-gate.functions";
 import {
   adminGetStats,
