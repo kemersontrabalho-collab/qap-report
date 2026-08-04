@@ -488,7 +488,17 @@ function UsersPanel() {
               </CardContent>
             </Card>
           ))}
+          {(data?.users.length ?? 0) > visible && (
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setVisible((v) => v + 30)}
+            >
+              Carregar mais ({(data?.users.length ?? 0) - visible} restantes)
+            </Button>
+          )}
         </div>
+
       )}
     </div>
   );
