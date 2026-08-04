@@ -41,10 +41,12 @@ const DEFAULT_ENTRY: Omit<SitemapEntry, "path"> = {
  */
 const ROUTE_FILES = import.meta.glob("./**/*.{ts,tsx}", { eager: false });
 
-/** Converte "./_authenticated/settings.tsx" no caminho público "/settings". */
+/** Converte "./guia-redacao-tecnica.tsx" no caminho público "/guia-redacao-tecnica". */
 function fileToPath(file: string): string | null {
   let clean = file.replace(/^\.\//, "").replace(/\.(tsx|ts)$/, "");
   if (clean.startsWith("__root")) return null;
+  // Layouts pathless (ex.: "_authenticated") são áreas privadas: nunca indexar.
+  if (clean.split("/").some((s) => s.startsWith("_") && !s.startsWith("__"))) return null;
   // Segmentos escapados: "sitemap[.]xml" -> "sitemap.xml"
   clean = clean.replace(/\[(.)\]/g, "$1");
 
