@@ -563,10 +563,13 @@ function EditBulletin() {
             <div>
               <div className="flex items-center justify-between gap-2">
                 <label className="text-sm font-medium">Palavras-chave *</label>
-                <VoiceDictateButton
-                  value={b.keywords ?? ""}
-                  onChange={(v) => update("keywords", v)}
-                />
+                <Suspense fallback={<div className="h-8 w-8" aria-hidden />}>
+                  <VoiceDictateButton
+                    value={b.keywords ?? ""}
+                    onChange={(v) => update("keywords", v)}
+                  />
+                </Suspense>
+
               </div>
               <textarea
                 value={b.keywords ?? ""}
