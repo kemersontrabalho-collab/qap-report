@@ -308,13 +308,20 @@ function UsersPanel() {
   const grantFn = useServerFn(adminGrantSubscription);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "blocked" | "active" | "inactive">("all");
+  // 300ms de debounce: 1 requisição por pausa de digitação em vez de 1 por tecla.
+  const debouncedSearch = useDebouncedValue(search, 300);
+  // Janela de renderização: listas de milhares de contas travavam o main thread.
+  const [visible, setVisible] = useState(30);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-users", search, filter],
-    queryFn: () => listFn({ data: { search, filter } }),
+    queryKey: ["admin-users", debouncedSearch, filter],
+    queryFn: () => listFn({ data: { search: debouncedSearch, filter } }),
+    // Mantém a lista anterior visível enquanto a nova chega → zero CLS na busca.
+    placeholderData: keepPreviousData,
     // Presença é volátil: recarrega a cada 60s para o status ficar atualizado.
     refetchInterval: 60_000,
   });
+
 
   const block = useMutation({
     mutationFn: (v: { userId: string; blocked: boolean }) => blockFn({ data: v }),
