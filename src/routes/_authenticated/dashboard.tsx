@@ -233,7 +233,6 @@ function Dashboard() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível favoritar"),
   });
 
-
   const emptyTrash = async () => {
     if (!confirm("Esvaziar a lixeira? Esta ação é definitiva.")) return;
     const trashed = bulletins.filter((b) => b.deleted_at);

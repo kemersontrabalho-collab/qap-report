@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -43,9 +43,12 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [keepSignedIn, setKeepSignedIn] = useState<boolean>(() =>
-    typeof window === "undefined" ? true : getKeepSignedInPreference(),
-  );
+  // Lido apenas após a hidratação: acessar localStorage no initializer do
+  // useState faz o HTML do servidor divergir do cliente (hydration mismatch).
+  const [keepSignedIn, setKeepSignedIn] = useState(true);
+  useEffect(() => {
+    setKeepSignedIn(getKeepSignedInPreference());
+  }, []);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
