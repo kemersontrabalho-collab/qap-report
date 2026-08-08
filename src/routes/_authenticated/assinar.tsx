@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/assinar")({
       {
         name: "description",
         content:
-          "Ative seu plano do QAP Report — mensal, anual, código promocional ou pagamento via Pix com liberação imediata.",
+          "Ative seu plano mensal do QAP Report — código promocional ou pagamento via Pix com liberação imediata.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
@@ -47,10 +47,10 @@ const PIX_KEY = "dc748121-4fd1-4277-b987-7b4b5aa2de0f";
 const WHATSAPP_NUMBER = "5555997153371"; // 55 (país) + 55 (DDD) + 997153371
 const WHATSAPP_FULL = "5555997153371";
 const PLANS = {
-  mensal: { label: "Mensal", price: 5, priceLabel: "R$ 5,00", cycle: "por mês" },
-  anual: { label: "Anual", price: 50, priceLabel: "R$ 50,00", cycle: "por ano (economize ~17%)" },
+  mensal: { label: "Mensal", price: 1.99, priceLabel: "R$ 1,99", cycle: "por mês" },
 } as const;
 type PlanId = keyof typeof PLANS;
+
 
 // ============================================================
 type Step = "plans" | "hasCoupon" | "coupon" | "pix";
@@ -205,7 +205,7 @@ function PlanSelector({ selected, onSelect }: { selected: PlanId; onSelect: (p: 
   return (
     <section className="space-y-3">
       <h2 className="text-lg font-semibold">Escolha seu plano</h2>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3">
         {(Object.keys(PLANS) as PlanId[]).map((id) => {
           const p = PLANS[id];
           const active = selected === id;

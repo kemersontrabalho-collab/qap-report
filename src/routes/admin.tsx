@@ -1016,9 +1016,14 @@ function PixPanel() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium">{r.full_name || "(sem nome)"}</p>
-                    <Badge variant={r.plan === "anual" ? "default" : "secondary"}>
-                      {r.plan === "anual" ? "Anual · R$ 50,00" : "Mensal · R$ 5,00"}
+                    <Badge variant="secondary">
+                      {r.plan === "anual" ? "Anual" : "Mensal"} ·{" "}
+                      {Number(r.amount_brl).toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
                     </Badge>
+
                     <Badge variant="outline">{r.status}</Badge>
                   </div>
                   <p className="truncate text-sm text-muted-foreground">
