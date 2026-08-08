@@ -221,7 +221,9 @@ function EditBulletin() {
       if (nextStatus) patch.status = nextStatus;
       const { error } = await supabase.from("bulletins").update(patch).eq("id", current.id);
       if (error) throw error;
-      dirtyRef.current = false;
+      // Mantém "sujo" se o usuário digitou durante a requisição: assim o
+      // próximo autosave envia o que ficou de fora deste patch.
+      if (revRef.current === revAtStart) dirtyRef.current = false;
 
       // Mescla apenas o que o servidor alterou; o que o usuário digitou
       // durante a requisição é preservado.
