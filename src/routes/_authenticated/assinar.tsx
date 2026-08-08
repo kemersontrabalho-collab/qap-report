@@ -205,7 +205,7 @@ function PlanSelector({ selected, onSelect }: { selected: PlanId; onSelect: (p: 
   return (
     <section className="space-y-3">
       <h2 className="text-lg font-semibold">Escolha seu plano</h2>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3">
         {(Object.keys(PLANS) as PlanId[]).map((id) => {
           const p = PLANS[id];
           const active = selected === id;
