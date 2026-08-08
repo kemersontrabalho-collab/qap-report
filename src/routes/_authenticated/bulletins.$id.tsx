@@ -182,6 +182,9 @@ function EditBulletin() {
   // sobrevive e as anteriores são descartadas.
   function update<K extends keyof Bulletin>(key: K, value: Bulletin[K]) {
     dirtyRef.current = true;
+    // Cada edição incrementa a revisão. O save só marca "limpo" se nenhuma
+    // tecla foi digitada durante a requisição.
+    revRef.current += 1;
     setB((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
 
