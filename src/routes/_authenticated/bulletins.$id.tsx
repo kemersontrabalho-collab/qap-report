@@ -148,6 +148,7 @@ function EditBulletin() {
   const [locating, setLocating] = useState<"crew" | "occ" | null>(null);
   const [b, setB] = useState<Bulletin | null>(null);
   const dirtyRef = useRef(false);
+  const revRef = useRef(0);
   const bRef = useRef<Bulletin | null>(null);
   bRef.current = b;
 
