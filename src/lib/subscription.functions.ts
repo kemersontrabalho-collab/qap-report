@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const planSchema = z.enum(["mensal", "anual"]);
+const planSchema = z.enum(["mensal"]);
 
 /**
  * Retorna o status atual da assinatura do usuário logado e
@@ -41,7 +41,7 @@ export const getMySubscriptionStatus = createServerFn({ method: "GET" })
  */
 export const createPixRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { plan: "mensal" | "anual" }) => ({
+  .inputValidator((data: { plan: "mensal" }) => ({
     plan: planSchema.parse(data.plan),
   }))
   .handler(async ({ context, data }) => {
