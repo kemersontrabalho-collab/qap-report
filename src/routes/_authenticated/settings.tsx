@@ -211,7 +211,7 @@ function SettingsPage() {
             <Crown className="h-4 w-4 text-primary" /> Assinatura
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ative seu plano mensal ou anual, resgate um código promocional ou envie comprovante de
+            Ative seu plano mensal, resgate um código promocional ou envie comprovante de
             Pix.
           </p>
           <Link
