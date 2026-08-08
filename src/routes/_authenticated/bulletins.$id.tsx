@@ -148,6 +148,7 @@ function EditBulletin() {
   const [locating, setLocating] = useState<"crew" | "occ" | null>(null);
   const [b, setB] = useState<Bulletin | null>(null);
   const dirtyRef = useRef(false);
+  const revRef = useRef(0);
   const bRef = useRef<Bulletin | null>(null);
   bRef.current = b;
 
@@ -182,6 +183,9 @@ function EditBulletin() {
   // sobrevive e as anteriores são descartadas.
   function update<K extends keyof Bulletin>(key: K, value: Bulletin[K]) {
     dirtyRef.current = true;
+    // Cada edição incrementa a revisão. O save só marca "limpo" se nenhuma
+    // tecla foi digitada durante a requisição.
+    revRef.current += 1;
     setB((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
 
@@ -190,6 +194,7 @@ function EditBulletin() {
   async function save(nextStatus?: "draft" | "done", opts?: { silent?: boolean }) {
     const current = bRef.current;
     if (!current || savingRef.current) return;
+    const revAtStart = revRef.current;
     savingRef.current = true;
     setSaving(true);
     try {
@@ -216,7 +221,9 @@ function EditBulletin() {
       if (nextStatus) patch.status = nextStatus;
       const { error } = await supabase.from("bulletins").update(patch).eq("id", current.id);
       if (error) throw error;
-      dirtyRef.current = false;
+      // Mantém "sujo" se o usuário digitou durante a requisição: assim o
+      // próximo autosave envia o que ficou de fora deste patch.
+      if (revRef.current === revAtStart) dirtyRef.current = false;
 
       // Mescla apenas o que o servidor alterou; o que o usuário digitou
       // durante a requisição é preservado.
