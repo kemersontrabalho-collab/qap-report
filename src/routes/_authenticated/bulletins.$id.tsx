@@ -194,6 +194,7 @@ function EditBulletin() {
   async function save(nextStatus?: "draft" | "done", opts?: { silent?: boolean }) {
     const current = bRef.current;
     if (!current || savingRef.current) return;
+    const revAtStart = revRef.current;
     savingRef.current = true;
     setSaving(true);
     try {
