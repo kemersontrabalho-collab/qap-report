@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/assinar")({
       {
         name: "description",
         content:
-          "Ative seu plano do QAP Report — mensal, anual, código promocional ou pagamento via Pix com liberação imediata.",
+          "Ative seu plano mensal do QAP Report — código promocional ou pagamento via Pix com liberação imediata.",
       },
       { name: "robots", content: "noindex, nofollow" },
     ],
