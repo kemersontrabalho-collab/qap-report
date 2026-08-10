@@ -51,7 +51,6 @@ const PLANS = {
 } as const;
 type PlanId = keyof typeof PLANS;
 
-
 // ============================================================
 type Step = "plans" | "hasCoupon" | "coupon" | "pix";
 

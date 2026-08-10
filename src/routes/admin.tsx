@@ -90,9 +90,6 @@ export const Route = createFileRoute("/admin")({
   component: AdminPanel,
 });
 
-
-
-
 function AdminPanel() {
   const sessionFn = useServerFn(adminSessionStatus);
   const { data: session, isLoading } = useQuery({
@@ -284,7 +281,6 @@ function StatsPanel() {
       >
         <AdminCharts data={data} />
       </Suspense>
-
     </div>
   );
 }
@@ -321,7 +317,6 @@ function UsersPanel() {
     // Presença é volátil: recarrega a cada 60s para o status ficar atualizado.
     refetchInterval: 60_000,
   });
-
 
   const block = useMutation({
     mutationFn: (v: { userId: string; blocked: boolean }) => blockFn({ data: v }),
@@ -387,7 +382,6 @@ function UsersPanel() {
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">{data?.users.length ?? 0} usuário(s)</p>
           {(data?.users ?? []).slice(0, visible).map((u) => (
-
             <Card key={u.id}>
               <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
@@ -489,16 +483,11 @@ function UsersPanel() {
             </Card>
           ))}
           {(data?.users.length ?? 0) > visible && (
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => setVisible((v) => v + 30)}
-            >
+            <Button variant="outline" className="w-full" onClick={() => setVisible((v) => v + 30)}>
               Carregar mais ({(data?.users.length ?? 0) - visible} restantes)
             </Button>
           )}
         </div>
-
       )}
     </div>
   );
