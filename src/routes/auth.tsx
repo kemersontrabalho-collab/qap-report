@@ -51,12 +51,8 @@ function AuthPage() {
   // Lido apenas após a hidratação: acessar localStorage no initializer do
   // useState faz o HTML do servidor divergir do cliente (hydration mismatch).
   const [keepSignedIn, setKeepSignedIn] = useState(true);
-  // Só pintamos a UI após a hidratação: quando o gate de /_authenticated
-  // redireciona para cá, o HTML do servidor é o da rota protegida (vazio).
-  const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
     setKeepSignedIn(getKeepSignedInPreference());
-    setHydrated(true);
   }, []);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -141,8 +137,6 @@ function AuthPage() {
 
   const handleGoogle = () => signInWithProvider("google");
   const handleApple = () => signInWithProvider("apple");
-
-  if (!hydrated) return null;
 
   return (
     <div className="min-h-screen bg-background">
