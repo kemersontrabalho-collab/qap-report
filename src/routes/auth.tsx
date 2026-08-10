@@ -142,6 +142,8 @@ function AuthPage() {
   const handleGoogle = () => signInWithProvider("google");
   const handleApple = () => signInWithProvider("apple");
 
+  if (!hydrated) return <div className="min-h-screen bg-background" />;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto grid min-h-screen max-w-6xl grid-cols-1 md:grid-cols-2">
