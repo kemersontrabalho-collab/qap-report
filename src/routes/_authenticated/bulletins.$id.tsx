@@ -576,7 +576,6 @@ function EditBulletin() {
                     onChange={(v) => update("keywords", v)}
                   />
                 </Suspense>
-
               </div>
               <textarea
                 value={b.keywords ?? ""}
@@ -652,7 +651,6 @@ function EditBulletin() {
               }}
             />
           </Suspense>
-
         </aside>
 
         <section className="rounded-2xl border bg-card">

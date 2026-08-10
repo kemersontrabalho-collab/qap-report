@@ -16,6 +16,11 @@ const search = z.object({
 });
 
 export const Route = createFileRoute("/auth")({
+  // Renderizada apenas no cliente: quando o gate de /_authenticated (ssr: false)
+  // redireciona para cá durante a hidratação, o HTML do servidor pertence à rota
+  // protegida e não bate com esta página — o que gerava "Hydration failed".
+  // A página é noindex, então não há perda de SEO.
+  ssr: false,
   validateSearch: search,
   head: () => ({
     meta: [
