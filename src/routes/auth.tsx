@@ -142,7 +142,7 @@ function AuthPage() {
   const handleGoogle = () => signInWithProvider("google");
   const handleApple = () => signInWithProvider("apple");
 
-  if (!hydrated) return <div className="min-h-screen bg-background" />;
+  if (!hydrated) return null;
 
   return (
     <div className="min-h-screen bg-background">
