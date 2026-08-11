@@ -347,11 +347,13 @@ function Dashboard() {
          * A partir de sm vira uma linha só. O antigo `flex-col` empilhava a
          * busca junto das ações, deixando "Esvaziar" e o menu espremidos.
          */}
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b p-4 sm:flex sm:justify-between">
-          <div className="flex min-w-0 items-center gap-2">
-            <activeTab.icon className="h-5 w-5 shrink-0 text-primary" />
-            <h2 className="truncate text-base font-semibold">{activeTab.label}</h2>
-            <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[var(--surface-line)] p-4 sm:flex sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/15">
+              <activeTab.icon className="h-4.5 w-4.5" />
+            </span>
+            <h2 className="truncate text-base font-semibold tracking-tight">{activeTab.label}</h2>
+            <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
               {counts[activeTab.key]}
             </span>
           </div>
@@ -359,15 +361,16 @@ function Dashboard() {
             data-tour="dashboard-search"
             className="relative order-last col-span-2 w-full sm:order-none sm:col-span-1 sm:w-64"
           >
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por título, texto ou data..."
               aria-label="Buscar boletins"
-              className="min-h-11 w-full rounded-lg border bg-background py-1.5 pl-8 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring sm:min-h-9"
+              className="min-h-11 w-full rounded-xl border border-[var(--surface-line)] bg-background/70 py-1.5 pl-9 pr-3 text-sm outline-none transition-shadow duration-300 placeholder:text-muted-foreground/70 focus:ring-2 focus:ring-ring sm:min-h-9"
             />
           </div>
+
           <div className="flex shrink-0 items-center gap-2">
             {tab === "trash" && bulletins.some((b) => b.deleted_at) && (
               <button
