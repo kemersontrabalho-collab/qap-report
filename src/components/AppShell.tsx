@@ -53,22 +53,28 @@ export function AppShell({ children }: { children: ReactNode }) {
          * `flex justify-between` puro causava abaixo de 360px.
          */}
         <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-fluid py-2 sm:py-3 md:grid-cols-[auto_minmax(0,1fr)_auto]">
-          <Link to="/dashboard" className="flex min-w-0 items-center gap-2">
-            <img
-              src={logoAsset.url}
-              alt="QAP Report"
-              width={32}
-              height={32}
-              decoding="async"
-              loading="eager"
-              // aspect-square + object-contain reserva a caixa antes do
-              // download da imagem → zero CLS.
-              className="aspect-square h-8 w-8 shrink-0 object-contain"
-            />
-            <span className="truncate font-semibold tracking-tight">QAP Report</span>
+          <Link to="/dashboard" className="group flex min-w-0 items-center gap-2.5">
+            <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--gradient-brand)] p-[1px] shadow-[var(--shadow-sm)] transition-transform duration-300 group-hover:scale-[1.04]">
+              <span className="grid h-full w-full place-items-center rounded-[0.65rem] bg-card">
+                <img
+                  src={logoAsset.url}
+                  alt="QAP Report"
+                  width={28}
+                  height={28}
+                  decoding="async"
+                  loading="eager"
+                  // aspect-square + object-contain reserva a caixa antes do
+                  // download da imagem → zero CLS.
+                  className="aspect-square h-7 w-7 object-contain"
+                />
+              </span>
+            </span>
+            <span className="truncate text-[0.95rem] font-semibold tracking-tight">
+              QAP <span className="text-gradient-brand">Report</span>
+            </span>
           </Link>
 
-          <nav className="hidden items-center justify-center gap-1 md:flex">
+          <nav className="hidden items-center justify-center gap-1 rounded-full border border-[var(--surface-line)] bg-muted/40 p-1 md:flex">
             {navItems.map((item) => {
               const active = pathname.startsWith(item.to);
               return (
@@ -76,13 +82,15 @@ export function AppShell({ children }: { children: ReactNode }) {
                   key={item.to}
                   to={item.to}
                   data-tour={`nav-${item.to.slice(1)}`}
-                  className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm ${
+                  className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm transition-all duration-300 [transition-timing-function:var(--ease-out-expo)] ${
                     active
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      ? "bg-card text-foreground shadow-[var(--shadow-sm)] ring-1 ring-[var(--surface-line)]"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
+                  <item.icon
+                    className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`}
+                  />
                   {item.label}
                 </Link>
               );
@@ -93,11 +101,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link
               to="/bulletins/new"
               data-tour="new-bulletin"
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground hover:opacity-90 sm:min-h-9 sm:py-1.5"
+              className="btn-brand inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3.5 text-sm font-medium sm:min-h-9 sm:py-1.5"
             >
               <Plus className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Novo</span>
             </Link>
+
             <div data-tour="notifications">
               <NotificationBell />
             </div>
