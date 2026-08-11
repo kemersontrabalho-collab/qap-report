@@ -339,7 +339,7 @@ function Dashboard() {
       </section>
 
 
-      <section className="rounded-2xl border bg-card">
+      <section className="surface-card reveal overflow-hidden rounded-2xl" style={{ ["--d" as string]: "360ms" }}>
         {/*
          * TOOLBAR — no mobile é um grid de 2 linhas:
          *   linha 1: [título elástico | ações fixas]
