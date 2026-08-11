@@ -278,6 +278,29 @@ export const adminGrantSubscription = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+// Remove os benefícios de assinatura e devolve a conta ao plano gratuito.
+export const adminRevokeSubscription = createServerFn({ method: "POST" })
+  .inputValidator((d: { userId: string }) => d)
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    const now = new Date().toISOString();
+    const { error } = await sb.from("subscriptions").upsert(
+      {
+        user_id: data.userId,
+        status: "canceled",
+        plan: "free",
+        trial_ends_at: null,
+        current_period_start: now,
+        current_period_end: now,
+        canceled_at: now,
+      },
+      { onConflict: "user_id" },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
 // =========================================================
 // Pix payment requests — moderação pelo admin
 // =========================================================
