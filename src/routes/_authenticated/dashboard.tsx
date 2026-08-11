@@ -375,7 +375,7 @@ function Dashboard() {
             {tab === "trash" && bulletins.some((b) => b.deleted_at) && (
               <button
                 onClick={emptyTrash}
-                className="min-h-11 whitespace-nowrap rounded-lg border border-destructive/50 px-3 text-sm text-destructive hover:bg-destructive/10 sm:min-h-9 sm:py-1.5"
+                className="min-h-11 whitespace-nowrap rounded-xl border border-destructive/40 px-3 text-sm text-destructive transition-colors hover:bg-destructive/10 sm:min-h-9 sm:py-1.5"
               >
                 Esvaziar
               </button>
@@ -385,7 +385,7 @@ function Dashboard() {
               <DropdownMenuTrigger
                 data-tour="tabs-menu"
                 aria-label="Abrir menu de abas"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-lg border bg-background text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring sm:h-9 sm:w-9"
+                className="btn-ghost-line inline-flex h-11 w-11 items-center justify-center rounded-xl focus:outline-none focus:ring-2 focus:ring-ring sm:h-9 sm:w-9 lg:hidden"
               >
                 <Menu className="h-5 w-5" />
               </DropdownMenuTrigger>
@@ -410,8 +410,37 @@ function Dashboard() {
                 })}
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Segmentado no desktop: todas as abas visíveis, sem menu. */}
+            <div
+              role="tablist"
+              aria-label="Abas de boletins"
+              className="hidden items-center gap-1 rounded-full border border-[var(--surface-line)] bg-muted/40 p-1 lg:flex"
+            >
+              {tabs.map((t) => {
+                const active = tab === t.key;
+                return (
+                  <button
+                    key={t.key}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setTab(t.key)}
+                    className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-300 [transition-timing-function:var(--ease-out-expo)] ${
+                      active
+                        ? "bg-card text-foreground shadow-[var(--shadow-sm)] ring-1 ring-[var(--surface-line)]"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <t.icon className={`h-3.5 w-3.5 ${active ? "text-primary" : ""}`} />
+                    {t.label}
+                    <span className="tabular-nums opacity-60">{counts[t.key]}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
+
 
         <ul className="divide-y">
           {filtered.length === 0 && (
