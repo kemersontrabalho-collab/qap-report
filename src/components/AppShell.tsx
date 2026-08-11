@@ -43,7 +43,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     // min-h-dvh (e não h-screen): no mobile, 100vh ignora a barra de endereço
     // retrátil e gera um "pulo" de layout ao rolar. dvh acompanha o viewport real.
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-[var(--surface-line)] glass supports-[backdrop-filter]:bg-[var(--surface-veil)]">
         {/*
          * HIERARQUIA VISUAL DO HEADER (3 zonas):
          *   [marca | navegação (≥md) | ações]
