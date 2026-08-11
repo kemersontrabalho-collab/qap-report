@@ -346,6 +346,15 @@ function UsersPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const revoke = useMutation({
+    mutationFn: (v: { userId: string }) => revokeFn({ data: v }),
+    onSuccess: () => {
+      toast.success("Assinatura removida — conta voltou ao plano gratuito");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row">
