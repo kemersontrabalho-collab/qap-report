@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { tutorialStore, useTutorialOpen } from "@/lib/tutorial-store";
 
@@ -15,6 +15,15 @@ const FREE_PATHS = ["/assinar", "/settings"];
 
 function AuthenticatedLayout() {
   const open = useTutorialOpen();
+  const { user } = Route.useRouteContext();
+
+  // Primeiro acesso da conta: o tour abre sozinho (uma única vez por usuário).
+  useEffect(() => {
+    if (!user?.id) return;
+    const t = window.setTimeout(() => tutorialStore.openIfFirstTime(user.id), 600);
+    return () => window.clearTimeout(t);
+  }, [user?.id]);
+
   return (
     <>
       <Outlet />
@@ -26,6 +35,7 @@ function AuthenticatedLayout() {
     </>
   );
 }
+
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
