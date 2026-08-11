@@ -113,7 +113,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             <button
               onClick={toggle}
-              className="grid h-11 w-11 place-items-center rounded-lg border hover:bg-accent sm:h-9 sm:w-9"
+              className="btn-ghost-line grid h-11 w-11 place-items-center rounded-xl sm:h-9 sm:w-9"
               aria-label="Alternar tema"
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -121,11 +121,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             {/* Sair fica no header apenas no desktop; em mobile vive na bottom bar. */}
             <button
               onClick={signOut}
-              className="hidden h-9 w-9 place-items-center rounded-lg border hover:bg-accent sm:grid"
+              className="btn-ghost-line hidden h-9 w-9 place-items-center rounded-xl sm:grid"
               aria-label="Sair"
             >
               <LogOut className="h-4 w-4" />
             </button>
+
           </div>
         </div>
       </header>
