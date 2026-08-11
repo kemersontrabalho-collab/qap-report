@@ -140,7 +140,7 @@ export function AppShell({ children }: { children: ReactNode }) {
        * alvos de toque. */}
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 pb-safe backdrop-blur md:hidden"
+        className="glass fixed inset-x-0 bottom-0 z-30 border-x-0 border-b-0 border-t pb-safe md:hidden"
       >
         <div className="grid grid-cols-4">
           {navItems.map((item) => {
@@ -150,15 +150,21 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={item.to}
                 to={item.to}
                 data-tour-mobile={`nav-${item.to.slice(1)}`}
-                className={`flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[0.6875rem] leading-tight ${
+                className={`relative flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[0.6875rem] leading-tight transition-colors duration-300 ${
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
               >
-                <item.icon className="h-5 w-5 shrink-0" />
+                {active && (
+                  <span className="absolute inset-x-5 top-0 h-[2px] rounded-full bg-[var(--gradient-brand)]" />
+                )}
+                <item.icon
+                  className={`h-5 w-5 shrink-0 transition-transform duration-300 ${active ? "scale-110" : ""}`}
+                />
                 <span className="w-full truncate text-center">{item.label}</span>
               </Link>
             );
           })}
+
           <button
             onClick={signOut}
             className="flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[0.6875rem] leading-tight text-muted-foreground"
