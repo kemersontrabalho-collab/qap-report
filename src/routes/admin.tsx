@@ -458,6 +458,19 @@ function UsersPanel() {
                             Vitalício
                           </Button>
                         </div>
+                        <div className="border-t pt-3">
+                          <p className="mb-2 text-xs text-muted-foreground">
+                            Remove todos os benefícios e devolve a conta ao plano gratuito.
+                          </p>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            disabled={revoke.isPending}
+                            onClick={() => revoke.mutate({ userId: u.id })}
+                          >
+                            Retirar assinatura (voltar ao free)
+                          </Button>
+                        </div>
                       </div>
                     </DialogContent>
                   </Dialog>
