@@ -442,23 +442,36 @@ function Dashboard() {
         </div>
 
 
-        <ul className="divide-y">
+        <ul className="divide-y divide-[var(--surface-line)]">
           {filtered.length === 0 && (
-            <li className="p-10 text-center">
-              <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
-              <p className="mt-3 text-sm text-muted-foreground">Nenhum boletim aqui ainda.</p>
+            <li className="p-12 text-center">
+              <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-muted/60 text-muted-foreground ring-1 ring-inset ring-[var(--surface-line)]">
+                <FileText className="h-6 w-6" />
+              </span>
+              <p className="mt-4 text-sm font-medium">Nenhum boletim aqui ainda.</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Escolha um tipo acima para começar a redigir.
+              </p>
             </li>
           )}
           {filtered.map((b) => (
-            <li key={b.id} className="group flex items-center gap-3 p-4 hover:bg-accent/50">
+            <li
+              key={b.id}
+              className="group relative flex items-center gap-3 p-4 transition-colors duration-300 hover:bg-accent/40"
+            >
+              <span
+                aria-hidden
+                className="absolute inset-y-2 left-0 w-[3px] scale-y-0 rounded-full bg-[var(--gradient-brand)] transition-transform duration-500 [transition-timing-function:var(--ease-out-expo)] group-hover:scale-y-100"
+              />
               <Link
                 to="/bulletins/$id"
                 params={{ id: b.id }}
-                className="flex flex-1 items-center gap-3 min-w-0"
+                className="flex min-w-0 flex-1 items-center gap-3"
               >
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-xs font-semibold text-primary">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-[0.65rem] font-semibold leading-tight text-primary ring-1 ring-inset ring-primary/15 transition-transform duration-500 [transition-timing-function:var(--ease-spring)] group-hover:scale-105">
                   {b.bulletin_type}
                 </div>
+
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="truncate font-medium">{b.title}</p>
