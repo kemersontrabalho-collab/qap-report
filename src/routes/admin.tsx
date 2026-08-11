@@ -20,6 +20,7 @@ import {
   adminToggleCoupon,
   adminDeleteCoupon,
   adminGrantSubscription,
+  adminRevokeSubscription,
   adminListPixRequests,
   adminApprovePixRequest,
   adminRejectPixRequest,
@@ -302,6 +303,7 @@ function UsersPanel() {
   const blockFn = useServerFn(adminSetUserBlocked);
   const delFn = useServerFn(adminDeleteUser);
   const grantFn = useServerFn(adminGrantSubscription);
+  const revokeFn = useServerFn(adminRevokeSubscription);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "blocked" | "active" | "inactive">("all");
   // 300ms de debounce: 1 requisição por pausa de digitação em vez de 1 por tecla.
@@ -341,6 +343,15 @@ function UsersPanel() {
       grantFn({ data: v }),
     onSuccess: () => {
       toast.success("Assinatura concedida");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const revoke = useMutation({
+    mutationFn: (v: { userId: string }) => revokeFn({ data: v }),
+    onSuccess: () => {
+      toast.success("Assinatura removida — conta voltou ao plano gratuito");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -456,6 +467,19 @@ function UsersPanel() {
                           </Button>
                           <Button onClick={() => grant.mutate({ userId: u.id, plan: "vitalicio" })}>
                             Vitalício
+                          </Button>
+                        </div>
+                        <div className="border-t pt-3">
+                          <p className="mb-2 text-xs text-muted-foreground">
+                            Remove todos os benefícios e devolve a conta ao plano gratuito.
+                          </p>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            disabled={revoke.isPending}
+                            onClick={() => revoke.mutate({ userId: u.id })}
+                          >
+                            Retirar assinatura (voltar ao free)
                           </Button>
                         </div>
                       </div>
