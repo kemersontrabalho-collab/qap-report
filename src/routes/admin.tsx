@@ -302,6 +302,7 @@ function UsersPanel() {
   const blockFn = useServerFn(adminSetUserBlocked);
   const delFn = useServerFn(adminDeleteUser);
   const grantFn = useServerFn(adminGrantSubscription);
+  const revokeFn = useServerFn(adminRevokeSubscription);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "blocked" | "active" | "inactive">("all");
   // 300ms de debounce: 1 requisição por pausa de digitação em vez de 1 por tecla.
