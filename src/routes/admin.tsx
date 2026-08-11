@@ -20,6 +20,7 @@ import {
   adminToggleCoupon,
   adminDeleteCoupon,
   adminGrantSubscription,
+  adminRevokeSubscription,
   adminListPixRequests,
   adminApprovePixRequest,
   adminRejectPixRequest,
