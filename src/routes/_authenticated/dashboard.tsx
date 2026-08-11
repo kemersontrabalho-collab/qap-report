@@ -281,11 +281,19 @@ function Dashboard() {
   return (
     <AppShell>
       <TrialBanner />
-      <div className="mb-6">
-        <h1 className="text-fluid-2xl font-bold tracking-tight">Painel</h1>
-        <p className="measure mt-1 text-fluid-sm text-muted-foreground">
-          Selecione um tipo de boletim para criar, ou gerencie os existentes.
-        </p>
+      <div className="aurora relative mb-8">
+        <div className="reveal">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--surface-line)] bg-card/60 px-3 py-1 text-fluid-xs font-medium text-muted-foreground backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-bright)]" />
+            Assistente de redação policial
+          </span>
+          <h1 className="mt-3 text-fluid-2xl font-bold tracking-tight">
+            Painel <span className="text-gradient-brand">operacional</span>
+          </h1>
+          <p className="measure mt-1.5 text-fluid-sm text-muted-foreground">
+            Selecione um tipo de boletim para criar, ou gerencie os existentes.
+          </p>
+        </div>
       </div>
 
       {/*
@@ -299,7 +307,7 @@ function Dashboard() {
         data-tour="bulletin-types"
         className="mb-8 grid auto-rows-fr grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-4"
       >
-        {BULLETIN_TYPES.map((t) => (
+        {BULLETIN_TYPES.map((t, i) => (
           <button
             key={t.code}
             disabled={createMut.isPending}
@@ -309,19 +317,27 @@ function Dashboard() {
               setCreatingType(t.code);
               createMut.mutate(t.code);
             }}
-            className="group flex flex-col items-start rounded-2xl border bg-card p-4 text-left transition-all hover:border-primary/40 hover:shadow-md disabled:opacity-60"
+            style={{ ["--d" as string]: `${80 + i * 70}ms` }}
+            className="surface-card lift reveal group relative flex flex-col items-start overflow-hidden rounded-2xl p-4 text-left disabled:opacity-60"
           >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 -top-16 h-24 bg-[radial-gradient(60%_100%_at_50%_100%,color-mix(in_oklab,var(--brand-bright)_28%,transparent),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            />
             <div className="flex w-full items-center justify-between">
-              <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+              <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold tracking-wide text-primary ring-1 ring-inset ring-primary/15">
                 {t.code}
               </span>
-              <Plus className="h-4 w-4 text-muted-foreground transition-transform group-hover:rotate-90" />
+              <span className="grid h-7 w-7 place-items-center rounded-full border border-[var(--surface-line)] bg-background/60 text-muted-foreground transition-all duration-500 [transition-timing-function:var(--ease-spring)] group-hover:border-transparent group-hover:bg-[var(--gradient-brand)] group-hover:text-primary-foreground">
+                <Plus className="h-4 w-4 transition-transform duration-500 group-hover:rotate-90" />
+              </span>
             </div>
             <h3 className="mt-3 text-sm font-semibold leading-tight">{t.name}</h3>
-            <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{t.desc}</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{t.desc}</p>
           </button>
         ))}
       </section>
+
 
       <section className="rounded-2xl border bg-card">
         {/*
