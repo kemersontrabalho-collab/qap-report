@@ -147,6 +147,24 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
     if (open) setI(0);
   }, [open]);
 
+  // Navegação por teclado: setas avançam/voltam, Esc encerra o tour.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" || e.key === "Enter") {
+        e.preventDefault();
+        setI((v) => Math.min(STEPS.length - 1, v + 1));
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setI((v) => Math.max(0, v - 1));
+      } else if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   useEffect(() => {
     const onResize = () => {
       setVp({ w: window.innerWidth, h: window.innerHeight });
