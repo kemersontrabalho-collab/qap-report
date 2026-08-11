@@ -234,26 +234,39 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
       {/* Transparent click-catcher for closing */}
       <div className="absolute inset-0 pointer-events-auto" onClick={onClose} />
       {spot ? (
-        <div
-          className="pointer-events-none absolute rounded-xl"
-          style={{
-            top: spot.top,
-            left: spot.left,
-            width: spot.width,
-            height: spot.height,
-            boxShadow: "0 0 0 9999px rgba(0,0,0,0.65)",
-            outline: "2px solid hsl(var(--primary))",
-            outlineOffset: 2,
-          }}
-        />
+        <>
+          <div
+            className="pointer-events-none absolute rounded-xl transition-all duration-500 ease-out"
+            style={{
+              top: spot.top,
+              left: spot.left,
+              width: spot.width,
+              height: spot.height,
+              boxShadow: "0 0 0 9999px rgba(0,0,0,0.65)",
+              outline: "2px solid hsl(var(--primary))",
+              outlineOffset: 2,
+            }}
+          />
+          {/* Anel pulsante: guia o olhar para o elemento destacado */}
+          <div
+            className="pointer-events-none absolute animate-ping rounded-xl border-2 border-primary/60 transition-all duration-500 ease-out"
+            style={{
+              top: spot.top,
+              left: spot.left,
+              width: spot.width,
+              height: spot.height,
+              animationDuration: "2s",
+            }}
+          />
+        </>
       ) : (
-        <div className="pointer-events-none absolute inset-0 bg-black/65" />
+        <div className="pointer-events-none absolute inset-0 bg-black/65 transition-opacity duration-300" />
       )}
 
       {/* Floating card */}
       <div
         ref={cardRef}
-        className="pointer-events-auto absolute animate-fade-in rounded-2xl border bg-card p-4 shadow-2xl sm:p-5"
+        className="pointer-events-auto absolute rounded-2xl border bg-card p-4 shadow-2xl transition-all duration-300 ease-out sm:p-5"
         style={{
           ...cardStyle,
           width: CARD_W,
@@ -264,29 +277,51 @@ export function TutorialModal({ open, onClose }: { open: boolean; onClose: () =>
       >
         <div className="flex items-center justify-between gap-2">
           <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+            <Sparkles className="h-3.5 w-3.5 shrink-0 animate-pulse" />
             <span className="truncate">
               Passo {i + 1} de {STEPS.length}
             </span>
           </span>
           <button
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-md hover:bg-accent"
+            className="grid h-8 w-8 place-items-center rounded-md transition-colors hover:bg-accent"
             aria-label="Fechar tour"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <h3 className="mt-2 text-base font-semibold sm:text-lg">{step.title}</h3>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground sm:text-sm">
-          {step.body}
-        </p>
+        {/* key={i} força o remount → cada passo entra com animação */}
+        <div key={i} className="animate-fade-in">
+          <h3 className="mt-2 text-base font-semibold sm:text-lg">{step.title}</h3>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground sm:text-sm">
+            {step.body}
+          </p>
+        </div>
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-accent">
           <div
-            className="h-full bg-primary transition-all duration-300"
+            className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
             style={{ width: `${((i + 1) / STEPS.length) * 100}%` }}
           />
         </div>
+        {/* Navegação direta por etapa */}
+        <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+          {STEPS.map((s, idx) => (
+            <button
+              key={s.title}
+              onClick={() => setI(idx)}
+              aria-label={`Ir para o passo ${idx + 1}: ${s.title}`}
+              aria-current={idx === i}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                idx === i
+                  ? "w-6 bg-primary"
+                  : idx < i
+                    ? "w-2 bg-primary/50"
+                    : "w-2 bg-muted-foreground/25 hover:bg-muted-foreground/50"
+              }`}
+            />
+          ))}
+        </div>
+
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
           <button
             onClick={() => setI((v) => Math.max(0, v - 1))}
