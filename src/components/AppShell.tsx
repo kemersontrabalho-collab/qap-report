@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </span>
           </Link>
 
-          <nav className="hidden items-center justify-center gap-1 rounded-full border border-[var(--surface-line)] bg-muted/40 p-1 md:flex">
+          <nav className="mx-auto hidden w-fit items-center gap-1 rounded-full border border-[var(--surface-line)] bg-muted/40 p-1 md:flex">
             {navItems.map((item) => {
               const active = pathname.startsWith(item.to);
               return (
