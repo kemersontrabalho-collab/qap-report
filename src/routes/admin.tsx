@@ -780,6 +780,8 @@ function MonitoringPanel() {
   const statsFn = useServerFn(adminGetErrorStats);
   const resolveFn = useServerFn(adminResolveErrorLog);
   const clearFn = useServerFn(adminClearResolvedLogs);
+  const resolveAllFn = useServerFn(adminResolveAllErrorLogs);
+
   const [category, setCategory] = useState<
     "all" | "frontend" | "server_function" | "security" | "performance"
   >("all");
