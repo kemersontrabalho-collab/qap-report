@@ -223,7 +223,7 @@ function SettingsPage() {
 
         <SavedBulletinsSection />
 
-        <section className="rounded-2xl border bg-card p-5">
+        <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="font-semibold">Aparência</h2>
 
           <p className="mt-1 text-sm text-muted-foreground">Alterne entre tema claro e escuro.</p>
@@ -247,7 +247,7 @@ function SettingsPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border bg-card p-5">
+        <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="font-semibold">Dados pessoais</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Field label="Nome completo">
@@ -298,7 +298,7 @@ function SettingsPage() {
           </button>
         </section>
 
-        <section className="rounded-2xl border bg-card p-5">
+        <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="flex items-center gap-2 font-semibold">
             <BookOpen className="h-4 w-4" /> Tutorial do aplicativo
           </h2>
@@ -314,7 +314,7 @@ function SettingsPage() {
           </button>
         </section>
 
-        <section className="rounded-2xl border bg-card p-5">
+        <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="flex items-center gap-2 font-semibold">
             <BellRing className="h-4 w-4" /> Notificações do dispositivo
           </h2>
@@ -340,7 +340,7 @@ function SettingsPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border bg-card p-5">
+        <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="flex items-center gap-2 font-semibold">
             <LifeBuoy className="h-4 w-4" /> Suporte
           </h2>
@@ -391,7 +391,7 @@ function SettingsPage() {
           </form>
         </section>
 
-        <section className="rounded-2xl border bg-card p-5">
+        <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="font-semibold">Instalar o aplicativo</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             O QAP Report funciona como app instalável (PWA). Sem download em loja — usa o próprio
@@ -440,7 +440,7 @@ function SettingsPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border bg-card p-5">
+        <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="font-semibold">Atualizações e link oficial</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Verifique novas versões do QAP Report e compartilhe o link oficial com colegas de
@@ -506,7 +506,7 @@ function SettingsPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border bg-card p-5">
+        <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="font-semibold">Sessão</h2>
           <div className="mt-4 flex flex-wrap gap-2">
             <button
@@ -592,7 +592,7 @@ function SavedBulletinsSection() {
   }
 
   return (
-    <section className="rounded-2xl border bg-card p-5">
+    <section className="surface-card reveal rounded-2xl p-5">
       <h2 className="flex items-center gap-2 font-semibold">
         <Library className="h-4 w-4" /> Meus boletins salvos
       </h2>
