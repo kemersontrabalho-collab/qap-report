@@ -34,8 +34,10 @@ import {
   adminListErrorLogs,
   adminGetErrorStats,
   adminResolveErrorLog,
+  adminResolveAllErrorLogs,
   adminClearResolvedLogs,
 } from "@/lib/monitoring.functions";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -778,6 +780,8 @@ function MonitoringPanel() {
   const statsFn = useServerFn(adminGetErrorStats);
   const resolveFn = useServerFn(adminResolveErrorLog);
   const clearFn = useServerFn(adminClearResolvedLogs);
+  const resolveAllFn = useServerFn(adminResolveAllErrorLogs);
+
   const [category, setCategory] = useState<
     "all" | "frontend" | "server_function" | "security" | "performance"
   >("all");
@@ -801,6 +805,16 @@ function MonitoringPanel() {
     mutationFn: (v: { id: string; resolved: boolean }) => resolveFn({ data: v }),
     onSuccess: () => {
       toast.success("Status atualizado");
+      qc.invalidateQueries({ queryKey: ["error-logs"] });
+      qc.invalidateQueries({ queryKey: ["error-stats"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const resolveAll = useMutation({
+    mutationFn: () => resolveAllFn(),
+    onSuccess: () => {
+      toast.success("Todos os eventos foram marcados como resolvidos");
       qc.invalidateQueries({ queryKey: ["error-logs"] });
       qc.invalidateQueries({ queryKey: ["error-stats"] });
     },
@@ -879,6 +893,14 @@ function MonitoringPanel() {
           Atualizar
         </Button>
         <Button
+          variant="outline"
+          size="sm"
+          onClick={() => resolveAll.mutate()}
+          disabled={resolveAll.isPending}
+        >
+          Marcar todos como resolvidos
+        </Button>
+        <Button
           variant="ghost"
           size="sm"
           onClick={() => clearAll.mutate()}
@@ -886,6 +908,7 @@ function MonitoringPanel() {
         >
           Limpar resolvidos
         </Button>
+
       </div>
 
       {list.isLoading ? (

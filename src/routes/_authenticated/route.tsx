@@ -20,9 +20,12 @@ function AuthenticatedLayout() {
   // Primeiro acesso da conta: o tour abre sozinho (uma única vez por usuário).
   useEffect(() => {
     if (!user?.id) return;
-    const t = window.setTimeout(() => tutorialStore.openIfFirstTime(user.id), 600);
+    const t = window.setTimeout(() => {
+      void tutorialStore.openIfFirstTime(user.id);
+    }, 600);
     return () => window.clearTimeout(t);
   }, [user?.id]);
+
 
   return (
     <>

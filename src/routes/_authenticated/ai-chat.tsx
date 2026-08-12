@@ -83,34 +83,47 @@ function AIChatPage() {
   return (
     <AppShell>
       <div className="mx-auto flex max-w-3xl flex-col">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Dúvidas com IA</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Tire dúvidas sobre enquadramento legal, penas e qual documento é adequado.
-            </p>
+        <div className="aurora relative mb-6">
+          <div className="reveal flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[var(--surface-line)] bg-card/60 px-3 py-1 text-fluid-xs font-medium text-muted-foreground backdrop-blur">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-bright)]" />
+                Apoio jurídico instantâneo
+              </span>
+              <h1 className="mt-3 text-fluid-2xl font-bold tracking-tight">
+                Dúvidas com <span className="text-gradient-brand">IA</span>
+              </h1>
+              <p className="measure mt-1.5 text-fluid-sm text-muted-foreground">
+                Enquadramento legal, penas e qual documento é adequado para a ocorrência.
+              </p>
+            </div>
+            {messages.length > 0 && (
+              <button
+                onClick={() => setMessages([])}
+                className="btn-ghost-line inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Limpar conversa
+              </button>
+            )}
           </div>
-          {messages.length > 0 && (
-            <button
-              onClick={() => setMessages([])}
-              className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Limpar
-            </button>
-          )}
         </div>
 
-        <div className="min-h-[420px] rounded-2xl border bg-card p-4">
+        <div className="surface-card min-h-[420px] rounded-2xl p-4 sm:p-5">
           {messages.length === 0 && (
-            <div className="py-8 text-center">
-              <MessageCircle className="mx-auto h-10 w-10 text-muted-foreground" />
-              <p className="mt-3 text-sm text-muted-foreground">Comece com uma pergunta:</p>
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                {SUGGESTIONS.map((s) => (
+            <div className="reveal py-10 text-center">
+              <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[var(--gradient-brand)] p-[1px] shadow-[var(--shadow-sm)]">
+                <span className="grid h-full w-full place-items-center rounded-[0.9rem] bg-card">
+                  <MessageCircle className="h-6 w-6 text-primary" />
+                </span>
+              </span>
+              <p className="mt-4 text-sm text-muted-foreground">Comece com uma pergunta:</p>
+              <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                {SUGGESTIONS.map((s, i) => (
                   <button
                     key={s}
                     onClick={() => send(s)}
-                    className="rounded-lg border p-3 text-left text-xs hover:border-primary/40 hover:bg-accent"
+                    style={{ ["--d" as string]: `${80 + i * 60}ms` }}
+                    className="reveal lift group rounded-xl border border-[var(--surface-line)] bg-background/50 p-3 text-left text-xs leading-relaxed transition-colors duration-300 hover:border-primary/40 hover:bg-accent/60"
                   >
                     {s}
                   </button>
@@ -123,13 +136,13 @@ function AIChatPage() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex animate-fade-in ${m.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-[var(--shadow-sm)] ${
                     m.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-accent text-accent-foreground"
+                      ? "rounded-br-md bg-[var(--gradient-brand)] text-primary-foreground"
+                      : "rounded-bl-md border border-[var(--surface-line)] bg-muted/50 text-foreground"
                   }`}
                 >
                   {m.role === "assistant" ? (
@@ -144,8 +157,8 @@ function AIChatPage() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl bg-accent px-4 py-2.5 text-sm text-muted-foreground">
-                  <Loader2 className="inline h-3.5 w-3.5 animate-spin" /> Consultando...
+                <div className="inline-flex items-center gap-2 rounded-2xl rounded-bl-md border border-[var(--surface-line)] bg-muted/50 px-4 py-2.5 text-sm text-muted-foreground">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Consultando...
                 </div>
               </div>
             )}
@@ -158,7 +171,7 @@ function AIChatPage() {
             e.preventDefault();
             send(input);
           }}
-          className="mt-3 flex items-end gap-2"
+          className="glass mt-3 flex items-end gap-2 rounded-2xl border border-[var(--surface-line)] p-2"
         >
           <textarea
             value={input}
@@ -171,14 +184,14 @@ function AIChatPage() {
             }}
             rows={2}
             placeholder="Escreva sua pergunta..."
-            className="flex-1 resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="flex-1 resize-none rounded-xl bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/70"
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            className="btn-brand inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl px-4 text-sm font-medium disabled:opacity-50"
           >
-            <Send className="h-4 w-4" /> Enviar
+            <Send className="h-4 w-4" /> <span className="hidden sm:inline">Enviar</span>
           </button>
         </form>
         <p className="mt-2 text-xs text-muted-foreground">
@@ -188,3 +201,4 @@ function AIChatPage() {
     </AppShell>
   );
 }
+

@@ -24,8 +24,43 @@ function shouldSend(key: string) {
   return true;
 }
 
+/** Mensagens sem valor diagnóstico: só poluíam o painel de monitoramento. */
+const NOISE = [
+  "script error.",
+  "undefined",
+  "uncaught undefined",
+  "unknown error",
+  "resizeobserver loop",
+  "load failed",
+  "failed to fetch",
+];
+
+function isNoise(message: string) {
+  const m = message.trim().toLowerCase();
+  if (m.length < 3) return true;
+  return NOISE.some((n) => m === n || m.startsWith(n));
+}
+
+/** Converte qualquer valor lançado (string, objeto, evento) em texto legível. */
+export function describeUnknownError(value: unknown): string {
+  if (value instanceof Error) return value.message || value.name;
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const anyVal = value as { message?: unknown; type?: unknown };
+    if (typeof anyVal.message === "string" && anyVal.message) return anyVal.message;
+    try {
+      return JSON.stringify(value).slice(0, 500);
+    } catch {
+      return "Erro não serializável";
+    }
+  }
+  return `Erro sem mensagem (${String(value)})`;
+}
+
 export function reportClientError(p: Payload): void {
   if (typeof window === "undefined") return;
+  if (isNoise(p.message ?? "")) return;
+
   const key = `${p.category ?? "frontend"}|${p.message}`.slice(0, 200);
   if (!shouldSend(key)) return;
   const body = JSON.stringify({
@@ -61,7 +96,7 @@ export function installClientErrorMonitor(): void {
   window.addEventListener("error", (event) => {
     const err = event.error;
     reportClientError({
-      message: event.message || (err instanceof Error ? err.message : "Unknown error"),
+      message: event.message || describeUnknownError(err),
       stack: err instanceof Error ? err.stack : undefined,
       metadata: {
         filename: event.filename,
@@ -74,18 +109,13 @@ export function installClientErrorMonitor(): void {
 
   window.addEventListener("unhandledrejection", (event) => {
     const reason = event.reason;
-    const msg =
-      reason instanceof Error
-        ? reason.message
-        : typeof reason === "string"
-          ? reason
-          : "Unhandled promise rejection";
     reportClientError({
-      message: msg,
+      message: describeUnknownError(reason),
       stack: reason instanceof Error ? reason.stack : undefined,
       metadata: { mechanism: "unhandledrejection" },
     });
   });
+
 
   // Performance: slow LCP / long tasks
   try {
