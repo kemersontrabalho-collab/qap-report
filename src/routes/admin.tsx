@@ -811,6 +811,16 @@ function MonitoringPanel() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const resolveAll = useMutation({
+    mutationFn: () => resolveAllFn(),
+    onSuccess: () => {
+      toast.success("Todos os eventos foram marcados como resolvidos");
+      qc.invalidateQueries({ queryKey: ["error-logs"] });
+      qc.invalidateQueries({ queryKey: ["error-stats"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const clearAll = useMutation({
     mutationFn: () => clearFn(),
     onSuccess: () => {
