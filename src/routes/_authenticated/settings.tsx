@@ -215,7 +215,7 @@ function SettingsPage() {
         </div>
 
 
-        <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
+        <section className="reveal rounded-2xl border border-primary/30 bg-primary/5 p-5 shadow-[var(--shadow-sm)]">
           <h2 className="flex items-center gap-2 font-semibold">
             <Crown className="h-4 w-4 text-primary" /> Assinatura
           </h2>
