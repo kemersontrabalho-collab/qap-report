@@ -406,21 +406,22 @@ function EditBulletin() {
       <div className="mb-4 flex items-center justify-between gap-2">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          className="group inline-flex items-center gap-2 rounded-full border border-[var(--surface-line)] bg-card/60 px-3 py-1.5 text-sm text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" /> Voltar
+          <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" />{" "}
+          Voltar
         </Link>
         <div className="flex items-center gap-2">
           <button
             onClick={() => update("is_favorite", !b.is_favorite)}
-            className="grid h-9 w-9 place-items-center rounded-lg border hover:bg-accent"
+            className="grid h-10 w-10 place-items-center rounded-xl border border-[var(--surface-line)] bg-card/60 transition-colors hover:bg-accent"
             aria-label="Favoritar"
           >
             <Star className={`h-4 w-4 ${b.is_favorite ? "fill-warning text-warning" : ""}`} />
           </button>
           <button
             onClick={trash}
-            className="grid h-9 w-9 place-items-center rounded-lg border text-destructive hover:bg-destructive/10"
+            className="grid h-10 w-10 place-items-center rounded-xl border border-destructive/30 bg-card/60 text-destructive transition-colors hover:bg-destructive/10"
             aria-label="Lixeira"
           >
             <Trash2 className="h-4 w-4" />
@@ -432,13 +433,18 @@ function EditBulletin() {
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <aside className="space-y-4">
-          <div className="surface-card reveal rounded-2xl p-4">
-            <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+          <div className="surface-card reveal relative overflow-hidden rounded-2xl p-4">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 -top-16 h-24 bg-[radial-gradient(60%_100%_at_50%_100%,color-mix(in_oklab,var(--brand-bright)_22%,transparent),transparent_70%)]"
+            />
+            <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold tracking-wide text-primary ring-1 ring-inset ring-primary/15">
               {b.bulletin_type}
             </span>
-            <h2 className="mt-2 font-semibold">{typeInfo?.name}</h2>
-            <p className="mt-1 text-xs text-muted-foreground">{typeInfo?.desc}</p>
+            <h2 className="mt-2 font-semibold tracking-tight">{typeInfo?.name}</h2>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{typeInfo?.desc}</p>
           </div>
+
 
           <div className="surface-card reveal space-y-3 rounded-2xl p-4">
             <div>
