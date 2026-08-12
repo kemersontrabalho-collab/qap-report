@@ -199,12 +199,21 @@ function SettingsPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-2xl space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Configurações</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Personalize sua experiência e seus dados de perfil.
-          </p>
+        <div className="aurora relative">
+          <div className="reveal">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[var(--surface-line)] bg-card/60 px-3 py-1 text-fluid-xs font-medium text-muted-foreground backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-bright)]" />
+              Sua conta
+            </span>
+            <h1 className="mt-3 text-fluid-2xl font-bold tracking-tight">
+              Configurações do <span className="text-gradient-brand">app</span>
+            </h1>
+            <p className="measure mt-1.5 text-fluid-sm text-muted-foreground">
+              Personalize sua experiência, seus dados de perfil e sua assinatura.
+            </p>
+          </div>
         </div>
+
 
         <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
           <h2 className="flex items-center gap-2 font-semibold">
