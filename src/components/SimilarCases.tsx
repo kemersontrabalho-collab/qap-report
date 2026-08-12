@@ -17,7 +17,10 @@ export function SimilarCases({ bulletinType, keywords, category, context, onUseR
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const query = [category, keywords, context].filter(Boolean).join(" ").trim();
+  // O servidor valida no máximo 2000 caracteres: textos longos do editor
+  // estouravam o limite e geravam erro "too_big" no monitoramento.
+  const query = [category, keywords, context].filter(Boolean).join(" ").trim().slice(0, 2000);
+
 
   useEffect(() => {
     if (query.length < 5) {
