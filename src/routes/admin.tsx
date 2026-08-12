@@ -879,6 +879,14 @@ function MonitoringPanel() {
           Atualizar
         </Button>
         <Button
+          variant="outline"
+          size="sm"
+          onClick={() => resolveAll.mutate()}
+          disabled={resolveAll.isPending}
+        >
+          Marcar todos como resolvidos
+        </Button>
+        <Button
           variant="ghost"
           size="sm"
           onClick={() => clearAll.mutate()}
@@ -886,6 +894,7 @@ function MonitoringPanel() {
         >
           Limpar resolvidos
         </Button>
+
       </div>
 
       {list.isLoading ? (
