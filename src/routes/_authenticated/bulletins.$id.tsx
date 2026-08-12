@@ -432,7 +432,7 @@ function EditBulletin() {
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <aside className="space-y-4">
-          <div className="rounded-2xl border bg-card p-4">
+          <div className="surface-card reveal rounded-2xl p-4">
             <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
               {b.bulletin_type}
             </span>
@@ -440,7 +440,7 @@ function EditBulletin() {
             <p className="mt-1 text-xs text-muted-foreground">{typeInfo?.desc}</p>
           </div>
 
-          <div className="space-y-3 rounded-2xl border bg-card p-4">
+          <div className="surface-card reveal space-y-3 rounded-2xl p-4">
             <div>
               <label className="text-sm font-medium">Título do Boletim *</label>
               <input
@@ -468,7 +468,7 @@ function EditBulletin() {
             </div>
           </div>
 
-          <div className="space-y-3 rounded-2xl border bg-card p-4">
+          <div className="surface-card reveal space-y-3 rounded-2xl p-4">
             <h3 className="text-sm font-semibold">Dados operacionais</h3>
             <div>
               <label className="text-sm font-medium">Composição da Guarnição *</label>
@@ -566,7 +566,7 @@ function EditBulletin() {
             </div>
           </div>
 
-          <div className="space-y-3 rounded-2xl border bg-card p-4">
+          <div className="surface-card reveal space-y-3 rounded-2xl p-4">
             <div>
               <div className="flex items-center justify-between gap-2">
                 <label className="text-sm font-medium">Palavras-chave *</label>
@@ -653,7 +653,7 @@ function EditBulletin() {
           </Suspense>
         </aside>
 
-        <section className="rounded-2xl border bg-card">
+        <section className="surface-card reveal rounded-2xl">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b p-3">
             <div className="text-sm font-medium">Documento</div>
             <div className="flex flex-wrap items-center gap-2">
