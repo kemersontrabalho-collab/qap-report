@@ -66,6 +66,17 @@ export const adminResolveErrorLog = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const adminResolveAllErrorLogs = createServerFn({ method: "POST" }).handler(async () => {
+  await requireAdminSession();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { error } = await supabaseAdmin
+    .from("error_logs")
+    .update({ resolved: true })
+    .eq("resolved", false);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+});
+
 export const adminClearResolvedLogs = createServerFn({ method: "POST" }).handler(async () => {
   await requireAdminSession();
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -73,3 +84,4 @@ export const adminClearResolvedLogs = createServerFn({ method: "POST" }).handler
   if (error) throw new Error(error.message);
   return { ok: true };
 });
+
