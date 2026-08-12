@@ -96,7 +96,7 @@ export function installClientErrorMonitor(): void {
   window.addEventListener("error", (event) => {
     const err = event.error;
     reportClientError({
-      message: event.message || (err instanceof Error ? err.message : "Unknown error"),
+      message: event.message || describeUnknownError(err),
       stack: err instanceof Error ? err.stack : undefined,
       metadata: {
         filename: event.filename,
@@ -109,18 +109,13 @@ export function installClientErrorMonitor(): void {
 
   window.addEventListener("unhandledrejection", (event) => {
     const reason = event.reason;
-    const msg =
-      reason instanceof Error
-        ? reason.message
-        : typeof reason === "string"
-          ? reason
-          : "Unhandled promise rejection";
     reportClientError({
-      message: msg,
+      message: describeUnknownError(reason),
       stack: reason instanceof Error ? reason.stack : undefined,
       metadata: { mechanism: "unhandledrejection" },
     });
   });
+
 
   // Performance: slow LCP / long tasks
   try {
