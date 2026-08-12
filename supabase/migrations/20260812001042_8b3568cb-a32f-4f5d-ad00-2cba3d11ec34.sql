@@ -1,0 +1,1 @@
+UPDATE public.error_logs SET resolved = true WHERE resolved = false AND created_at < now();
