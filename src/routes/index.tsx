@@ -461,7 +461,8 @@ function Landing() {
       <footer className="border-t border-[var(--surface-line)]">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-fluid py-8 sm:flex-row">
           <p className="text-fluid-xs text-muted-foreground">
-            © {new Date().getFullYear()} QAP Report · Ferramenta de apoio à redação policial
+            © {new Date().getFullYear()} kemerson · QAP Report · Ferramenta de apoio à redação
+            policial
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-fluid-xs text-muted-foreground">
             <Link
@@ -476,9 +477,22 @@ function Landing() {
             >
               Modelos de boletim
             </Link>
+            <Link to="/termos" className="transition-colors duration-300 hover:text-foreground">
+              Termos
+            </Link>
+            <Link
+              to="/privacidade"
+              className="transition-colors duration-300 hover:text-foreground"
+            >
+              Privacidade
+            </Link>
+            <Link to="/reembolso" className="transition-colors duration-300 hover:text-foreground">
+              Reembolso
+            </Link>
             <Link to="/auth" className="transition-colors duration-300 hover:text-foreground">
               Entrar
             </Link>
+
           </div>
         </div>
       </footer>
