@@ -9,8 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ReembolsoRouteImport } from './routes/reembolso'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ModelosBoletimOcorrenciaRouteImport } from './routes/modelos-boletim-ocorrencia'
 import { Route as GuiaRedacaoTecnicaRouteImport } from './routes/guia-redacao-tecnica'
 import { Route as GuiaDelegaciaOnlineRouteImport } from './routes/guia-delegacia-online'
@@ -26,6 +29,11 @@ import { Route as ApiPublicLogErrorRouteImport } from './routes/api/public/log-e
 import { Route as AuthenticatedBulletinsNewRouteImport } from './routes/_authenticated/bulletins.new'
 import { Route as AuthenticatedBulletinsIdRouteImport } from './routes/_authenticated/bulletins.$id'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -34,6 +42,16 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReembolsoRoute = ReembolsoRouteImport.update({
+  id: '/reembolso',
+  path: '/reembolso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModelosBoletimOcorrenciaRoute =
@@ -116,8 +134,11 @@ export interface FileRoutesByFullPath {
   '/guia-delegacia-online': typeof GuiaDelegaciaOnlineRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/reembolso': typeof ReembolsoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
   '/assinar': typeof AuthenticatedAssinarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -133,8 +154,11 @@ export interface FileRoutesByTo {
   '/guia-delegacia-online': typeof GuiaDelegaciaOnlineRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/reembolso': typeof ReembolsoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/ai-chat': typeof AuthenticatedAiChatRoute
   '/assinar': typeof AuthenticatedAssinarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -152,8 +176,11 @@ export interface FileRoutesById {
   '/guia-delegacia-online': typeof GuiaDelegaciaOnlineRoute
   '/guia-redacao-tecnica': typeof GuiaRedacaoTecnicaRoute
   '/modelos-boletim-ocorrencia': typeof ModelosBoletimOcorrenciaRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/reembolso': typeof ReembolsoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos': typeof TermosRoute
   '/_authenticated/ai-chat': typeof AuthenticatedAiChatRoute
   '/_authenticated/assinar': typeof AuthenticatedAssinarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -171,8 +198,11 @@ export interface FileRouteTypes {
     | '/guia-delegacia-online'
     | '/guia-redacao-tecnica'
     | '/modelos-boletim-ocorrencia'
+    | '/privacidade'
+    | '/reembolso'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/termos'
     | '/ai-chat'
     | '/assinar'
     | '/dashboard'
@@ -188,8 +218,11 @@ export interface FileRouteTypes {
     | '/guia-delegacia-online'
     | '/guia-redacao-tecnica'
     | '/modelos-boletim-ocorrencia'
+    | '/privacidade'
+    | '/reembolso'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/termos'
     | '/ai-chat'
     | '/assinar'
     | '/dashboard'
@@ -206,8 +239,11 @@ export interface FileRouteTypes {
     | '/guia-delegacia-online'
     | '/guia-redacao-tecnica'
     | '/modelos-boletim-ocorrencia'
+    | '/privacidade'
+    | '/reembolso'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/termos'
     | '/_authenticated/ai-chat'
     | '/_authenticated/assinar'
     | '/_authenticated/dashboard'
@@ -225,13 +261,23 @@ export interface RootRouteChildren {
   GuiaDelegaciaOnlineRoute: typeof GuiaDelegaciaOnlineRoute
   GuiaRedacaoTecnicaRoute: typeof GuiaRedacaoTecnicaRoute
   ModelosBoletimOcorrenciaRoute: typeof ModelosBoletimOcorrenciaRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  ReembolsoRoute: typeof ReembolsoRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermosRoute: typeof TermosRoute
   ApiPublicLogErrorRoute: typeof ApiPublicLogErrorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -244,6 +290,20 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reembolso': {
+      id: '/reembolso'
+      path: '/reembolso'
+      fullPath: '/reembolso'
+      preLoaderRoute: typeof ReembolsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/modelos-boletim-ocorrencia': {
@@ -376,8 +436,11 @@ const rootRouteChildren: RootRouteChildren = {
   GuiaDelegaciaOnlineRoute: GuiaDelegaciaOnlineRoute,
   GuiaRedacaoTecnicaRoute: GuiaRedacaoTecnicaRoute,
   ModelosBoletimOcorrenciaRoute: ModelosBoletimOcorrenciaRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  ReembolsoRoute: ReembolsoRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermosRoute: TermosRoute,
   ApiPublicLogErrorRoute: ApiPublicLogErrorRoute,
 }
 export const routeTree = rootRouteImport
