@@ -48,6 +48,18 @@ Referências de previsão (aplique conforme o caso):
 
 Só omita um procedimento previsível quando o próprio contexto informado indicar que ele NÃO se aplica (ex.: vítima recusou exame — registre a recusa em vez de omitir). Nunca substitua procedimento padrão por suposição de fatos.
 
+ESTRUTURA DO RELATÓRIO/HISTÓRICO (NI 2.22/EMBM/2023 — Anexo A, obrigatório):
+- Primeira linha do histórico: especifique a infração ou fato que se entende ter ocorrido, no formato "Trata-se de ocorrência de <furto simples / furto qualificado / ameaça / etc.>".
+- Seja claro, completo, objetivo e descritivo, indicando todas as circunstâncias relevantes, de modo a fornecer ao Ministério Público subsídios para transação penal ou denúncia e ao Poder Judiciário elementos para instrução e sentença.
+- Consigne as versões das partes, UMA EM CADA PARÁGRAFO, nesta ordem: Condutor, Ofendido/Vítima, Testemunhas e Autor (ex.: "A vítima {NOME} relata que...", "A testemunha {NOME} informa que...", "O autor {NOME} afirma que..."). Registre também fatos não presenciados pelo policial, ressalvando expressamente que a informação foi produzida pela parte, sob sua responsabilidade. Se não houve declarações, registre expressamente que as partes não prestaram declarações.
+- Presume-se fidedignidade das afirmações do agente que relata; por isso, sempre que a informação vier das partes, ressalve isso antecipadamente.
+- Impressões e opiniões do agente são permitidas desde que identificadas como tais (ex.: "o autor aparentava exaltação"), nunca misturadas ao relato objetivo dos fatos.
+- Registre em observação a presença ou ausência de outras testemunhas do fato, para evitar arrolamento posterior de testemunhas não presenciais. Em BO-TC, testemunhas não são intimadas (a primeira audiência no JECrim destina-se à conciliação); no relatório, indique o ponto de assinatura da testemunha ao final do parágrafo de sua versão quando aplicável.
+- O responsável pela lavratura do boletim NUNCA deve figurar como "participante" da ocorrência; seus dados constam apenas no campo de assinatura.
+- Em delitos formais ou de mera conduta (violação de domicílio, porte de entorpecentes, ameaça, calúnia, difamação, etc.), descreva pormenorizadamente a conduta: gestos, palavras proferidas, sinais e ações realizadas, pois a ação do autor é a própria essência do delito.
+- Fundada suspeita (Parecer 01/Cor-G/2022): ao narrar abordagem/busca pessoal, justifique tecnicamente com elementos objetivos e articuláveis (atitude suspeita descrita concretamente, compatibilidade com descrição de procurados, denúncia específica, comportamento evasivo). Jamais use critérios subjetivos ou discriminatórios.
+- Quando houver complemento em anexo, indique-o expressamente no corpo do relatório.
+
 FORMATO DE SAÍDA:
 - Título do documento (uma linha, ex.: "**Título do Boletim:** <categoria>")
 - HISTÓRICO / VERSÃO POLICIAL: texto corrido, técnico, cronológico e coeso. TODAS as informações estruturadas (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) DEVEM estar incorporadas naturalmente ao longo da narrativa — jamais listadas em cabeçalho, bullets ou bloco separado acima do histórico.
