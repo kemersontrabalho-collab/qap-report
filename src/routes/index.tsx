@@ -386,6 +386,52 @@ function Landing() {
           </div>
         </section>
 
+        {/* PREÇO — visível publicamente, sem exigir login. */}
+        <section id="precos" className="pb-fluid-section">
+          <div className="measure">
+            <h2 className="text-fluid-2xl font-bold">Preço simples e transparente.</h2>
+            <p className="mt-3 text-fluid-base text-muted-foreground">
+              24 horas de teste gratuito ao criar a conta. Depois, um único plano.
+            </p>
+          </div>
+
+          <div className="mt-8 max-w-md rounded-2xl border border-[var(--surface-line)] p-7 shadow-[var(--shadow-lg)]">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Plano Mensal
+            </p>
+            <p className="mt-2 flex items-baseline gap-2">
+              <span className="text-4xl font-bold">R$ 1,99</span>
+              <span className="text-sm text-muted-foreground">por mês</span>
+            </p>
+            <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
+              <li>Geração ilimitada de boletins BA, BO-COP, BO-TC e BOAT</li>
+              <li>Aba de dúvidas jurídicas com IA</li>
+              <li>Rascunhos, favoritos, histórico e exportação em PDF</li>
+              <li>Cancele quando quiser · garantia de reembolso de 30 dias</li>
+            </ul>
+            <Link
+              to="/auth"
+              search={{ mode: "signup" }}
+              className="mt-7 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground"
+            >
+              Começar teste de 24h
+            </Link>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Valores em reais (BRL), com impostos aplicáveis calculados no checkout. Assinatura
+              renovada mensalmente até o cancelamento. Consulte os{" "}
+              <Link to="/termos" className="underline">
+                Termos
+              </Link>{" "}
+              e a{" "}
+              <Link to="/reembolso" className="underline">
+                Política de Reembolso
+              </Link>
+              .
+            </p>
+          </div>
+        </section>
+
+
         {/* CTA de fechamento: bloco de marca em largura total, o único momento
             da página com fundo saturado — por isso funciona como clímax. */}
         <section className="pb-fluid-section">
