@@ -462,7 +462,6 @@
   opacity: 0;
   animation: reveal-up 0.8s var(--ease-out-expo) forwards;
   animation-delay: var(--d, 0ms);
-  will-change: opacity, transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
