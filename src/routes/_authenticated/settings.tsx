@@ -602,7 +602,7 @@ function SavedBulletinsSection() {
   }
 
   return (
-    <section className="surface-card reveal rounded-2xl p-5">
+    <section className="surface-card reveal relative z-30 rounded-2xl p-5">
       <h2 className="flex items-center gap-2 font-semibold">
         <Library className="h-4 w-4" /> Meus boletins salvos
       </h2>

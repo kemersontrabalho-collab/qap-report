@@ -447,7 +447,7 @@ function EditBulletin() {
           </div>
 
 
-          <div className="surface-card reveal space-y-3 rounded-2xl p-4">
+          <div className="surface-card reveal relative z-30 space-y-3 rounded-2xl p-4">
             <div>
               <label className="text-sm font-medium">Título do Boletim *</label>
               <input

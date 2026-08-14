@@ -114,7 +114,7 @@ export function CategorySearch({
   };
 
   return (
-    <div ref={containerRef} className="relative mt-1">
+    <div ref={containerRef} className={`relative mt-1 ${open ? "z-50" : ""}`}>
       <div className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 focus-within:ring-2 focus-within:ring-ring">
         <input
           ref={inputRef}
@@ -152,7 +152,7 @@ export function CategorySearch({
         <div
           id="category-listbox"
           role="listbox"
-          className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border bg-popover shadow-lg"
+          className="absolute z-50 mt-1 max-h-64 w-full overflow-auto overscroll-contain rounded-lg border bg-popover shadow-lg"
         >
           {filtered.length === 0 ? (
             <div className="px-3 py-2 text-sm text-muted-foreground">
