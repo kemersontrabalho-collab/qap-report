@@ -5,6 +5,7 @@ import { AppShell, BULLETIN_TYPES } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
+import { CategorySearch } from "@/components/CategorySearch";
 import { toast } from "sonner";
 
 // Recursos secundários do editor: nenhum é necessário para o primeiro paint do
@@ -706,101 +707,5 @@ function EditBulletin() {
         </section>
       </div>
     </AppShell>
-  );
-}
-
-function CategorySearch({
-  categories,
-  value,
-  bulletinType,
-  onChange,
-}: {
-  categories: { name: string; requiresTC?: boolean }[];
-  value: string | null;
-  bulletinType: string;
-  onChange: (v: string | null) => void;
-}) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const onDocClick = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
-
-  const normalize = (s: string) =>
-    s
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-  const q = normalize(query.trim());
-  const filtered = q ? categories.filter((c) => normalize(c.name).includes(q)) : categories;
-
-  const select = (name: string) => {
-    onChange(name);
-    setQuery("");
-    setOpen(false);
-  };
-
-  return (
-    <div ref={containerRef} className="relative mt-1">
-      <div className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2">
-        <input
-          value={open ? query : (value ?? "")}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => {
-            setOpen(true);
-            setQuery("");
-          }}
-          placeholder="Pesquisar categoria..."
-          className="flex-1 bg-transparent text-sm outline-none"
-        />
-        {value && (
-          <button
-            type="button"
-            onClick={() => {
-              onChange(null);
-              setQuery("");
-            }}
-            className="text-xs text-muted-foreground hover:text-foreground"
-            aria-label="Limpar categoria"
-          >
-            ×
-          </button>
-        )}
-      </div>
-      {open && (
-        <div className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border bg-popover shadow-lg">
-          {filtered.length === 0 ? (
-            <div className="px-3 py-2 text-sm text-muted-foreground">
-              Nenhuma categoria encontrada.
-            </div>
-          ) : (
-            filtered.map((c) => (
-              <button
-                key={c.name}
-                type="button"
-                onClick={() => select(c.name)}
-                className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent ${
-                  value === c.name ? "bg-accent/50 font-medium" : ""
-                }`}
-              >
-                <span>{c.name}</span>
-                {bulletinType === "BO-COP" && c.requiresTC && (
-                  <span className="ml-2 text-xs text-warning">requer TC</span>
-                )}
-              </button>
-            ))
-          )}
-        </div>
-      )}
-    </div>
   );
 }

@@ -32,6 +32,7 @@ import { sendSupportMessage } from "@/lib/support.functions";
 import { deleteMyAccount } from "@/lib/account.functions";
 import { saveExistingBulletin } from "@/lib/library.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
+import { CategorySearch } from "@/components/CategorySearch";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
@@ -637,18 +638,13 @@ function SavedBulletinsSection() {
               </select>
             </Field>
             <Field label="Categoria (opcional)">
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="input"
-              >
-                <option value="">Selecione...</option>
-                {(CATEGORIES_BY_TYPE[type] ?? []).map((c) => (
-                  <option key={c.name} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <CategorySearch
+                categories={CATEGORIES_BY_TYPE[type] ?? []}
+                value={category || null}
+                bulletinType={type}
+                onChange={(v) => setCategory(v ?? "")}
+                placeholder="Pesquisar categoria..."
+              />
             </Field>
           </div>
           <Field label="Título">
