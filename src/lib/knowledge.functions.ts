@@ -26,6 +26,11 @@ export const findSimilarBulletins = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<SimilarCase[]> => {
     await assertPremium(context.supabase, context.userId);
     const limit = data.limit ?? 3;
+    // A busca na base coletiva usa credencial de serviço porque a função do
+    // banco deixou de ser executável diretamente por usuários autenticados.
+    const admin = await import("@/integrations/supabase/client.server")
+      .then((m) => m.supabaseAdmin)
+      .catch(() => null);
     const [own, tpl, community] = await Promise.all([
       context.supabase.rpc("match_bulletin_knowledge", {
         _query: data.query,
@@ -37,12 +42,15 @@ export const findSimilarBulletins = createServerFn({ method: "POST" })
         _bulletin_type: data.bulletinType ?? undefined,
         _limit: limit,
       }),
-      context.supabase.rpc("match_community_knowledge", {
-        _query: data.query,
-        _bulletin_type: data.bulletinType ?? undefined,
-        _limit: limit,
-      }),
+      admin
+        ? admin.rpc("match_community_knowledge", {
+            _query: data.query,
+            _bulletin_type: data.bulletinType ?? undefined,
+            _limit: limit,
+          })
+        : Promise.resolve({ data: [], error: null }),
     ]);
+
     if (own.error) throw new Error(own.error.message);
     if (tpl.error) throw new Error(tpl.error.message);
     // A base coletiva é complementar: falha nela não deve quebrar as sugestões.
