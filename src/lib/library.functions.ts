@@ -7,6 +7,8 @@ const saveInput = z.object({
   category: z.string().trim().max(160).optional(),
   title: z.string().trim().min(3).max(160),
   content: z.string().trim().min(100).max(20000),
+  /** Consentimento explícito do autor para alimentar a base coletiva anônima. */
+  shareToCommunity: z.boolean().optional(),
 });
 
 export type SavedBulletin = {
@@ -18,9 +20,9 @@ export type SavedBulletin = {
 };
 
 /**
- * Salva um boletim já redigido pelo policial. Além de ficar disponível na
- * biblioteca pessoal, ele alimenta (anonimizado) a base coletiva através dos
- * gatilhos do banco.
+ * Salva um boletim já redigido pelo policial na biblioteca pessoal. Ele só é
+ * anonimizado e enviado para a base coletiva (ainda sujeita a revisão manual)
+ * quando o autor marca explicitamente o compartilhamento.
  */
 export const saveExistingBulletin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -35,6 +37,7 @@ export const saveExistingBulletin = createServerFn({ method: "POST" })
         title: data.title,
         content: data.content,
         status: "done",
+        share_to_community: data.shareToCommunity === true,
         context: "Boletim salvo pelo usuário na biblioteca pessoal.",
       })
       .select("id")
@@ -42,6 +45,7 @@ export const saveExistingBulletin = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true, id: (row as { id: string }).id };
   });
+
 
 export const listSavedBulletins = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
