@@ -149,6 +149,7 @@ export type Database = {
           occurrence_at: string | null
           occurrence_lat: number | null
           occurrence_lng: number | null
+          share_to_community: boolean
           status: string
           title: string
           updated_at: string
@@ -173,6 +174,7 @@ export type Database = {
           occurrence_at?: string | null
           occurrence_lat?: number | null
           occurrence_lng?: number | null
+          share_to_community?: boolean
           status?: string
           title?: string
           updated_at?: string
@@ -197,6 +199,7 @@ export type Database = {
           occurrence_at?: string | null
           occurrence_lat?: number | null
           occurrence_lng?: number | null
+          share_to_community?: boolean
           status?: string
           title?: string
           updated_at?: string
