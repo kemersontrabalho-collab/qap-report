@@ -127,9 +127,9 @@ async function buildReferences(
 ): Promise<string | null> {
   if (!query || query.trim().length < 3) return null;
   const client = sb as RagClient;
-  const call = async (fn: string, limit: number): Promise<RagRow[]> => {
+  const call = async (c: RagClient, fn: string, limit: number): Promise<RagRow[]> => {
     try {
-      const { data, error } = await client.rpc(fn, {
+      const { data, error } = await c.rpc(fn, {
         _query: query.slice(0, 1500),
         _bulletin_type: bulletinType,
         _limit: limit,
@@ -141,11 +141,18 @@ async function buildReferences(
     }
   };
 
+  // A base coletiva é lida com credencial de serviço: a função do banco não é
+  // mais executável por usuários logados (evita chamada direta à API).
+  const communityClient = await import("@/integrations/supabase/client.server")
+    .then((m) => m.supabaseAdmin as unknown as RagClient)
+    .catch(() => null);
+
   const [tpl, own, community] = await Promise.all([
-    call("match_bulletin_templates", 2),
-    call("match_bulletin_knowledge", 2),
-    call("match_community_knowledge", 2),
+    call(client, "match_bulletin_templates", 2),
+    call(client, "match_bulletin_knowledge", 2),
+    communityClient ? call(communityClient, "match_community_knowledge", 2) : Promise.resolve([]),
   ]);
+
 
   const fmt = (rows: RagRow[], origem: string) =>
     rows
