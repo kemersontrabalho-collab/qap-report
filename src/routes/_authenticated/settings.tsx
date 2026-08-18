@@ -675,11 +675,25 @@ function SavedBulletinsSection() {
               className="input resize-y"
             />
           </Field>
+          <label className="flex items-start gap-2 rounded-lg border border-[var(--surface-line)] p-3 text-xs">
+            <input
+              type="checkbox"
+              checked={share}
+              onChange={(e) => setShare(e.target.checked)}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span className="text-muted-foreground">
+              Autorizo compartilhar este boletim, de forma anonimizada, com a base coletiva. Revise o
+              texto e remova nomes, endereços e demais dados pessoais antes de marcar — a
+              anonimização automática é apenas um apoio e o envio ainda passa por revisão manual.
+            </span>
+          </label>
           <div className="flex items-center justify-between gap-3">
             <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-              <Users className="h-3 w-3" /> Dados pessoais são removidos automaticamente antes de ir
-              para a base coletiva.
+              <Users className="h-3 w-3" /> Sem essa autorização, o boletim fica somente na sua
+              biblioteca pessoal.
             </span>
+
             <button
               type="submit"
               disabled={saving}
