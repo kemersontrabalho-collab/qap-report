@@ -565,6 +565,7 @@ function SavedBulletinsSection() {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [share, setShare] = useState(false);
   const [saving, setSaving] = useState(false);
 
   async function submit(e: React.FormEvent) {
@@ -585,13 +586,20 @@ function SavedBulletinsSection() {
           category: category || undefined,
           title: title.trim(),
           content: content.trim(),
+          shareToCommunity: share,
         },
       });
-      toast.success("Boletim salvo e enviado para a base coletiva.");
+      toast.success(
+        share
+          ? "Boletim salvo e enviado para revisão da base coletiva."
+          : "Boletim salvo na sua biblioteca pessoal.",
+      );
       setTitle("");
       setContent("");
       setCategory("");
+      setShare(false);
       setOpen(false);
+
       qc.invalidateQueries({ queryKey: ["saved-bulletins"] });
       qc.invalidateQueries({ queryKey: ["bulletins"] });
     } catch (err) {
