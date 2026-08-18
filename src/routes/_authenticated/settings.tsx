@@ -565,6 +565,7 @@ function SavedBulletinsSection() {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [share, setShare] = useState(false);
   const [saving, setSaving] = useState(false);
 
   async function submit(e: React.FormEvent) {
@@ -585,13 +586,20 @@ function SavedBulletinsSection() {
           category: category || undefined,
           title: title.trim(),
           content: content.trim(),
+          shareToCommunity: share,
         },
       });
-      toast.success("Boletim salvo e enviado para a base coletiva.");
+      toast.success(
+        share
+          ? "Boletim salvo e enviado para revisão da base coletiva."
+          : "Boletim salvo na sua biblioteca pessoal.",
+      );
       setTitle("");
       setContent("");
       setCategory("");
+      setShare(false);
       setOpen(false);
+
       qc.invalidateQueries({ queryKey: ["saved-bulletins"] });
       qc.invalidateQueries({ queryKey: ["bulletins"] });
     } catch (err) {
@@ -607,9 +615,10 @@ function SavedBulletinsSection() {
         <Library className="h-4 w-4" /> Meus boletins salvos
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Guarde boletins que você já redigiu. Eles ficam na sua biblioteca pessoal como referência da
-        IA e, de forma anonimizada, ajudam a alimentar a base coletiva do QAP Report.
+        Guarde boletins que você já redigiu. Eles ficam na sua biblioteca pessoal, visível apenas
+        para você, e só vão para a base coletiva se você autorizar no formulário.
       </p>
+
 
       <button
         onClick={() => setOpen((v) => !v)}
@@ -666,11 +675,25 @@ function SavedBulletinsSection() {
               className="input resize-y"
             />
           </Field>
+          <label className="flex items-start gap-2 rounded-lg border border-[var(--surface-line)] p-3 text-xs">
+            <input
+              type="checkbox"
+              checked={share}
+              onChange={(e) => setShare(e.target.checked)}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span className="text-muted-foreground">
+              Autorizo compartilhar este boletim, de forma anonimizada, com a base coletiva. Revise o
+              texto e remova nomes, endereços e demais dados pessoais antes de marcar — a
+              anonimização automática é apenas um apoio e o envio ainda passa por revisão manual.
+            </span>
+          </label>
           <div className="flex items-center justify-between gap-3">
             <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-              <Users className="h-3 w-3" /> Dados pessoais são removidos automaticamente antes de ir
-              para a base coletiva.
+              <Users className="h-3 w-3" /> Sem essa autorização, o boletim fica somente na sua
+              biblioteca pessoal.
             </span>
+
             <button
               type="submit"
               disabled={saving}
