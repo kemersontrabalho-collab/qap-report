@@ -615,9 +615,10 @@ function SavedBulletinsSection() {
         <Library className="h-4 w-4" /> Meus boletins salvos
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Guarde boletins que você já redigiu. Eles ficam na sua biblioteca pessoal como referência da
-        IA e, de forma anonimizada, ajudam a alimentar a base coletiva do QAP Report.
+        Guarde boletins que você já redigiu. Eles ficam na sua biblioteca pessoal, visível apenas
+        para você, e só vão para a base coletiva se você autorizar no formulário.
       </p>
+
 
       <button
         onClick={() => setOpen((v) => !v)}
