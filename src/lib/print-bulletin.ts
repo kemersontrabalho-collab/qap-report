@@ -7,6 +7,7 @@ type PrintData = {
   category: string | null;
   crewComposition: string | null;
   vehiclePrefix: string | null;
+  supportCrew?: string | null;
   occurrenceAt: string | null;
   crewAddress: string | null;
   occurrenceAddress: string | null;
@@ -46,6 +47,7 @@ export function printBulletin(data: PrintData): boolean {
   <tr><td class="k">Categoria</td><td>${esc(data.category)}</td></tr>
   <tr><td class="k">Composição da guarnição</td><td>${esc(data.crewComposition)}</td></tr>
   <tr><td class="k">Prefixo da viatura</td><td>${esc(data.vehiclePrefix)}</td></tr>
+  ${data.supportCrew && data.supportCrew.trim() ? `<tr><td class="k">Apoio da guarnição</td><td>${esc(data.supportCrew)}</td></tr>` : ""}
   <tr><td class="k">Data e hora</td><td>${esc(when)}</td></tr>
   <tr><td class="k">Localização da guarnição</td><td>${esc(data.crewAddress)}</td></tr>
   <tr><td class="k">Localização da ocorrência</td><td>${esc(data.occurrenceAddress)}</td></tr>
