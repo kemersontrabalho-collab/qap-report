@@ -511,6 +511,20 @@ function EditBulletin() {
             </div>
 
             <div>
+              <label className="text-sm font-medium">APOIO DA GUARNIÇÃO</label>
+              <textarea
+                value={b.support_crew ?? ""}
+                onChange={(e) => update("support_crew", e.target.value)}
+                rows={2}
+                placeholder="Ex.: VTR 12-345, SD PM CICLANO e SD PM BELTRANO (apoio solicitado via COPOM)"
+                className="mt-1 w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Opcional. Se ficar em branco, nenhum apoio será citado no texto.
+              </p>
+            </div>
+
+            <div>
               <label className="text-sm font-medium">LOCALIZAÇÃO DA GUARNIÇÃO *</label>
               <textarea
                 value={b.crew_address ?? ""}
