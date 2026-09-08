@@ -1,0 +1,1 @@
+ALTER TABLE public.bulletins ADD COLUMN IF NOT EXISTS support_crew text;

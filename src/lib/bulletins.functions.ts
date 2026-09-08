@@ -11,6 +11,7 @@ REGRAS FUNDAMENTAIS (obrigatórias, nunca as viole):
 2.1. O campo de palavras-chave pode vir como texto corrido, relato narrativo, frases soltas, tópicos ou termos separados por vírgula, ponto, quebra de linha ou espaço. INTERPRETE SEMPRE O CONTEÚDO COMO UM TODO, extraindo o sentido global dos fatos — não trate cada palavra isoladamente nem exija separação por vírgulas. Preserve integralmente todos os fatos ali descritos, mesmo os mencionados de forma informal ou abreviada, convertendo-os para linguagem técnica formal.
 3. Se faltarem dados essenciais, encerre o texto e, em uma seção "PERGUNTAS COMPLEMENTARES:", liste as informações que faltam.
 4. Comece SEMPRE o Histórico com: composição da guarnição, prefixo da viatura (quando informado), data e hora, endereço da guarnição no momento do despacho e endereço do local da ocorrência — usando somente o que foi informado. Se algum dado não foi fornecido, use um marcador entre chaves como {COMPOSIÇÃO DA GUARNIÇÃO} — nunca invente.
+4.2. APOIO DA GUARNIÇÃO: se o campo "APOIO DA GUARNIÇÃO" for informado, registre na narrativa, no momento cronológico adequado, a solicitação e a chegada da guarnição de apoio, identificando-a exatamente como informado (sem inventar prefixos, nomes ou quantidade de policiais) e descrevendo sua atuação apenas conforme o relato. Se o campo NÃO for informado, NÃO cite apoio, reforço, outra guarnição, acionamento de apoio nem marcador algum, e não pergunte por isso nas PERGUNTAS COMPLEMENTARES.
 4.1. PREFIXO DE VIATURA: se o prefixo da viatura NÃO for informado, presuma que a guarnição estava a pé (patrulhamento/policiamento a pé). NÃO cite viatura, prefixo, marcador {PREFIXO} nem deslocamento motorizado. Escreva naturalmente que "a guarnição deslocou-se ao local", "a guarnição aproximou-se do local" ou "a guarnição compareceu ao local", conforme melhor couber ao texto. Nunca pergunte pelo prefixo nas PERGUNTAS COMPLEMENTARES.
 5. Em ocorrências com prisão, condução ou uso de algemas, inclua expressamente:
    - "O uso de algemas foi empregado estritamente nos termos da Súmula Vinculante nº 11 do STF..."
@@ -75,6 +76,7 @@ const genInput = z.object({
   context: z.string().optional(),
   crewComposition: z.string().optional(),
   vehiclePrefix: z.string().optional(),
+  supportCrew: z.string().optional(),
   occurrenceAt: z.string().optional(),
   crewAddress: z.string().optional(),
   occurrenceAddress: z.string().optional(),
@@ -205,6 +207,7 @@ export const generateBulletin = createServerFn({ method: "POST" })
       data.category && `- Categoria: ${data.category}`,
       data.crewComposition && `- Composição da Guarnição: ${data.crewComposition}`,
       data.vehiclePrefix && `- Prefixo da viatura: ${data.vehiclePrefix}`,
+      data.supportCrew?.trim() && `- APOIO DA GUARNIÇÃO: ${data.supportCrew.trim()}`,
       fmtDate && `- Data e Hora: ${fmtDate}`,
       data.crewAddress && `- LOCALIZAÇÃO DA GUARNIÇÃO: ${data.crewAddress}`,
       data.occurrenceAddress && `- Localização da Ocorrência: ${data.occurrenceAddress}`,

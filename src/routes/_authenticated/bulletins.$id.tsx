@@ -55,6 +55,7 @@ type Bulletin = {
   deleted_at: string | null;
   crew_composition: string | null;
   vehicle_prefix: string | null;
+  support_crew: string | null;
   occurrence_at: string | null;
   crew_address: string | null;
   crew_lat: number | null;
@@ -211,6 +212,7 @@ function EditBulletin() {
         is_favorite: current.is_favorite,
         crew_composition: current.crew_composition,
         vehicle_prefix: current.vehicle_prefix,
+        support_crew: current.support_crew,
         occurrence_at: current.occurrence_at,
         crew_address: current.crew_address,
         crew_lat: current.crew_lat,
@@ -286,6 +288,7 @@ function EditBulletin() {
           context: b.context ?? undefined,
           crewComposition: b.crew_composition ?? undefined,
           vehiclePrefix: b.vehicle_prefix ?? undefined,
+          supportCrew: b.support_crew ?? undefined,
           occurrenceAt: b.occurrence_at ?? undefined,
           crewAddress: b.crew_address ?? undefined,
           occurrenceAddress: b.occurrence_address ?? undefined,
@@ -320,6 +323,7 @@ function EditBulletin() {
       category: b.category,
       crewComposition: b.crew_composition,
       vehiclePrefix: b.vehicle_prefix,
+      supportCrew: b.support_crew,
       occurrenceAt: b.occurrence_at,
       crewAddress: b.crew_address,
       occurrenceAddress: b.occurrence_address,
@@ -508,6 +512,20 @@ function EditBulletin() {
                   className="mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">APOIO DA GUARNIÇÃO</label>
+              <textarea
+                value={b.support_crew ?? ""}
+                onChange={(e) => update("support_crew", e.target.value)}
+                rows={2}
+                placeholder="Ex.: VTR 12-345, SD PM CICLANO e SD PM BELTRANO (apoio solicitado via COPOM)"
+                className="mt-1 w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Opcional. Se ficar em branco, nenhum apoio será citado no texto.
+              </p>
             </div>
 
             <div>
