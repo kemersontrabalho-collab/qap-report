@@ -151,6 +151,7 @@ export type Database = {
           occurrence_lng: number | null
           share_to_community: boolean
           status: string
+          support_crew: string | null
           title: string
           updated_at: string
           user_id: string
@@ -176,6 +177,7 @@ export type Database = {
           occurrence_lng?: number | null
           share_to_community?: boolean
           status?: string
+          support_crew?: string | null
           title?: string
           updated_at?: string
           user_id: string
@@ -201,6 +203,7 @@ export type Database = {
           occurrence_lng?: number | null
           share_to_community?: boolean
           status?: string
+          support_crew?: string | null
           title?: string
           updated_at?: string
           user_id?: string
