@@ -317,10 +317,14 @@ const SHARED: Category[] = [
 
 const BOAT: Category[] = [{ name: "Acidente de Trânsito" }, { name: "Infração de Trânsito" }];
 
+// Ordena em pt-BR para que a lista e a busca fiquem sempre em ordem alfabética.
+const byName = (a: Category, b: Category) => a.name.localeCompare(b.name, "pt-BR");
+
 export const CATEGORIES_BY_TYPE: Record<string, Category[]> = {
-  BA,
-  "BO-COP": SHARED,
+  BA: [...BA].sort(byName),
+  "BO-COP": [...SHARED].sort(byName),
   // BO-TC mostra apenas categorias de menor potencial ofensivo (requiresTC = true)
-  "BO-TC": SHARED.filter((c) => c.requiresTC),
+  "BO-TC": SHARED.filter((c) => c.requiresTC).sort(byName),
   BOAT,
+
 };
