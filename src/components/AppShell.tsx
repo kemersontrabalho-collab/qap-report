@@ -133,7 +133,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Um único landmark <main> por página. max-w-6xl trava a medida de
        * leitura em ultrawide; px-fluid escala o gutter e respeita o notch. */}
-      <main className="mx-auto w-full max-w-6xl flex-1 px-fluid py-6 sm:py-8">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-fluid py-6 sm:py-8">{children}</main>
 
       {/* BOTTOM BAR (mobile): 4 colunas iguais, cada célula com ≥44px de altura
        * e rótulo truncado. pb-safe evita que a home indicator do iOS cubra os
