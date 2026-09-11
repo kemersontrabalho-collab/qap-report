@@ -165,6 +165,19 @@
     overflow-x: clip;
   }
 
+  /* Ambiência de fundo em todas as abas: dois focos de luz azul institucional,
+   * fixos, sem custo de imagem e sem interferir na rolagem. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(60rem 32rem at 12% -8%, color-mix(in oklab, var(--brand-bright) 14%, transparent), transparent 68%),
+      radial-gradient(48rem 28rem at 92% 4%, color-mix(in oklab, var(--brand-glow) 11%, transparent), transparent 70%);
+  }
+
   html {
     /* Impede o iOS de inflar fontes ao girar para paisagem. */
     -webkit-text-size-adjust: 100%;
