@@ -83,9 +83,9 @@
   --success-foreground: oklch(0.99 0 0);
   --warning: oklch(0.75 0.15 75);
   --warning-foreground: oklch(0.22 0.03 60);
-  --border: oklch(0.92 0.006 260);
-  --input: oklch(0.94 0.005 260);
-  --ring: oklch(0.42 0.14 258);
+  --border: oklch(0.915 0.012 258);
+  --input: oklch(0.94 0.01 258);
+  --ring: oklch(0.55 0.17 254);
 
   /* ACENTOS CALCULADOS — um único acento vibrante (azure) sobre base sóbria.
    * Usado com parcimônia: brilho de foco, halo do hero e realce tipográfico. */
