@@ -100,13 +100,13 @@
 .dark {
   /* Escuro "tinta azul", não cinza morto: 0.14 L de base dá contraste real
    * para os cartões em 0.19 sem precisar de bordas fortes. */
-  --background: oklch(0.145 0.018 262);
-  --foreground: oklch(0.96 0.005 260);
-  --card: oklch(0.195 0.021 262);
-  --card-foreground: oklch(0.96 0.005 260);
-  --popover: oklch(0.195 0.021 262);
-  --popover-foreground: oklch(0.96 0.005 260);
-  --primary: oklch(0.72 0.13 258);
+  --background: oklch(0.165 0.035 264);
+  --foreground: oklch(0.965 0.008 258);
+  --card: oklch(0.225 0.042 264);
+  --card-foreground: oklch(0.965 0.008 258);
+  --popover: oklch(0.225 0.042 264);
+  --popover-foreground: oklch(0.965 0.008 258);
+  --primary: oklch(0.74 0.14 254);
   --primary-foreground: oklch(0.15 0.02 260);
   --secondary: oklch(0.24 0.02 260);
   --secondary-foreground: oklch(0.96 0.005 260);
