@@ -89,9 +89,9 @@
 
   /* ACENTOS CALCULADOS — um único acento vibrante (azure) sobre base sóbria.
    * Usado com parcimônia: brilho de foco, halo do hero e realce tipográfico. */
-  --brand: oklch(0.42 0.14 258);
-  --brand-bright: oklch(0.60 0.17 250);
-  --brand-glow: oklch(0.72 0.14 232);
+  --brand: oklch(0.40 0.16 264);
+  --brand-bright: oklch(0.55 0.18 256);
+  --brand-glow: oklch(0.74 0.14 246);
   --surface-veil: oklch(1 0 0 / 0.72);
   --surface-line: oklch(0.20 0.02 260 / 0.08);
   --gradient-brand: linear-gradient(135deg, var(--brand) 0%, var(--brand-bright) 55%, var(--brand-glow) 100%);
