@@ -1,6 +1,7 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useParams, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { AppShell, BULLETIN_TYPES } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
@@ -34,8 +35,21 @@ import {
   ExternalLink,
   Printer,
 } from "lucide-react";
+const bulletinQueryOptions = (id: string) => queryOptions({
+  queryKey: ["bulletin", id],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("bulletins").select("*").eq("id", id).maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error("NotFound");
+    const bulletin = data as Bulletin;
+    if (!bulletin.occurrence_at) bulletin.occurrence_at = new Date().toISOString();
+    return bulletin;
+  },
+});
+
 
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
+  loader: ({ context, params }) => context.queryClient.ensureQueryData(bulletinQueryOptions(params.id)),
   head: () => ({
     meta: [{ title: "Editar boletim · QAP Report" }, { name: "robots", content: "noindex" }],
   }),
