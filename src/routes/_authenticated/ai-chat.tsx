@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useEffect } from "react";
+import { lazy, Suspense, useState, useRef, useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { askAI } from "@/lib/bulletins.functions";
 import { toast } from "sonner";
 import { Send, Loader2, MessageCircle, Trash2 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+
+const MarkdownRenderer = lazy(() => import("@/components/MarkdownRenderer"));
 
 export const Route = createFileRoute("/_authenticated/ai-chat")({
   head: () => ({
@@ -146,9 +147,9 @@ function AIChatPage() {
                   }`}
                 >
                   {m.role === "assistant" ? (
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <ReactMarkdown>{m.content}</ReactMarkdown>
-                    </div>
+                    <Suspense fallback={<p className="whitespace-pre-wrap">{m.content}</p>}>
+                      <MarkdownRenderer content={m.content} />
+                    </Suspense>
                   ) : (
                     <p className="whitespace-pre-wrap">{m.content}</p>
                   )}

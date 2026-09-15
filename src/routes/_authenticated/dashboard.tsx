@@ -31,7 +31,6 @@ type Bulletin = {
   bulletin_type: string;
   category: string | null;
   title: string;
-  content: string;
   status: "draft" | "done";
   is_favorite: boolean;
   deleted_at: string | null;
@@ -46,7 +45,7 @@ const bulletinsQueryOptions = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("bulletins")
-      .select("*")
+      .select("id, bulletin_type, category, title, status, is_favorite, deleted_at, created_at, updated_at")
       .order("updated_at", { ascending: false });
     if (error) throw error;
     return (data ?? []) as Bulletin[];
@@ -150,7 +149,6 @@ function Dashboard() {
       if (!s) return true;
       return (
         b.title.toLowerCase().includes(s) ||
-        b.content.toLowerCase().includes(s) ||
         (b.category ?? "").toLowerCase().includes(s) ||
         new Date(b.created_at).toLocaleDateString("pt-BR").includes(s)
       );
