@@ -124,7 +124,7 @@ function SettingsPage() {
       if (!userData.user) return null;
       const { data } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, full_name, rank, phone, email, functional_id, avatar_url")
         .eq("id", userData.user.id)
         .maybeSingle();
       return (

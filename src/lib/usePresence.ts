@@ -12,10 +12,20 @@ import { supabase } from "@/integrations/supabase/client";
  * - ignora batimentos enquanto a aba está oculta;
  * - protege contra execuções concorrentes (visibilitychange + intervalo).
  */
-export function usePresence(intervalMs = 60_000) {
+export function usePresence(intervalMs = 120_000) {
   useEffect(() => {
     let cancelled = false;
     let running = false;
+    let timer: number | undefined;
+
+    function schedule() {
+      if (cancelled || document.visibilityState !== "visible") return;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(async () => {
+        await ping();
+        schedule();
+      }, intervalMs);
+    }
 
     async function ping() {
       if (cancelled || running) return;
@@ -36,14 +46,16 @@ export function usePresence(intervalMs = 60_000) {
       }
     }
 
-    void ping();
-    const id = setInterval(() => void ping(), intervalMs);
-    const onVisible = () => void ping();
+    void ping().then(schedule);
+    const onVisible = () => {
+      window.clearTimeout(timer);
+      if (document.visibilityState === "visible") void ping().then(schedule);
+    };
     document.addEventListener("visibilitychange", onVisible);
 
     return () => {
       cancelled = true;
-      clearInterval(id);
+      window.clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [intervalMs]);

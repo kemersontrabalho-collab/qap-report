@@ -158,11 +158,11 @@ function EditBulletin() {
   const genFn = useServerFn(generateBulletin);
   const geoFn = useServerFn(reverseGeocode);
 
-  const [loading, setLoading] = useState(true);
+  const { data: loadedBulletin } = useSuspenseQuery(bulletinQueryOptions(id));
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [locating, setLocating] = useState<"crew" | "occ" | null>(null);
-  const [b, setB] = useState<Bulletin | null>(null);
+  const [b, setB] = useState<Bulletin>(() => ({ ...loadedBulletin }));
   const dirtyRef = useRef(false);
   const revRef = useRef(0);
   const bRef = useRef<Bulletin | null>(null);
@@ -170,29 +170,6 @@ function EditBulletin() {
 
   const typeInfo = useMemo(() => BULLETIN_TYPES.find((t) => t.code === b?.bulletin_type), [b]);
   const categories = useMemo(() => (b ? (CATEGORIES_BY_TYPE[b.bulletin_type] ?? []) : []), [b]);
-
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from("bulletins")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
-      if (data) {
-        const loaded = data as Bulletin;
-        if (!loaded.occurrence_at) loaded.occurrence_at = new Date().toISOString();
-        setB(loaded);
-      } else if (!error || error.code === "PGRST116") {
-        toast.error("Boletim não encontrado");
-        navigate({ to: "/dashboard" });
-      } else {
-        toast.error(translateDbError(error));
-        navigate({ to: "/dashboard" });
-      }
-      setLoading(false);
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
 
   // Atualização funcional: várias chamadas seguidas (ex.: lat, lng e endereço
   // ao usar o GPS) não podem partir do mesmo snapshot `b`, senão só a última
@@ -408,16 +385,6 @@ function EditBulletin() {
       return;
     }
     navigate({ to: "/dashboard" });
-  }
-
-  if (loading || !b) {
-    return (
-      <AppShell>
-        <div className="flex items-center justify-center py-20 text-muted-foreground">
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Carregando...
-        </div>
-      </AppShell>
-    );
   }
 
   return (

@@ -12,6 +12,21 @@ const TutorialModal = lazy(() =>
 
 // Rotas que NÃO exigem assinatura ativa (usuário sem plano ainda pode acessar).
 const FREE_PATHS = ["/assinar", "/settings"];
+const PREMIUM_CACHE_MS = 30_000;
+let premiumCache: { userId: string; value: boolean; checkedAt: number } | null = null;
+
+async function getPremiumStatus(userId: string): Promise<boolean> {
+  if (
+    premiumCache?.userId === userId &&
+    Date.now() - premiumCache.checkedAt < PREMIUM_CACHE_MS
+  ) {
+    return premiumCache.value;
+  }
+  const { data } = await supabase.rpc("is_premium_user", { _user_id: userId });
+  const value = data === true;
+  premiumCache = { userId, value, checkedAt: Date.now() };
+  return value;
+}
 
 function AuthenticatedLayout() {
   const open = useTutorialOpen();
@@ -55,9 +70,7 @@ export const Route = createFileRoute("/_authenticated")({
     const pathname = location.pathname;
     const isFree = FREE_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
     if (!isFree) {
-      const { data: premium } = await supabase.rpc("is_premium_user", {
-        _user_id: data.user.id,
-      });
+      const premium = await getPremiumStatus(data.user.id);
       if (!premium) {
         throw redirect({ to: "/assinar" });
       }

@@ -1,0 +1,13 @@
+{
+  "name": "QAP Report — Assistente de Redação Policial",
+  "short_name": "QAP Report",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1220",
+  "theme_color": "#1f2b57",
+  "description": "Assistente de redação de boletins policiais (BA, BO-COP, BO-TC, BOAT).",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" },
+    { "src": "/__l5e/assets-v1/e45d3f8c-3c14-4c6a-be78-c3364dc3d4d0/qap-report-logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any" }
+  ]
+}
