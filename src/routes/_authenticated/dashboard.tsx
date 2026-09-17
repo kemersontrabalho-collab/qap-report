@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { playUiSound, prepareUiSounds } from "@/lib/ui-sounds";
 import {
   FileText,
   Star,
@@ -189,6 +190,7 @@ function Dashboard() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["bulletins"] });
+      playUiSound("deleted");
       toast.success("Movido para a lixeira");
     },
     onError: (e) =>
@@ -214,6 +216,7 @@ function Dashboard() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["bulletins"] });
+      playUiSound("deleted");
       toast.success("Excluído definitivamente");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Não foi possível excluir"),
@@ -248,6 +251,7 @@ function Dashboard() {
       return;
     }
     qc.invalidateQueries({ queryKey: ["bulletins"] });
+    playUiSound("deleted");
     toast.success("Lixeira esvaziada");
   };
 
@@ -372,7 +376,10 @@ function Dashboard() {
           <div className="flex shrink-0 items-center gap-2">
             {tab === "trash" && bulletins.some((b) => b.deleted_at) && (
               <button
-                onClick={emptyTrash}
+                onClick={() => {
+                  prepareUiSounds();
+                  void emptyTrash();
+                }}
                 className="min-h-11 whitespace-nowrap rounded-xl border border-destructive/40 px-3 text-sm text-destructive transition-colors hover:bg-destructive/10 sm:min-h-9 sm:py-1.5"
               >
                 Esvaziar
@@ -513,7 +520,10 @@ function Dashboard() {
                     </button>
                     <button
                       onClick={() => {
-                        if (confirm("Excluir definitivamente?")) hardDelete.mutate(b.id);
+                        if (confirm("Excluir definitivamente?")) {
+                          prepareUiSounds();
+                          hardDelete.mutate(b.id);
+                        }
                       }}
                       className="grid h-8 w-8 place-items-center rounded-lg text-destructive hover:bg-destructive/10"
                       aria-label="Excluir"
@@ -523,7 +533,10 @@ function Dashboard() {
                   </>
                 ) : (
                   <button
-                    onClick={() => softDelete.mutate(b.id)}
+                    onClick={() => {
+                      prepareUiSounds();
+                      softDelete.mutate(b.id);
+                    }}
                     className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                     aria-label="Mover para lixeira"
                   >
