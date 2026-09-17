@@ -22,6 +22,7 @@ const VoiceDictateButton = lazy(() =>
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import { copyWithFeedback } from "@/lib/clipboard";
 import { printBulletin } from "@/lib/print-bulletin";
+import { playUiSound, prepareUiSounds } from "@/lib/ui-sounds";
 import {
   ArrowLeft,
   Sparkles,
@@ -231,6 +232,7 @@ function EditBulletin() {
           : prev,
       );
       if (!opts?.silent) {
+        playUiSound(nextStatus === "done" ? "completed" : "saved");
         toast.success(nextStatus === "done" ? "Boletim concluído" : "Salvo");
       }
     } catch (e) {
@@ -269,6 +271,7 @@ function EditBulletin() {
       return;
     }
     setGenerating(true);
+    prepareUiSounds();
 
     try {
       const res = await genFn({
@@ -286,6 +289,7 @@ function EditBulletin() {
         },
       });
       update("content", res.content);
+      playUiSound("generated");
       toast.success("Texto gerado. Revise antes de concluir.");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao gerar");
@@ -384,6 +388,7 @@ function EditBulletin() {
       toast.error(translateDbError(error));
       return;
     }
+    playUiSound("deleted");
     navigate({ to: "/dashboard" });
   }
 
@@ -406,7 +411,10 @@ function EditBulletin() {
             <Star className={`h-4 w-4 ${b.is_favorite ? "fill-warning text-warning" : ""}`} />
           </button>
           <button
-            onClick={trash}
+            onClick={() => {
+              prepareUiSounds();
+              void trash();
+            }}
             className="grid h-10 w-10 place-items-center rounded-xl border border-destructive/30 bg-card/60 text-destructive transition-colors hover:bg-destructive/10"
             aria-label="Lixeira"
           >
@@ -676,7 +684,10 @@ function EditBulletin() {
                 <Printer className="h-3.5 w-3.5" /> PDF
               </button>
               <button
-                onClick={() => save()}
+                onClick={() => {
+                  prepareUiSounds();
+                  void save();
+                }}
                 disabled={saving}
                 className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent disabled:opacity-60"
               >
@@ -688,7 +699,10 @@ function EditBulletin() {
                 Salvar
               </button>
               <button
-                onClick={() => save("done")}
+                onClick={() => {
+                  prepareUiSounds();
+                  void save("done");
+                }}
                 disabled={saving}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:opacity-90 disabled:opacity-60"
               >
