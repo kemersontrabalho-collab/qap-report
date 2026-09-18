@@ -8,7 +8,6 @@ import {
   Scale,
   ChevronRight,
   AlertTriangle,
-  Car,
   User,
   Briefcase,
   Download,
@@ -25,7 +24,7 @@ export const Route = createFileRoute("/modelos-boletim-ocorrencia")({
       {
         name: "description",
         content:
-          "Modelos prontos de boletim de ocorrência (BA, BO-COP, BO-TC, BOAT) para roubo, furto, acidente e dano. Textos técnicos para copiar e usar.",
+          "Modelos prontos de boletim de ocorrência (BA, BO-COP e BO-TC) para roubo, furto, lesão corporal e dano. Textos técnicos para copiar e usar.",
       },
       {
         property: "og:title",
@@ -34,7 +33,7 @@ export const Route = createFileRoute("/modelos-boletim-ocorrencia")({
       {
         property: "og:description",
         content:
-          "Modelos prontos de boletim de ocorrência (BA, BO-COP, BO-TC, BOAT) para roubo, furto, acidente e dano. Textos técnicos para copiar e usar.",
+          "Modelos prontos de boletim de ocorrência (BA, BO-COP e BO-TC) para roubo, furto, lesão corporal e dano. Textos técnicos para copiar e usar.",
       },
       { property: "og:type", content: "article" },
       {
@@ -44,12 +43,12 @@ export const Route = createFileRoute("/modelos-boletim-ocorrencia")({
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "Modelos de Boletim de Ocorrência Prontos — BA, BO-COP, BO-TC, BOAT",
+        content: "Modelos de Boletim de Ocorrência Prontos — BA, BO-COP e BO-TC",
       },
       {
         name: "twitter:description",
         content:
-          "Modelos de boletim de ocorrência prontos para roubo, furto, perda de documentos, acidente de trânsito, lesão corporal e dano.",
+          "Modelos de boletim de ocorrência prontos para roubo, furto, perda de documentos, lesão corporal e dano.",
       },
     ],
     links: [
@@ -66,7 +65,7 @@ export const Route = createFileRoute("/modelos-boletim-ocorrencia")({
           "@type": "Article",
           headline: "Modelos de Boletim de Ocorrência Prontos",
           description:
-            "Modelos de boletim de ocorrência prontos para roubo, furto, perda de documentos, acidente de trânsito, lesão corporal e dano.",
+            "Modelos de boletim de ocorrência prontos para roubo, furto, perda de documentos, lesão corporal e dano.",
           author: { "@type": "Organization", name: "QAP Report" },
           publisher: { "@type": "Organization", name: "QAP Report" },
           inLanguage: "pt-BR",
@@ -231,41 +230,6 @@ Diante do exposto, lavrou-se o presente boletim para registro do extravio.`,
       "Deixe claro que não há indícios de crime, apenas extravio.",
       "Inclua os números dos documentos para facilitar a identificação futura.",
       "Oriente a vítima sobre a necessidade de comunicação a bancos e cartórios, se for o caso.",
-    ],
-  },
-  {
-    id: "acidente-transito",
-    tipo: "BOAT",
-    titulo: "Acidente de trânsito",
-    icone: Car,
-    quando: [
-      "Colisão envolvendo veículos, motocicletas, ciclistas ou pedestres.",
-      "Ocorrência com vítimas ou danos materiais.",
-      "Necessidade de registro para seguradora ou perícia.",
-    ],
-    dados: [
-      "Data, hora e local precisos do acidente.",
-      "Descrição dos veículos envolvidos (placa, marca, modelo, cor).",
-      "Identificação dos condutores e respectivas CNHs.",
-      "Relato de como ocorreu a colisão (direção, sinalização, velocidade aproximada).",
-      "Vítimas, testemunhas e estado da via.",
-      "Danos materiais e envolvimento de terceiros.",
-    ],
-    texto: `Às [HORA] do dia [DATA], a guarnição [COMPOSIÇÃO DA GUARNIÇÃO], em patrulhamento na [LOCALIZAÇÃO DA GUARNIÇÃO], foi acionada para atender acidente de trânsito na [LOCALIZAÇÃO DA OCORRÊNCIA].
-
-No local, constatou-se o envolvimento de [DESCREVER VEÍCULOS: placa, marca, modelo, cor], conduzidos por [NOME DOS CONDUTORES], portadores das CNHs [NÚMEROS].
-
-Segundo relato dos envolvidos, o acidente ocorreu da seguinte forma: [DESCRIÇÃO DO FATO — direção, sinalização, condições da via, velocidade aproximada].
-
-Houve [danos materiais / vítimas com lesões de natureza leve/grave]. Foram tomadas as providências de [isolamento do local, acionamento de socorro médico, registro fotográfico, testemunho]. A via apresentava [ESTADO DA VIA] e a sinalização era [DESCREVER].
-
-Os condutores foram orientados quanto aos procedimentos de troca de informações e eventual perícia. O trânsito foi [liberado / desviado / interditado] até a regularização do local.
-
-Diante do exposto, lavrou-se o presente Boletim de Acidente de Trânsito (BOAT) para registro dos fatos.`,
-    dicas: [
-      "Descreva a dinâmica do acidente sem atribuir culpa antecipadamente.",
-      "Mencione sinais de embriaguez ou teste de bafômetro apenas se constatados.",
-      "Registre se houve vítimas e as providências de socorro.",
     ],
   },
   {
@@ -499,7 +463,7 @@ function ModelsPage() {
             </h1>
             <p className="mt-4 text-base text-muted-foreground md:text-lg">
               Textos técnicos e jurídicos prontos para copiar, preencher e usar em ocorrências de
-              roubo, furto, perda de documentos, acidente de trânsito, lesão corporal e dano. Edite
+               roubo, furto, perda de documentos, lesão corporal e dano. Edite
               com a QAP Report em segundos.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -587,7 +551,7 @@ function ModelsPage() {
               <div className="rounded-2xl border bg-primary p-5 text-primary-foreground shadow-sm">
                 <h3 className="font-semibold">Gere boletins em segundos</h3>
                 <p className="mt-2 text-sm opacity-90">
-                  A QAP Report transforma palavras-chave em boletins BA, BO-COP, BO-TC e BOAT com
+                  A QAP Report transforma palavras-chave em boletins BA, BO-COP e BO-TC com
                   linguagem técnica e fundamento jurídico.
                 </p>
                 <Link
@@ -609,7 +573,7 @@ function ModelsPage() {
                     Guia de redação técnica de BO
                   </Link>
                   <p className="text-muted-foreground">
-                    <strong>Tipos de boletim:</strong> BA, BO-COP, BO-TC e BOAT.
+                    <strong>Tipos de boletim:</strong> BA, BO-COP e BO-TC.
                   </p>
                   <p className="text-muted-foreground">
                     <strong>Súmula Vinculante 11:</strong> ausência de flagrante não impede o Termo
