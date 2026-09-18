@@ -5,7 +5,6 @@ export type Category = { name: string; requiresTC?: boolean };
 
 const BA: Category[] = [
   "Abastecimento",
-  "Acidente de Trânsito",
   "Advertência",
   "Aeronave Empregada",
   "Alarme disparado",
@@ -114,10 +113,6 @@ const SHARED: Category[] = [
   ["Abastecimento", false],
   ["Abuso de Incapaz", false],
   ["Acidente de Trabalho", true],
-  ["Acidente de Trânsito", false],
-  ["Acidente de Trânsito com Danos Materiais", false],
-  ["Acidente de Trânsito, Veículo Oficial com Danos", false],
-  ["Acidente de Trânsito, Veículo Oficial com Lesões", true],
   ["Adulteração de Sinal Identificador de Veículo Automotor", true],
   ["Advocacia Administrativa", true],
   ["Afirmação Enganosa sobre Produto", true],
@@ -315,8 +310,6 @@ const SHARED: Category[] = [
 ].map(([name, requiresTC]) => ({ name: name as string, requiresTC: requiresTC as boolean }));
 
 
-const BOAT: Category[] = [{ name: "Acidente de Trânsito" }, { name: "Infração de Trânsito" }];
-
 // Ordena em pt-BR para que a lista e a busca fiquem sempre em ordem alfabética.
 const byName = (a: Category, b: Category) => a.name.localeCompare(b.name, "pt-BR");
 
@@ -325,6 +318,4 @@ export const CATEGORIES_BY_TYPE: Record<string, Category[]> = {
   "BO-COP": [...SHARED].sort(byName),
   // BO-TC mostra apenas categorias de menor potencial ofensivo (requiresTC = true)
   "BO-TC": SHARED.filter((c) => c.requiresTC).sort(byName),
-  BOAT,
-
 };

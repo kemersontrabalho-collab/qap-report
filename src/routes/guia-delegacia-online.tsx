@@ -45,7 +45,7 @@ export const Route = createFileRoute("/guia-delegacia-online")({
               name: "O que posso registrar na delegacia online?",
               acceptedAnswer: {
                 "@type": "Answer",
-                text: "Em geral: furto, perda ou extravio de documentos e objetos, desaparecimento de pessoas, acidente de trânsito sem vítima, dano e injúria/ameaça, conforme as regras de cada estado. Crimes com violência, flagrante ou vítima ferida exigem atendimento presencial ou acionamento da polícia.",
+                text: "Em geral: furto, perda ou extravio de documentos e objetos, desaparecimento de pessoas, dano e injúria/ameaça, conforme as regras de cada estado. Crimes com violência, flagrante ou vítima ferida exigem atendimento presencial ou acionamento da polícia.",
               },
             },
             {
@@ -85,7 +85,7 @@ const STATES: {
     portal: "Delegacia Eletrônica — Polícia Civil de SP",
     url: "https://www.delegaciaeletronica.policiacivil.sp.gov.br/",
     notes:
-      "Aceita furto, perda de documentos e objetos, acidente de trânsito sem vítima e desaparecimento. O registro passa por análise e o número do BO chega por e-mail.",
+      "Aceita furto, perda de documentos e objetos e desaparecimento. O registro passa por análise e o número do BO chega por e-mail.",
   },
   {
     uf: "RJ",
@@ -101,7 +101,7 @@ const STATES: {
     portal: "Delegacia Virtual — Polícia Civil de MG",
     url: "https://delegaciavirtual.sids.mg.gov.br/",
     notes:
-      "Cadastro prévio do cidadão. Cobre furto, dano, extravio de documentos, ameaça e acidente de trânsito sem vítima.",
+      "Cadastro prévio do cidadão. Cobre furto, dano, extravio de documentos e ameaça.",
   },
   {
     uf: "SC",
@@ -199,7 +199,6 @@ function OnlinePoliceGuide() {
               <ul>
                 <li>furto (sem violência ou grave ameaça);</li>
                 <li>perda ou extravio de documentos e objetos;</li>
-                <li>acidente de trânsito sem vítima;</li>
                 <li>dano ao patrimônio;</li>
                 <li>desaparecimento de pessoa;</li>
                 <li>ameaça, injúria, calúnia e difamação (varia por estado).</li>

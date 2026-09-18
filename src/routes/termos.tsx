@@ -37,8 +37,8 @@ function TermsPage() {
 
       <h2>1. Descrição do serviço</h2>
       <p>
-        O QAP Report é uma ferramenta de apoio à redação de documentos policiais (BA, BO-COP, BO-TC
-        e BOAT) com auxílio de inteligência artificial, modelos padronizados e base de conhecimento
+        O QAP Report é uma ferramenta de apoio à redação de documentos policiais (BA, BO-COP e
+        BO-TC) com auxílio de inteligência artificial, modelos padronizados e base de conhecimento
         jurídica. O serviço é acessível por navegador e como aplicativo instalável (PWA).
       </p>
 

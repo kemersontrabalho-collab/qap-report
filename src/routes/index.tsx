@@ -12,13 +12,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Plataforma QAP Report: redija boletins BA, BO-COP, BO-TC e BOAT com terminologia técnica, base de conhecimento jurídica e apoio de IA em segundos.",
+          "Plataforma QAP Report: redija boletins BA, BO-COP e BO-TC com terminologia técnica, base de conhecimento jurídica e apoio de IA em segundos.",
       },
       { property: "og:title", content: "QAP Report — Assistente de Redação Policial com IA" },
       {
         property: "og:description",
         content:
-          "Redija boletins BA, BO-COP, BO-TC e BOAT com apoio de IA e terminologia técnica policial.",
+          "Redija boletins BA, BO-COP e BO-TC com apoio de IA e terminologia técnica policial.",
       },
       { property: "og:url", content: "https://qap-report.lovable.app/" },
     ],
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
           name: "QAP Report",
           url: "https://qap-report.lovable.app/",
           description:
-            "Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT.",
+            "Assistente de redação policial com IA para boletins BA, BO-COP e BO-TC.",
           inLanguage: "pt-BR",
         }),
       },
@@ -240,7 +240,7 @@ function Landing() {
               className="reveal measure mt-6 text-fluid-base text-muted-foreground"
               style={{ "--d": "170ms" } as React.CSSProperties}
             >
-              Informe o tipo de ocorrência (BA, BO-COP, BO-TC ou BOAT) e as palavras-chave. O QAP
+              Informe o tipo de ocorrência (BA, BO-COP ou BO-TC) e as palavras-chave. O QAP
               Report produz um texto formal, técnico e fiel aos fatos — pronto para revisão.
             </p>
 
@@ -372,7 +372,7 @@ function Landing() {
             <Feature
               icon={Sparkles}
               title="Agilidade no plantão"
-              desc="Modelos prontos para BA, BO-COP, BO-TC e BOAT."
+              desc="Modelos prontos para BA, BO-COP e BO-TC."
               span="lg:col-span-4"
               delay={280}
             />
@@ -404,7 +404,7 @@ function Landing() {
               <span className="text-sm text-muted-foreground">por mês</span>
             </p>
             <ul className="mt-5 space-y-2 text-sm text-muted-foreground">
-              <li>Geração ilimitada de boletins BA, BO-COP, BO-TC e BOAT</li>
+              <li>Geração ilimitada de boletins BA, BO-COP e BO-TC</li>
               <li>Aba de dúvidas jurídicas com IA</li>
               <li>Rascunhos, favoritos, histórico e exportação em PDF</li>
               <li>Cancele quando quiser · garantia de reembolso de 30 dias</li>

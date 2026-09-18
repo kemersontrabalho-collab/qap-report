@@ -1,10 +1,10 @@
 # QAP Report
 
-> Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT, com terminologia técnica e base de conhecimento jurídica.
+> Assistente de redação policial com IA para boletins BA, BO-COP e BO-TC, com terminologia técnica e base de conhecimento jurídica.
 
 QAP Report ajuda policiais a redigir boletins de ocorrência claros, técnicos e fiéis aos fatos a partir de palavras-chave, com apoio de inteligência artificial e modelos padronizados.
 
 ## Pages
 
 - [Início](/): Visão geral do QAP Report e principais recursos.
-- [Guia de Redação Técnica](/guia-redacao-tecnica): Guia completo sobre BA, BO-COP, BO-TC, BOAT e Súmula Vinculante 11.
+- [Guia de Redação Técnica](/guia-redacao-tecnica): Guia completo sobre BA, BO-COP, BO-TC e Súmula Vinculante 11.

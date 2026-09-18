@@ -276,7 +276,7 @@ function EditBulletin() {
     try {
       const res = await genFn({
         data: {
-          bulletinType: b.bulletin_type as "BA" | "BO-COP" | "BO-TC" | "BOAT",
+          bulletinType: b.bulletin_type as "BA" | "BO-COP" | "BO-TC",
           category: b.category ?? undefined,
           keywords: b.keywords,
           context: b.context ?? undefined,

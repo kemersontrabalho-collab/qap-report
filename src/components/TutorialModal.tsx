@@ -23,7 +23,7 @@ const STEPS: Step[] = [
   },
   {
     title: "Escolha o tipo de boletim",
-    body: "No painel, clique em BA, BO-COP, BO-TC ou BOAT para criar um novo boletim já com o modelo certo. O botão 'Novo' no topo também abre o mesmo fluxo.",
+    body: "No painel, clique em BA, BO-COP ou BO-TC para criar um novo boletim já com o modelo certo. O botão 'Novo' no topo também abre o mesmo fluxo.",
     route: "/dashboard",
     target: '[data-tour="bulletin-types"]',
   },

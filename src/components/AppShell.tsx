@@ -197,11 +197,6 @@ export const BULLETIN_TYPES = [
     name: "Termo Circunstanciado",
     desc: "Infrações de menor potencial ofensivo.",
   },
-  {
-    code: "BOAT",
-    name: "Boletim de Acidente de Trânsito",
-    desc: "Ocorrências específicas de trânsito.",
-  },
 ] as const;
 
 export type BulletinCode = (typeof BULLETIN_TYPES)[number]["code"];

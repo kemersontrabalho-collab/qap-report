@@ -9,7 +9,7 @@ export const Route = createFileRoute("/guia-redacao-tecnica")({
       {
         name: "description",
         content:
-          "Guia prático de redação técnica para BA, BO-COP, BO-TC e BOAT com fundamentos legais e exemplos jurídicos.",
+          "Guia prático de redação técnica para BA, BO-COP e BO-TC com fundamentos legais e exemplos jurídicos.",
       },
       {
         property: "og:title",
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/guia-redacao-tecnica")({
       {
         property: "og:description",
         content:
-          "Guia prático de redação técnica para BA, BO-COP, BO-TC e BOAT com fundamentos legais e exemplos jurídicos.",
+          "Guia prático de redação técnica para BA, BO-COP e BO-TC com fundamentos legais e exemplos jurídicos.",
       },
       { property: "og:type", content: "article" },
       { property: "og:url", content: "https://qap-report.lovable.app/guia-redacao-tecnica" },
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/guia-redacao-tecnica")({
       {
         name: "twitter:description",
         content:
-          "Guia prático de redação técnica para BA, BO-COP, BO-TC e BOAT com fundamentos legais e exemplos jurídicos.",
+          "Guia prático de redação técnica para BA, BO-COP e BO-TC com fundamentos legais e exemplos jurídicos.",
       },
     ],
     links: [
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/guia-redacao-tecnica")({
           "@type": "Article",
           headline: "Guia de Redação Técnica de Boletim de Ocorrência",
           description:
-            "Aprenda a redigir boletim de ocorrência online com linguagem técnica e jurídica. Guia completo sobre BA, BO-COP, BO-TC, BOAT, Súmula Vinculante 11 e como o QAP Report automatiza a redação policial.",
+            "Aprenda a redigir boletim de ocorrência online com linguagem técnica e jurídica. Guia completo sobre BA, BO-COP, BO-TC, Súmula Vinculante 11 e como o QAP Report automatiza a redação policial.",
           author: { "@type": "Organization", name: "QAP Report" },
           publisher: { "@type": "Organization", name: "QAP Report" },
           mainEntityOfPage: {
@@ -163,7 +163,7 @@ function GuidePage() {
                 </ul>
               </Section>
 
-              <Section icon={FileText} title="Tipos de boletim: BA, BO-COP, BO-TC e BOAT">
+              <Section icon={FileText} title="Tipos de boletim: BA, BO-COP e BO-TC">
                 <p>
                   Cada sigla representa um documento com finalidade específica. Conhecer a diferença
                   é essencial para escolher a linguagem e o encaminhamento correto.
@@ -186,12 +186,6 @@ function GuidePage() {
                   Aplica-se às infrações de menor potencial ofensivo (Lei 9.099/1995), como pequenos
                   furtos, lesões corporais leves e perturbação da ordem. O texto deve ser conciso,
                   indicar os elementos do crime, o valor envolvido e as condições do infrator.
-                </p>
-                <h3>BOAT — Boletim de Acidente de Trânsito</h3>
-                <p>
-                  Documento específico para ocorrências de trânsito, com foco em veículos,
-                  condutores, testemunhas, condições da via e sinais de trânsito. A clareza é
-                  fundamental para perícias e seguradoras.
                 </p>
               </Section>
 
@@ -219,10 +213,6 @@ function GuidePage() {
                     <strong>Lei 11.343/2006</strong> — define as condutas e penas relacionadas a
                     drogas;
                   </li>
-                  <li>
-                    <strong>Código de Trânsito Brasileiro</strong> — base para BOAT e ocorrências de
-                    trânsito.
-                  </li>
                 </ul>
                 <Tip>
                   <strong>Dica:</strong> cite a norma aplicável sem exagerar. A citação correta
@@ -234,7 +224,7 @@ function GuidePage() {
                 <p>
                   A QAP Report é um assistente de redação policial que transforma palavras-chave em
                   textos técnicos prontos para revisão. O usuário informa o tipo de boletim (BA,
-                  BO-COP, BO-TC ou BOAT) e os dados da ocorrência, e a ferramenta gera:
+                  BO-COP ou BO-TC) e os dados da ocorrência, e a ferramenta gera:
                 </p>
                 <ul>
                   <li>
@@ -285,8 +275,7 @@ function GuidePage() {
               <div className="rounded-2xl border bg-card p-5 shadow-sm">
                 <h3 className="font-semibold">Modelos prontos para usar</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Baixe ou copie textos-modelo para roubo, furto, perda, acidente de trânsito, lesão
-                  corporal e dano.
+                  Baixe ou copie textos-modelo para roubo, furto, perda, lesão corporal e dano.
                 </p>
                 <Link
                   to="/modelos-boletim-ocorrencia"
@@ -299,7 +288,7 @@ function GuidePage() {
               <div className="rounded-2xl border bg-primary p-5 text-primary-foreground shadow-sm">
                 <h3 className="font-semibold">Experimente a QAP Report</h3>
                 <p className="mt-2 text-sm opacity-90">
-                  Crie boletins BA, BO-COP, BO-TC e BOAT com linguagem técnica e apoio de IA. Menos
+                  Crie boletins BA, BO-COP e BO-TC com linguagem técnica e apoio de IA. Menos
                   erros, mais agilidade no plantão.
                 </p>
                 <Link

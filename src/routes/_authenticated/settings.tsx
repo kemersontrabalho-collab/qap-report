@@ -554,7 +554,7 @@ function SettingsPage() {
   );
 }
 
-const BULLETIN_TYPES = ["BA", "BO-COP", "BO-TC", "BOAT"] as const;
+const BULLETIN_TYPES = ["BA", "BO-COP", "BO-TC"] as const;
 
 function SavedBulletinsSection() {
   const qc = useQueryClient();

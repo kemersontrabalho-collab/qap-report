@@ -149,7 +149,7 @@ function AuthPage() {
           <div>
             <p className="text-3xl font-bold leading-tight">Redação policial assistida por IA.</p>
             <p className="mt-3 text-sm opacity-80">
-              Gere boletins BA, BO-COP, BO-TC e BOAT com terminologia técnica adequada e fidelidade
+              Gere boletins BA, BO-COP e BO-TC com terminologia técnica adequada e fidelidade
               aos fatos.
             </p>
           </div>
