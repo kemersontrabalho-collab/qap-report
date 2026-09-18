@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "QAP Report: assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT com terminologia técnica.",
+          "QAP Report: assistente de redação policial com IA para boletins BA, BO-COP e BO-TC com terminologia técnica.",
       },
       { name: "author", content: "QAP Report" },
       { property: "og:type", content: "website" },
@@ -95,11 +95,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "QAP Report — Assistente de Redação Policial" },
       {
         property: "og:description",
-        content: "Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT.",
+        content: "Assistente de redação policial com IA para boletins BA, BO-COP e BO-TC.",
       },
       {
         name: "twitter:description",
-        content: "Assistente de redação policial com IA para boletins BA, BO-COP, BO-TC e BOAT.",
+        content: "Assistente de redação policial com IA para boletins BA, BO-COP e BO-TC.",
       },
       {
         property: "og:image",

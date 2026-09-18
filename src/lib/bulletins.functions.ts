@@ -32,7 +32,6 @@ TIPOS DE BOLETIM:
 - BA: condução à delegacia (inclui tráfico em flagrante).
 - BO-COP: indivíduo presente no local (inclui consumo de maconha).
 - BO-TC: menor potencial ofensivo (inclui posse de cocaína para consumo pessoal).
-- BOAT: acidente/infração de trânsito.
 
 PREVISÃO DE PROCEDIMENTOS PADRÃO (obrigatório):
 Ao redigir o histórico, ANTECIPE e INCLUA os desdobramentos legais e operacionais padrão que naturalmente decorrem do tipo de ocorrência, mesmo quando o usuário não os mencionar explicitamente — desde que sejam procedimentos obrigatórios ou consagrados na prática policial brasileira. Nunca invente fatos concretos (nomes, horários, quantidades), mas descreva as diligências padronizadas que sempre se aplicam ao cenário.
@@ -45,7 +44,6 @@ Referências de previsão (aplique conforme o caso):
 - Entorpecentes — tráfico (Art. 33, Lei 11.343/06): pesagem, arrecadação e cadeia de custódia da substância; condução do autor à DP com apresentação à autoridade policial para APF; encaminhamento da droga para perícia.
 - Entorpecentes — usuário (Art. 28, Lei 11.343/06): lavratura de TCO (BO-TC) quando cabível; arrecadação da substância para perícia; liberação após qualificação e assinatura de termo de comparecimento.
 - Envolvendo criança/adolescente: acionamento do Conselho Tutelar; encaminhamento à Delegacia de Proteção à Criança e ao Adolescente (DPCA) quando existente.
-- Acidente de trânsito (BOAT — CTB, Lei 9.503/97): isolamento e sinalização do local; acionamento de resgate/SAMU quando houver vítimas; teste do etilômetro quando cabível (Art. 165/165-A); registro do BOAT; remoção de veículos quando necessário.
 - Óbito/suspeita de crime contra a vida: preservação do local até chegada da Perícia Técnica e do IML; acionamento do Delegado de Homicídios/DHPP quando existente.
 
 Só omita um procedimento previsível quando o próprio contexto informado indicar que ele NÃO se aplica (ex.: vítima recusou exame — registre a recusa em vez de omitir). Nunca substitua procedimento padrão por suposição de fatos.
@@ -70,7 +68,7 @@ FORMATO DE SAÍDA:
 - (Se necessário) PERGUNTAS COMPLEMENTARES`;
 
 const genInput = z.object({
-  bulletinType: z.enum(["BA", "BO-COP", "BO-TC", "BOAT"]),
+  bulletinType: z.enum(["BA", "BO-COP", "BO-TC"]),
   category: z.string().optional(),
   keywords: z.string().min(3, "Informe palavras-chave"),
   context: z.string().optional(),
@@ -251,7 +249,7 @@ const askInput = z.object({
 
 const CHAT_SYSTEM = `Você é um assistente jurídico especializado em direito penal, processual penal e legislação policial brasileira.
 Responda dúvidas de policiais militares e civis sobre:
-- Qual documento (BA, BO-COP, BO-TC, BOAT) é indicado para cada situação.
+- Qual documento (BA, BO-COP ou BO-TC) é indicado para cada situação.
 - Enquadramento legal (artigos, leis, incisos) e penas previstas.
 - Procedimentos operacionais (Súmula Vinculante 11 do STF, direitos do preso, etc.).
 Seja objetivo, cite artigos e leis quando possível. Se não tiver certeza, diga que a orientação depende do caso concreto e recomende consultar a autoridade policial competente.
