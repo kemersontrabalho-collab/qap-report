@@ -9,49 +9,53 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermosRouteImport } from './routes/termos'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as ReembolsoRouteImport } from './routes/reembolso'
-import { Route as PrivacidadeRouteImport } from './routes/privacidade'
-import { Route as ModelosBoletimOcorrenciaRouteImport } from './routes/modelos-boletim-ocorrencia'
-import { Route as GuiaRedacaoTecnicaRouteImport } from './routes/guia-redacao-tecnica'
-import { Route as GuiaDelegaciaOnlineRouteImport } from './routes/guia-delegacia-online'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedAssinarRouteImport } from './routes/_authenticated/assinar'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as GuiaDelegaciaOnlineRouteImport } from './routes/guia-delegacia-online'
+import { Route as GuiaRedacaoTecnicaRouteImport } from './routes/guia-redacao-tecnica'
+import { Route as ModelosBoletimOcorrenciaRouteImport } from './routes/modelos-boletim-ocorrencia'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as ReembolsoRouteImport } from './routes/reembolso'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as AuthenticatedAiChatRouteImport } from './routes/_authenticated/ai-chat'
-import { Route as ApiPublicLogErrorRouteImport } from './routes/api/public/log-error'
-import { Route as AuthenticatedBulletinsNewRouteImport } from './routes/_authenticated/bulletins.new'
+import { Route as AuthenticatedAssinarRouteImport } from './routes/_authenticated/assinar'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedBulletinsIdRouteImport } from './routes/_authenticated/bulletins.$id'
+import { Route as AuthenticatedBulletinsNewRouteImport } from './routes/_authenticated/bulletins.new'
+import { Route as ApiPublicLogErrorRouteImport } from './routes/api/public/log-error'
 
-const TermosRoute = TermosRouteImport.update({
-  id: '/termos',
-  path: '/termos',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReembolsoRoute = ReembolsoRouteImport.update({
-  id: '/reembolso',
-  path: '/reembolso',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivacidadeRoute = PrivacidadeRouteImport.update({
-  id: '/privacidade',
-  path: '/privacidade',
+const GuiaDelegaciaOnlineRoute = GuiaDelegaciaOnlineRouteImport.update({
+  id: '/guia-delegacia-online',
+  path: '/guia-delegacia-online',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuiaRedacaoTecnicaRoute = GuiaRedacaoTecnicaRouteImport.update({
+  id: '/guia-redacao-tecnica',
+  path: '/guia-redacao-tecnica',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModelosBoletimOcorrenciaRoute =
@@ -60,43 +64,34 @@ const ModelosBoletimOcorrenciaRoute =
     path: '/modelos-boletim-ocorrencia',
     getParentRoute: () => rootRouteImport,
   } as any)
-const GuiaRedacaoTecnicaRoute = GuiaRedacaoTecnicaRouteImport.update({
-  id: '/guia-redacao-tecnica',
-  path: '/guia-redacao-tecnica',
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GuiaDelegaciaOnlineRoute = GuiaDelegaciaOnlineRouteImport.update({
-  id: '/guia-delegacia-online',
-  path: '/guia-delegacia-online',
+const ReembolsoRoute = ReembolsoRouteImport.update({
+  id: '/reembolso',
+  path: '/reembolso',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedAiChatRoute = AuthenticatedAiChatRouteImport.update({
+  id: '/ai-chat',
+  path: '/ai-chat',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAssinarRoute = AuthenticatedAssinarRouteImport.update({
@@ -104,28 +99,33 @@ const AuthenticatedAssinarRoute = AuthenticatedAssinarRouteImport.update({
   path: '/assinar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAiChatRoute = AuthenticatedAiChatRouteImport.update({
-  id: '/ai-chat',
-  path: '/ai-chat',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ApiPublicLogErrorRoute = ApiPublicLogErrorRouteImport.update({
-  id: '/api/public/log-error',
-  path: '/api/public/log-error',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedBulletinsNewRoute =
-  AuthenticatedBulletinsNewRouteImport.update({
-    id: '/bulletins/new',
-    path: '/bulletins/new',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedBulletinsIdRoute =
   AuthenticatedBulletinsIdRouteImport.update({
     id: '/bulletins/$id',
     path: '/bulletins/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBulletinsNewRoute =
+  AuthenticatedBulletinsNewRouteImport.update({
+    id: '/bulletins/new',
+    path: '/bulletins/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicLogErrorRoute = ApiPublicLogErrorRouteImport.update({
+  id: '/api/public/log-error',
+  path: '/api/public/log-error',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -271,74 +271,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/termos': {
-      id: '/termos'
-      path: '/termos'
-      fullPath: '/termos'
-      preLoaderRoute: typeof TermosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reembolso': {
-      id: '/reembolso'
-      path: '/reembolso'
-      fullPath: '/reembolso'
-      preLoaderRoute: typeof ReembolsoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacidade': {
-      id: '/privacidade'
-      path: '/privacidade'
-      fullPath: '/privacidade'
-      preLoaderRoute: typeof PrivacidadeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/modelos-boletim-ocorrencia': {
-      id: '/modelos-boletim-ocorrencia'
-      path: '/modelos-boletim-ocorrencia'
-      fullPath: '/modelos-boletim-ocorrencia'
-      preLoaderRoute: typeof ModelosBoletimOcorrenciaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/guia-redacao-tecnica': {
-      id: '/guia-redacao-tecnica'
-      path: '/guia-redacao-tecnica'
-      fullPath: '/guia-redacao-tecnica'
-      preLoaderRoute: typeof GuiaRedacaoTecnicaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/guia-delegacia-online': {
-      id: '/guia-delegacia-online'
-      path: '/guia-delegacia-online'
-      fullPath: '/guia-delegacia-online'
-      preLoaderRoute: typeof GuiaDelegaciaOnlineRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -348,25 +285,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+    '/guia-delegacia-online': {
+      id: '/guia-delegacia-online'
+      path: '/guia-delegacia-online'
+      fullPath: '/guia-delegacia-online'
+      preLoaderRoute: typeof GuiaDelegaciaOnlineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guia-redacao-tecnica': {
+      id: '/guia-redacao-tecnica'
+      path: '/guia-redacao-tecnica'
+      fullPath: '/guia-redacao-tecnica'
+      preLoaderRoute: typeof GuiaRedacaoTecnicaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/modelos-boletim-ocorrencia': {
+      id: '/modelos-boletim-ocorrencia'
+      path: '/modelos-boletim-ocorrencia'
+      fullPath: '/modelos-boletim-ocorrencia'
+      preLoaderRoute: typeof ModelosBoletimOcorrenciaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reembolso': {
+      id: '/reembolso'
+      path: '/reembolso'
+      fullPath: '/reembolso'
+      preLoaderRoute: typeof ReembolsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/ai-chat': {
+      id: '/_authenticated/ai-chat'
+      path: '/ai-chat'
+      fullPath: '/ai-chat'
+      preLoaderRoute: typeof AuthenticatedAiChatRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/assinar': {
@@ -376,25 +369,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAssinarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/ai-chat': {
-      id: '/_authenticated/ai-chat'
-      path: '/ai-chat'
-      fullPath: '/ai-chat'
-      preLoaderRoute: typeof AuthenticatedAiChatRouteImport
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/log-error': {
-      id: '/api/public/log-error'
-      path: '/api/public/log-error'
-      fullPath: '/api/public/log-error'
-      preLoaderRoute: typeof ApiPublicLogErrorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/bulletins/new': {
-      id: '/_authenticated/bulletins/new'
-      path: '/bulletins/new'
-      fullPath: '/bulletins/new'
-      preLoaderRoute: typeof AuthenticatedBulletinsNewRouteImport
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/bulletins/$id': {
@@ -403,6 +389,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/bulletins/$id'
       preLoaderRoute: typeof AuthenticatedBulletinsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bulletins/new': {
+      id: '/_authenticated/bulletins/new'
+      path: '/bulletins/new'
+      fullPath: '/bulletins/new'
+      preLoaderRoute: typeof AuthenticatedBulletinsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/log-error': {
+      id: '/api/public/log-error'
+      path: '/api/public/log-error'
+      fullPath: '/api/public/log-error'
+      preLoaderRoute: typeof ApiPublicLogErrorRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
