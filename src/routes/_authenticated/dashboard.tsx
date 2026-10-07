@@ -47,6 +47,7 @@ const bulletinsQueryOptions = queryOptions({
     const { data, error } = await supabase
       .from("bulletins")
       .select("id, bulletin_type, category, title, status, is_favorite, deleted_at, created_at, updated_at")
+      .in("bulletin_type", ["BA", "BO-COP", "BO-TC"])
       .order("updated_at", { ascending: false });
     if (error) throw error;
     return (data ?? []) as Bulletin[];
