@@ -184,6 +184,7 @@ function EditBulletin() {
   }
 
   const savingRef = useRef(false);
+  const [shareCommunity, setShareCommunity] = useState(true);
 
   async function save(nextStatus?: "draft" | "done", opts?: { silent?: boolean }) {
     const current = bRef.current;
@@ -214,6 +215,9 @@ function EditBulletin() {
         occurrence_lng: current.occurrence_lng,
       };
       if (nextStatus) patch.status = nextStatus;
+      if (nextStatus === "done") {
+        (patch as Record<string, unknown>).share_to_community = shareCommunity;
+      }
       const { error } = await supabase.from("bulletins").update(patch).eq("id", current.id);
       if (error) throw error;
       // Mantém "sujo" se o usuário digitou durante a requisição: assim o
@@ -698,6 +702,15 @@ function EditBulletin() {
                 )}
                 Salvar
               </button>
+              <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={shareCommunity}
+                  onChange={(e) => setShareCommunity(e.target.checked)}
+                  className="h-3.5 w-3.5 accent-primary"
+                />
+                Enviar anônimo à base coletiva
+              </label>
               <button
                 onClick={() => {
                   prepareUiSounds();
