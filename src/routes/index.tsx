@@ -272,7 +272,7 @@ function Landing() {
               style={{ "--d": "330ms" } as React.CSSProperties}
             >
               {[
-                ["4", "tipos de boletim"],
+                ["3", "tipos de boletim"],
                 ["24h", "de teste"],
                 ["100%", "dados isolados"],
               ].map(([value, label]) => (
