@@ -80,7 +80,9 @@ const genInput = z.object({
   occurrenceAddress: z.string().optional(),
 });
 
-async function callGateway(messages: { role: string; content: string }[]) {
+type GatewayMessage = { role: string; content: string | unknown[] };
+
+async function callGateway(messages: GatewayMessage[], extra?: Record<string, unknown>) {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY ausente");
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -89,7 +91,7 @@ async function callGateway(messages: { role: string; content: string }[]) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({ model: "openai/gpt-5.4-mini", messages }),
+    body: JSON.stringify({ model: "openai/gpt-5.4-mini", messages, ...(extra ?? {}) }),
   });
   if (!res.ok) {
     if (res.status === 429)
