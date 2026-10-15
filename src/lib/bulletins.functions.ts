@@ -78,6 +78,8 @@ const genInput = z.object({
   occurrenceAt: z.string().optional(),
   crewAddress: z.string().optional(),
   occurrenceAddress: z.string().optional(),
+  seizedItems: z.string().max(4000).optional(),
+  involvedParties: z.string().max(4000).optional(),
 });
 
 type GatewayMessage = { role: string; content: string | unknown[] };
@@ -211,6 +213,10 @@ export const generateBulletin = createServerFn({ method: "POST" })
       fmtDate && `- Data e Hora: ${fmtDate}`,
       data.crewAddress && `- LOCALIZAÇÃO DA GUARNIÇÃO: ${data.crewAddress}`,
       data.occurrenceAddress && `- Localização da Ocorrência: ${data.occurrenceAddress}`,
+      data.seizedItems?.trim() &&
+        `- MATERIAIS APREENDIDOS (descreva-os integralmente na narrativa, com quantidades e características exatamente como informadas; registre acondicionamento e destino apenas se informados):\n${data.seizedItems.trim()}`,
+      data.involvedParties?.trim() &&
+        `- ENVOLVIDOS (use estes nomes e papéis; não invente qualificação adicional):\n${data.involvedParties.trim()}`,
     ]
       .filter(Boolean)
       .join("\n");
@@ -231,7 +237,7 @@ Produza o boletim seguindo rigorosamente as regras. Estrutura obrigatória:
 2) Em seguida, "## HISTÓRICO / VERSÃO POLICIAL" e o texto corrido.
 Todos os dados padronizados acima (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) devem estar EMBASADOS/EMBUTIDOS na narrativa do histórico — NÃO crie cabeçalho, lista ou bloco de campos acima do histórico. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — jamais invente informação.`;
 
-    const messages: { role: string; content: string }[] = [
+    const messages: GatewayMessage[] = [
       { role: "system", content: SYSTEM_PROMPT },
     ];
     if (references) messages.push({ role: "system", content: references });
@@ -305,5 +311,158 @@ export const reverseGeocode = createServerFn({ method: "POST" })
       throw e;
     } finally {
       clearTimeout(timer);
+    }
+  });
+
+// ---- Auditoria jurídica preventiva ----
+const auditInput = z.object({
+  content: z.string().min(50).max(20000),
+  bulletinType: z.string().max(20),
+});
+
+const AUDIT_SYSTEM = `Você é um revisor jurídico de boletins policiais brasileiros. Analise o histórico e aponte vulnerabilidades que podem levar à nulidade em audiência de custódia ou em juízo: fundada suspeita genérica ou subjetiva (ex.: "atitude suspeita" sem elementos concretos), entrada em domicílio sem autorização expressa do morador ou sem flagrante delito justificado, uso de algemas sem justificativa (Súmula Vinculante 11), ausência de leitura de direitos (Art. 5º, LXIII, CF), cadeia de custódia incompleta (lacre, acondicionamento, destino), versões das partes ausentes, contradições cronológicas. Não aponte problemas inexistentes. Responda somente em JSON.`;
+
+const auditSchema = {
+  type: "json_schema",
+  json_schema: {
+    name: "audit",
+    strict: true,
+    schema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["issues"],
+      properties: {
+        issues: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["severity", "title", "excerpt", "suggestion"],
+            properties: {
+              severity: { type: "string", enum: ["alta", "media", "baixa"] },
+              title: { type: "string" },
+              excerpt: { type: "string" },
+              suggestion: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+export type AuditIssue = {
+  severity: "alta" | "media" | "baixa";
+  title: string;
+  excerpt: string;
+  suggestion: string;
+};
+
+export const auditBulletin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => auditInput.parse(data))
+  .handler(async ({ data, context }) => {
+    await assertPremium(context.supabase, context.userId);
+    const raw = await callGateway(
+      [
+        { role: "system", content: AUDIT_SYSTEM },
+        { role: "user", content: `Tipo: ${data.bulletinType}\n\nHistórico (json de saída):\n${data.content}` },
+      ],
+      { response_format: auditSchema },
+    );
+    try {
+      const parsed = JSON.parse(raw) as { issues?: AuditIssue[] };
+      return { issues: (parsed.issues ?? []).slice(0, 12) };
+    } catch {
+      throw new Error("Não foi possível interpretar a auditoria. Tente novamente.");
+    }
+  });
+
+const fixInput = z.object({
+  content: z.string().min(50).max(20000),
+  issues: z.array(z.string().max(600)).min(1).max(12),
+});
+
+export const fixBulletin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => fixInput.parse(data))
+  .handler(async ({ data, context }) => {
+    await assertPremium(context.supabase, context.userId);
+    const content = await callGateway([
+      { role: "system", content: SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: `Revise o histórico abaixo corrigindo SOMENTE a redação dos pontos apontados. É PROIBIDO acrescentar fatos não presentes no texto original (nomes, horários, objetos, autorizações, resistências). Se a correção depender de um fato não informado, insira um marcador entre chaves, ex.: {DESCREVER ELEMENTO CONCRETO DA FUNDADA SUSPEITA}. Mantenha a estrutura e o formato de saída.
+
+PONTOS A CORRIGIR:
+${data.issues.map((i, n) => `${n + 1}. ${i}`).join("\n")}
+
+HISTÓRICO ORIGINAL:
+${data.content}`,
+      },
+    ]);
+    return { content };
+  });
+
+// ---- Leitura de documento por foto (imagem não é armazenada) ----
+const docInput = z.object({
+  image: z
+    .string()
+    .max(6_000_000)
+    .regex(/^data:image\/(jpeg|png|webp);base64,/, "Imagem inválida"),
+});
+
+const docSchema = {
+  type: "json_schema",
+  json_schema: {
+    name: "document",
+    strict: true,
+    schema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["name", "rg", "cpf", "birthDate", "motherName"],
+      properties: {
+        name: { type: "string" },
+        rg: { type: "string" },
+        cpf: { type: "string" },
+        birthDate: { type: "string" },
+        motherName: { type: "string" },
+      },
+    },
+  },
+};
+
+export const extractDocument = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => docInput.parse(data))
+  .handler(async ({ data, context }) => {
+    await assertPremium(context.supabase, context.userId);
+    const raw = await callGateway(
+      [
+        {
+          role: "system",
+          content:
+            "Extraia os dados textuais de um documento de identificação brasileiro (RG, CNH ou similar). Use string vazia para o que não estiver legível. Não invente. Data no formato DD/MM/AAAA. Responda em JSON.",
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Extraia nome, RG, CPF, data de nascimento e nome da mãe (json)." },
+            { type: "image_url", image_url: { url: data.image } },
+          ],
+        },
+      ],
+      { response_format: docSchema },
+    );
+    try {
+      return JSON.parse(raw) as {
+        name: string;
+        rg: string;
+        cpf: string;
+        birthDate: string;
+        motherName: string;
+      };
+    } catch {
+      throw new Error("Não foi possível ler o documento. Tente uma foto mais nítida.");
     }
   });
