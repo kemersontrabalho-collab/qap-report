@@ -88,6 +88,51 @@ export type Database = {
           },
         ]
       }
+      bulletin_presets: {
+        Row: {
+          bulletin_type: string
+          category: string | null
+          context: string | null
+          created_at: string
+          crew_composition: string | null
+          id: string
+          keywords: string | null
+          name: string
+          support_crew: string | null
+          updated_at: string
+          user_id: string
+          vehicle_prefix: string | null
+        }
+        Insert: {
+          bulletin_type: string
+          category?: string | null
+          context?: string | null
+          created_at?: string
+          crew_composition?: string | null
+          id?: string
+          keywords?: string | null
+          name: string
+          support_crew?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_prefix?: string | null
+        }
+        Update: {
+          bulletin_type?: string
+          category?: string | null
+          context?: string | null
+          created_at?: string
+          crew_composition?: string | null
+          id?: string
+          keywords?: string | null
+          name?: string
+          support_crew?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_prefix?: string | null
+        }
+        Relationships: []
+      }
       bulletin_templates: {
         Row: {
           bulletin_type: string
@@ -143,12 +188,14 @@ export type Database = {
           crew_lng: number | null
           deleted_at: string | null
           id: string
+          involved_parties: Json
           is_favorite: boolean
           keywords: string | null
           occurrence_address: string | null
           occurrence_at: string | null
           occurrence_lat: number | null
           occurrence_lng: number | null
+          seized_items: Json
           share_to_community: boolean
           status: string
           support_crew: string | null
@@ -169,12 +216,14 @@ export type Database = {
           crew_lng?: number | null
           deleted_at?: string | null
           id?: string
+          involved_parties?: Json
           is_favorite?: boolean
           keywords?: string | null
           occurrence_address?: string | null
           occurrence_at?: string | null
           occurrence_lat?: number | null
           occurrence_lng?: number | null
+          seized_items?: Json
           share_to_community?: boolean
           status?: string
           support_crew?: string | null
@@ -195,12 +244,14 @@ export type Database = {
           crew_lng?: number | null
           deleted_at?: string | null
           id?: string
+          involved_parties?: Json
           is_favorite?: boolean
           keywords?: string | null
           occurrence_address?: string | null
           occurrence_at?: string | null
           occurrence_lat?: number | null
           occurrence_lng?: number | null
+          seized_items?: Json
           share_to_community?: boolean
           status?: string
           support_crew?: string | null
