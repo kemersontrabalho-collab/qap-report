@@ -23,6 +23,17 @@ import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import { copyWithFeedback } from "@/lib/clipboard";
 import { printBulletin } from "@/lib/print-bulletin";
 import { playUiSound, prepareUiSounds } from "@/lib/ui-sounds";
+import { AuditPanel, InvolvedPartiesSection, SeizedItemsSection } from "@/components/BulletinExtras";
+import {
+  asArray,
+  formatWhatsApp,
+  partiesToText,
+  seizedToText,
+  type InvolvedParty,
+  type SeizedItem,
+} from "@/lib/bulletin-extras";
+import { getPending, isNetworkError, removePending, savePending } from "@/lib/offline-drafts";
+import { useOnline } from "@/lib/use-online";
 import {
   ArrowLeft,
   Sparkles,
@@ -35,6 +46,9 @@ import {
   MapPin,
   ExternalLink,
   Printer,
+  MessageCircle,
+  BookmarkPlus,
+  WifiOff,
 } from "lucide-react";
 const bulletinQueryOptions = (id: string) => queryOptions({
   queryKey: ["bulletin", id],
@@ -42,7 +56,9 @@ const bulletinQueryOptions = (id: string) => queryOptions({
     const { data, error } = await supabase.from("bulletins").select("*").eq("id", id).maybeSingle();
     if (error) throw error;
     if (!data) throw new Error("NotFound");
-    const bulletin = data as Bulletin;
+    const bulletin = data as unknown as Bulletin;
+    bulletin.seized_items = asArray<SeizedItem>(data.seized_items);
+    bulletin.involved_parties = asArray<InvolvedParty>(data.involved_parties);
     if (!bulletin.occurrence_at) bulletin.occurrence_at = new Date().toISOString();
     return bulletin;
   },
@@ -78,6 +94,8 @@ type Bulletin = {
   occurrence_address: string | null;
   occurrence_lat: number | null;
   occurrence_lng: number | null;
+  seized_items: SeizedItem[];
+  involved_parties: InvolvedParty[];
 };
 
 // Formata timestamp ISO -> valor de <input type="datetime-local">
@@ -168,6 +186,25 @@ function EditBulletin() {
   const revRef = useRef(0);
   const bRef = useRef<Bulletin | null>(null);
   bRef.current = b;
+  const online = useOnline();
+  const [localOnly, setLocalOnly] = useState(false);
+
+  // Restaura alterações salvas no aparelho sem sinal e tenta sincronizá-las.
+  useEffect(() => {
+    void getPending(id)
+      .then((p) => {
+        if (!p) return;
+        dirtyRef.current = true;
+        revRef.current += 1;
+        setLocalOnly(true);
+        setB((prev) => ({ ...prev, ...(p.patch as Partial<Bulletin>) }));
+      })
+      .catch(() => {});
+  }, [id]);
+  useEffect(() => {
+    if (online && localOnly && dirtyRef.current) void save(undefined, { silent: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [online, localOnly]);
 
   const typeInfo = useMemo(() => BULLETIN_TYPES.find((t) => t.code === b?.bulletin_type), [b]);
   const categories = useMemo(() => (b ? (CATEGORIES_BY_TYPE[b.bulletin_type] ?? []) : []), [b]);
@@ -213,13 +250,26 @@ function EditBulletin() {
         occurrence_address: current.occurrence_address,
         occurrence_lat: current.occurrence_lat,
         occurrence_lng: current.occurrence_lng,
+        seized_items: current.seized_items,
+        involved_parties: current.involved_parties,
       };
       if (nextStatus) patch.status = nextStatus;
       if (nextStatus === "done") {
         (patch as Record<string, unknown>).share_to_community = shareCommunity;
       }
-      const { error } = await supabase.from("bulletins").update(patch).eq("id", current.id);
+      if (typeof navigator !== "undefined" && !navigator.onLine && !nextStatus) {
+        throw new TypeError("Failed to fetch");
+      }
+      const { error } = await supabase
+        .from("bulletins")
+        .update(patch as never)
+        .eq("id", current.id);
       if (error) throw error;
+      void removePending(current.id).catch(() => {});
+      if (localOnly) {
+        setLocalOnly(false);
+        toast.success("Rascunho sincronizado com a nuvem");
+      }
       // Mantém "sujo" se o usuário digitou durante a requisição: assim o
       // próximo autosave envia o que ficou de fora deste patch.
       if (revRef.current === revAtStart) dirtyRef.current = false;
@@ -240,7 +290,26 @@ function EditBulletin() {
         toast.success(nextStatus === "done" ? "Boletim concluído" : "Salvo");
       }
     } catch (e) {
-      toast.error(translateDbError(e));
+      if (isNetworkError(e) && nextStatus !== "done") {
+        try {
+          const { status: _s, ...rest } = {
+            ...(bRef.current as unknown as Record<string, unknown>),
+            status: undefined,
+          };
+          void _s;
+          delete rest.id;
+          await savePending(current.id, rest);
+          if (revRef.current === revAtStart) dirtyRef.current = false;
+          setLocalOnly(true);
+          if (!opts?.silent) toast.message("Salvo localmente (sem sinal)");
+        } catch {
+          toast.error("Sem conexão e não foi possível salvar no aparelho.");
+        }
+      } else if (isNetworkError(e)) {
+        toast.error("Sem conexão. Conclua quando o sinal voltar.");
+      } else {
+        toast.error(translateDbError(e));
+      }
     } finally {
       savingRef.current = false;
       setSaving(false);
@@ -290,6 +359,8 @@ function EditBulletin() {
           occurrenceAt: b.occurrence_at ?? undefined,
           crewAddress: b.crew_address ?? undefined,
           occurrenceAddress: b.occurrence_address ?? undefined,
+          seizedItems: seizedToText(b.seized_items) || undefined,
+          involvedParties: partiesToText(b.involved_parties) || undefined,
         },
       });
       update("content", res.content);
@@ -310,6 +381,47 @@ function EditBulletin() {
     await copyWithFeedback(stripBraces(b.content));
   }
 
+  async function copyWhatsApp() {
+    if (!b.content?.trim()) {
+      toast.error("Gere ou escreva o histórico antes.");
+      return;
+    }
+    await copyWithFeedback(
+      formatWhatsApp({
+        bulletinType: b.bulletin_type,
+        category: b.category,
+        title: b.title,
+        occurrenceAt: b.occurrence_at,
+        occurrenceAddress: b.occurrence_address,
+        crewComposition: b.crew_composition,
+        vehiclePrefix: b.vehicle_prefix,
+        supportCrew: b.support_crew,
+        seized: b.seized_items,
+        content: b.content,
+      }),
+    );
+  }
+
+  async function saveAsPreset() {
+    const name = prompt("Nome do modelo (ex.: Tático - Flagrante de tráfico)");
+    if (!name?.trim()) return;
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const { error } = await supabase.from("bulletin_presets").insert({
+      user_id: u.user.id,
+      name: name.trim().slice(0, 120),
+      bulletin_type: b.bulletin_type,
+      category: b.category,
+      crew_composition: b.crew_composition,
+      vehicle_prefix: b.vehicle_prefix,
+      support_crew: b.support_crew,
+      keywords: b.keywords,
+      context: b.context,
+    });
+    if (error) toast.error(translateDbError(error));
+    else toast.success("Modelo salvo. Use-o em Novo boletim.");
+  }
+
   function exportPdf() {
     if (!b) return;
     if (!b.content?.trim()) {
@@ -327,6 +439,8 @@ function EditBulletin() {
       crewAddress: b.crew_address,
       occurrenceAddress: b.occurrence_address,
       content: stripBraces(b.content),
+      seizedItems: b.seized_items,
+      involvedParties: b.involved_parties,
     });
     if (!ok) toast.error("Libere os pop-ups deste site para exportar em PDF.");
   }
@@ -584,6 +698,13 @@ function EditBulletin() {
             </div>
           </div>
 
+          <SeizedItemsSection items={b.seized_items} onChange={(v) => update("seized_items", v)} />
+          <InvolvedPartiesSection
+            parties={b.involved_parties}
+            onChange={(v) => update("involved_parties", v)}
+            online={online}
+          />
+
           <div className="surface-card reveal space-y-3 rounded-2xl p-4">
             <div>
               <div className="flex items-center justify-between gap-2">
@@ -641,7 +762,8 @@ function EditBulletin() {
 
             <button
               onClick={generate}
-              disabled={generating}
+              disabled={generating || !online}
+              title={online ? undefined : "Indisponível sem internet"}
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
             >
               {generating ? (
@@ -673,7 +795,15 @@ function EditBulletin() {
 
         <section className="surface-card reveal rounded-2xl">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b p-3">
-            <div className="text-sm font-medium">Documento</div>
+            <div className="flex items-center gap-2 text-sm font-medium">
+              Documento
+              {(!online || localOnly) && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-warning/15 px-2 py-0.5 text-xs text-warning-foreground dark:text-warning">
+                  <WifiOff className="h-3 w-3" />
+                  {online ? "Sincronizando…" : "Sem sinal — salvo localmente"}
+                </span>
+              )}
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={copyText}
@@ -686,6 +816,18 @@ function EditBulletin() {
                 className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent"
               >
                 <Printer className="h-3.5 w-3.5" /> PDF
+              </button>
+              <button
+                onClick={copyWhatsApp}
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent"
+              >
+                <MessageCircle className="h-3.5 w-3.5" /> Copiar p/ WhatsApp
+              </button>
+              <button
+                onClick={saveAsPreset}
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent"
+              >
+                <BookmarkPlus className="h-3.5 w-3.5" /> Salvar como modelo
               </button>
               <button
                 onClick={() => {
@@ -723,6 +865,12 @@ function EditBulletin() {
               </button>
             </div>
           </div>
+          <AuditPanel
+            content={b.content}
+            bulletinType={b.bulletin_type}
+            online={online}
+            onApply={(t) => update("content", t)}
+          />
           <textarea
             value={b.content}
             onChange={(e) => update("content", e.target.value)}

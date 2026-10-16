@@ -1,6 +1,8 @@
 // Impressão/PDF do boletim: monta um documento limpo em uma janela separada.
 // Antes o app prometia "exportação em PDF" no tutorial, mas nenhum botão existia.
 
+import { partyLine, seizedLine, type InvolvedParty, type SeizedItem } from "./bulletin-extras";
+
 type PrintData = {
   title: string;
   bulletinType: string;
@@ -12,6 +14,8 @@ type PrintData = {
   crewAddress: string | null;
   occurrenceAddress: string | null;
   content: string;
+  seizedItems?: SeizedItem[];
+  involvedParties?: InvolvedParty[];
 };
 
 function esc(v: string | null | undefined): string {
@@ -39,6 +43,7 @@ export function printBulletin(data: PrintData): boolean {
   table { width:100%; border-collapse: collapse; margin:16px 0; font-size:12px; }
   td { border:1px solid #999; padding:6px 8px; vertical-align: top; }
   td.k { width:34%; background:#f3f3f3; font-weight:bold; text-transform:uppercase; font-size:11px; }
+  h2 { font-size: 13px; text-transform: uppercase; margin: 14px 0 0; }
   pre { white-space: pre-wrap; font-family: inherit; font-size:13px; margin:0; text-align: justify; }
 </style></head><body>
 <div class="tag">${esc(data.bulletinType)}</div>
@@ -52,6 +57,14 @@ export function printBulletin(data: PrintData): boolean {
   <tr><td class="k">Localização da guarnição</td><td>${esc(data.crewAddress)}</td></tr>
   <tr><td class="k">Localização da ocorrência</td><td>${esc(data.occurrenceAddress)}</td></tr>
 </table>
+${(() => {
+  const seized = (data.seizedItems ?? []).filter((i) => i.description?.trim());
+  const parties = (data.involvedParties ?? []).filter((p) => p.name?.trim());
+  let out = "";
+  if (parties.length) out += `<h2>Envolvidos</h2><table>${parties.map((p) => `<tr><td>${esc(partyLine(p))}</td></tr>`).join("")}</table>`;
+  if (seized.length) out += `<h2>Materiais apreendidos</h2><table>${seized.map((i) => `<tr><td>${esc(seizedLine(i))}</td></tr>`).join("")}</table>`;
+  return out;
+})()}
 <pre>${esc(data.content)}</pre>
 <script>window.onload=function(){window.focus();window.print();}${"<"}/script>
 </body></html>`;
