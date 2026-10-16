@@ -139,7 +139,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d)){document.documentElement.classList.add('dark');}}catch(e){}`,
+            __html: `try{var t=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||t==='tactical'||(!t&&d)){document.documentElement.classList.add('dark');}if(t==='tactical'){document.documentElement.classList.add('tactical');}}catch(e){}`,
           }}
         />
       </head>

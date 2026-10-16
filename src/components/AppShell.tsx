@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle } from "lucide-react";
+import { LayoutDashboard, Settings, LogOut, Moon, Sun, Plus, MessageCircle, Crosshair } from "lucide-react";
 import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/lib/theme";
@@ -114,9 +114,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <button
               onClick={toggle}
               className="btn-ghost-line grid h-11 w-11 place-items-center rounded-xl sm:h-9 sm:w-9"
-              aria-label="Alternar tema"
+              aria-label="Alternar tema (claro, escuro, tático noturno)"
+              title={theme === "light" ? "Tema escuro" : theme === "dark" ? "Modo tático noturno" : "Tema claro"}
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {theme === "light" ? <Moon className="h-4 w-4" /> : theme === "dark" ? <Crosshair className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </button>
             {/* Sair fica no header apenas no desktop; em mobile vive na bottom bar. */}
             <button

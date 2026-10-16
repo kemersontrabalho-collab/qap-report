@@ -233,11 +233,15 @@ function SettingsPage() {
 
         <SavedBulletinsSection />
 
+        <PresetsSection />
+
         <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="font-semibold">Aparência</h2>
 
-          <p className="mt-1 text-sm text-muted-foreground">Alterne entre tema claro e escuro.</p>
-          <div className="mt-4 grid grid-cols-1 gap-2 xs:grid-cols-2">
+          <p className="mt-1 text-sm text-muted-foreground">
+            Claro, escuro ou Tático Noturno (fundo preto e textos em vermelho/âmbar, para serviço noturno).
+          </p>
+          <div className="mt-4 grid grid-cols-1 gap-2 xs:grid-cols-3">
             <button
               onClick={() => setTheme("light")}
               className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
@@ -253,6 +257,14 @@ function SettingsPage() {
               }`}
             >
               <Moon className="h-4 w-4" /> Escuro
+            </button>
+            <button
+              onClick={() => setTheme("tactical")}
+              className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
+                theme === "tactical" ? "border-primary bg-primary/5" : "hover:bg-accent"
+              }`}
+            >
+              <Crosshair className="h-4 w-4" /> Tático Noturno
             </button>
           </div>
         </section>
