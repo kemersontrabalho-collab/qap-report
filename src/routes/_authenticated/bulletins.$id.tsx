@@ -187,7 +187,12 @@ function EditBulletin() {
   const bRef = useRef<Bulletin | null>(null);
   bRef.current = b;
   const online = useOnline();
-  const [localOnly, setLocalOnly] = useState(false);
+  const [localOnly, setLocalOnlyState] = useState(false);
+  const localOnlyRef = useRef(false);
+  const setLocalOnly = (v: boolean) => {
+    localOnlyRef.current = v;
+    setLocalOnlyState(v);
+  };
 
   // Restaura alterações salvas no aparelho sem sinal e tenta sincronizá-las.
   useEffect(() => {
@@ -266,7 +271,7 @@ function EditBulletin() {
         .eq("id", current.id);
       if (error) throw error;
       void removePending(current.id).catch(() => {});
-      if (localOnly) {
+      if (localOnlyRef.current) {
         setLocalOnly(false);
         toast.success("Rascunho sincronizado com a nuvem");
       }
@@ -292,12 +297,9 @@ function EditBulletin() {
     } catch (e) {
       if (isNetworkError(e) && nextStatus !== "done") {
         try {
-          const { status: _s, ...rest } = {
-            ...(bRef.current as unknown as Record<string, unknown>),
-            status: undefined,
-          };
-          void _s;
+          const rest: Record<string, unknown> = { ...(bRef.current as unknown as Record<string, unknown>) };
           delete rest.id;
+          delete rest.status;
           await savePending(current.id, rest);
           if (revRef.current === revAtStart) dirtyRef.current = false;
           setLocalOnly(true);
