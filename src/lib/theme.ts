@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark" | "tactical";
 
 function readInitialTheme(): Theme {
   if (typeof window === "undefined") return "light";
   try {
     const stored = localStorage.getItem("theme") as Theme | null;
-    if (stored === "dark" || stored === "light") return stored;
+    if (stored === "dark" || stored === "light" || stored === "tactical") return stored;
     return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   } catch {
     return "light";
@@ -15,7 +15,8 @@ function readInitialTheme(): Theme {
 
 function apply(theme: Theme) {
   if (typeof document === "undefined") return;
-  document.documentElement.classList.toggle("dark", theme === "dark");
+  document.documentElement.classList.toggle("dark", theme !== "light");
+  document.documentElement.classList.toggle("tactical", theme === "tactical");
 }
 
 export function useTheme() {
@@ -36,7 +37,8 @@ export function useTheme() {
     }
   };
 
-  const toggle = () => setTheme(theme === "dark" ? "light" : "dark");
+  const toggle = () =>
+    setTheme(theme === "light" ? "dark" : theme === "dark" ? "tactical" : "light");
 
   return { theme, setTheme, toggle, ready: true };
 }
