@@ -359,6 +359,7 @@ function EditBulletin() {
           vehiclePrefix: b.vehicle_prefix ?? undefined,
           supportCrew: b.support_crew ?? undefined,
           occurrenceAt: b.occurrence_at ?? undefined,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo",
           crewAddress: b.crew_address ?? undefined,
           occurrenceAddress: b.occurrence_address ?? undefined,
           seizedItems: seizedToText(b.seized_items) || undefined,
