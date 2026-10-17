@@ -166,7 +166,14 @@ export function CategorySearch({
                 type="button"
                 role="option"
                 aria-selected={value === c.name}
-                onClick={() => select(c.name)}
+                // preventDefault evita que um <label> pai devolva o foco ao campo
+                // (o que reabria a lista e apagava a escolha).
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  select(c.name);
+                }}
                 onMouseEnter={() => setActiveIndex(i)}
                 className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent ${
                   value === c.name ? "bg-accent/50 font-medium" : ""
