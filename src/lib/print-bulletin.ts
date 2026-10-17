@@ -66,7 +66,15 @@ ${(() => {
   return out;
 })()}
 <pre>${esc(data.content)}</pre>
-<script>window.onload=function(){window.focus();window.print();}${"<"}/script>
+<style>.qap-bar{position:sticky;top:0;display:flex;gap:8px;justify-content:space-between;padding:10px;margin:-10px -10px 16px;background:#0f1d33;z-index:9}.qap-bar button{font:600 15px system-ui,sans-serif;padding:10px 16px;border-radius:8px;border:0;cursor:pointer}.qap-back{background:#fff;color:#0f1d33}.qap-print{background:#3b82f6;color:#fff}@media print{.qap-bar{display:none!important}}</style>
+<script>
+(function(){var bar=document.createElement('div');bar.className='qap-bar';
+bar.innerHTML='<button class="qap-back" type="button">← Voltar ao boletim</button><button class="qap-print" type="button">Salvar PDF</button>';
+document.body.insertBefore(bar,document.body.firstChild);
+bar.querySelector('.qap-back').onclick=function(){try{window.close();}catch(e){}setTimeout(function(){if(window.opener){try{window.opener.focus();}catch(e){}}else{history.back();}},150);};
+bar.querySelector('.qap-print').onclick=function(){window.print();};})();
+window.onload=function(){window.focus();window.print();};
+${"<"}/script>
 </body></html>`;
 
   // Não usar "noopener": com essa flag window.open retorna null e o documento

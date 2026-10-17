@@ -389,20 +389,23 @@ function EditBulletin() {
       toast.error("Gere ou escreva o histórico antes.");
       return;
     }
-    await copyWithFeedback(
-      formatWhatsApp({
-        bulletinType: b.bulletin_type,
-        category: b.category,
-        title: b.title,
-        occurrenceAt: b.occurrence_at,
-        occurrenceAddress: b.occurrence_address,
-        crewComposition: b.crew_composition,
-        vehiclePrefix: b.vehicle_prefix,
-        supportCrew: b.support_crew,
-        seized: b.seized_items,
-        content: b.content,
-      }),
-    );
+    const text = formatWhatsApp({
+      bulletinType: b.bulletin_type,
+      category: b.category,
+      title: b.title,
+      occurrenceAt: b.occurrence_at,
+      occurrenceAddress: b.occurrence_address,
+      crewComposition: b.crew_composition,
+      vehiclePrefix: b.vehicle_prefix,
+      supportCrew: b.support_crew,
+      seized: b.seized_items,
+      content: b.content,
+    });
+    // Abre a janela antes do await para não ser bloqueada como pop-up.
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    const w = window.open(url, "_blank");
+    await copyWithFeedback(text);
+    if (!w) window.location.href = url;
   }
 
   async function saveAsPreset() {
@@ -824,7 +827,7 @@ function EditBulletin() {
                 onClick={copyWhatsApp}
                 className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs hover:bg-accent"
               >
-                <MessageCircle className="h-3.5 w-3.5" /> Copiar p/ WhatsApp
+                <MessageCircle className="h-3.5 w-3.5" /> Enviar no WhatsApp
               </button>
               <button
                 onClick={saveAsPreset}
