@@ -40,8 +40,28 @@ const STEPS: Step[] = [
     target: '[data-tour="tabs-menu"]',
   },
   {
-    title: "Editor padronizado",
-    body: "Cada boletim tem campos fixos: Título, Categoria (com busca da infração), Composição da Guarnição, Localização da Guarnição, Localização da Ocorrência (via GPS/Google Maps) e Data/Hora automática. Ditado por voz e exportação em PDF estão prontos para uso.",
+    title: "Editor: dados da ocorrência",
+    body: "Ao abrir um BA, BO-COP ou BO-TC você preenche: Título, Categoria (busque a infração pelo nome), Composição da Guarnição, Prefixo da viatura (deixe vazio se a guarnição estava a pé), Apoio da Guarnição (só se houve apoio) e Data e Hora — já vem com o horário do seu aparelho e pode ser ajustada.",
+    route: "/dashboard",
+  },
+  {
+    title: "Editor: localizações",
+    body: "Localização da Guarnição e Localização da Ocorrência podem ser digitadas ou preenchidas pelo botão de GPS. Confira sempre o endereço antes de gerar.",
+    route: "/dashboard",
+  },
+  {
+    title: "Editor: palavras-chave e contexto",
+    body: "Na caixa de palavras-chave escreva o que aconteceu do seu jeito — frases soltas ou um relato corrido, sem precisar de vírgulas. No contexto, acrescente detalhes (versões dos envolvidos, fundada suspeita, uso de algemas). Use o microfone para ditar. A IA só redige o que você informou, sem inventar.",
+    route: "/dashboard",
+  },
+  {
+    title: "Editor: apreensões e envolvidos",
+    body: "Adicione materiais apreendidos (arma, droga, dinheiro, celular) e os envolvidos. A câmera lê o documento e preenche os dados; a foto não é guardada. Confira tudo antes de confirmar.",
+    route: "/dashboard",
+  },
+  {
+    title: "Editor: gerar, auditar e concluir",
+    body: "Toque em Gerar para criar o histórico técnico. Revise e edite o texto, veja os alertas da Auditoria Jurídica e use 'Corrigir com IA' se quiser. Depois exporte em PDF, copie para o WhatsApp, salve como modelo e toque em Concluir. O app salva sozinho enquanto você digita, mesmo sem sinal.",
     route: "/dashboard",
   },
   {
@@ -52,13 +72,13 @@ const STEPS: Step[] = [
   },
   {
     title: "Dúvidas com IA",
-    body: "Precisa consultar uma lei, pena ou o documento correto para uma situação? A aba 'Dúvidas IA' é seu apoio jurídico rápido.",
+    body: "Precisa consultar uma lei, pena ou o documento correto para uma situação? Digite a pergunta na aba 'Dúvidas IA' e receba uma resposta rápida. Sempre confira o texto legal oficial em casos importantes.",
     route: "/ai-chat",
     target: '[data-tour="nav-ai-chat"], [data-tour-mobile="nav-ai-chat"]',
   },
   {
     title: "Configurações e assinatura",
-    body: "Em Configurações você assina planos, resgata cupons, envia suporte ao administrador, ativa notificações do dispositivo, reabre este tutorial e pode excluir a conta com segurança.",
+    body: "Em Configurações você edita seu perfil, escolhe o tema (Claro, Escuro ou Tático noturno), gerencia seus modelos salvos, envia boletins antigos à base coletiva, assina o plano ou resgata cupom, fala com o suporte, reabre este tutorial e pode excluir a conta com segurança.",
     route: "/settings",
     target: '[data-tour="nav-settings"], [data-tour-mobile="nav-settings"]',
   },

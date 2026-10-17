@@ -76,6 +76,7 @@ const genInput = z.object({
   vehiclePrefix: z.string().optional(),
   supportCrew: z.string().optional(),
   occurrenceAt: z.string().optional(),
+  timeZone: z.string().max(64).optional(),
   crewAddress: z.string().optional(),
   occurrenceAddress: z.string().optional(),
   seizedItems: z.string().max(4000).optional(),
@@ -196,11 +197,18 @@ export const generateBulletin = createServerFn({ method: "POST" })
     const ragQuery = [data.category, data.keywords, data.context].filter(Boolean).join(" ");
     const references = await buildReferences(context.supabase, ragQuery, data.bulletinType);
 
+    // O servidor roda em UTC: formata no fuso do aparelho do usuário
+    // (fallback: horário de Brasília / Porto Alegre).
     const fmtDate = data.occurrenceAt
-      ? new Date(data.occurrenceAt).toLocaleString("pt-BR", {
-          dateStyle: "short",
-          timeStyle: "short",
-        })
+      ? (() => {
+          const opts = { dateStyle: "short", timeStyle: "short" } as const;
+          const d = new Date(data.occurrenceAt);
+          try {
+            return d.toLocaleString("pt-BR", { ...opts, timeZone: data.timeZone || "America/Sao_Paulo" });
+          } catch {
+            return d.toLocaleString("pt-BR", { ...opts, timeZone: "America/Sao_Paulo" });
+          }
+        })()
       : undefined;
 
     // Nomenclatura padronizada: os rótulos devem aparecer literalmente
