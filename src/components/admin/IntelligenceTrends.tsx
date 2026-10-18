@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { adminGetIntelligenceTrends } from "@/lib/admin.functions";
 import { SEIZED_LABEL, type SeizedKind } from "@/lib/bulletin-extras";
 
-const C = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
+const C = ["var(--primary)", "var(--accent-foreground)", "var(--muted-foreground)", "var(--ring)", "var(--secondary-foreground)"];
 const PERIODS = [
   [7, "7 dias"],
   [30, "30 dias"],
@@ -100,13 +100,13 @@ export default function IntelligenceTrends() {
             <ChartCard title="Mancha horária">
               <BarChart data={data.byHour}>
                 <XAxis dataKey="hour" fontSize={10} interval={2} /><YAxis fontSize={11} allowDecimals={false} /><Tooltip />
-                <Bar dataKey="count" name="Ocorrências" fill="var(--chart-1)" />
+                <Bar dataKey="count" name="Ocorrências" fill="var(--primary)" />
               </BarChart>
             </ChartCard>
             <ChartCard title="Turnos">
               <BarChart data={data.byShift}>
                 <XAxis dataKey="name" fontSize={11} /><YAxis fontSize={11} allowDecimals={false} /><Tooltip />
-                <Bar dataKey="count" name="Ocorrências" fill="var(--chart-2)" />
+                <Bar dataKey="count" name="Ocorrências" fill="var(--accent-foreground)" />
               </BarChart>
             </ChartCard>
             <ChartCard title="Tipo de boletim">
@@ -120,7 +120,7 @@ export default function IntelligenceTrends() {
             <ChartCard title="Evolução diária">
               <AreaChart data={data.byDay}>
                 <XAxis dataKey="day" fontSize={10} /><YAxis fontSize={11} allowDecimals={false} /><Tooltip />
-                <Area type="monotone" dataKey="count" name="Ocorrências" stroke="var(--chart-1)" fill="var(--chart-1)" fillOpacity={0.25} />
+                <Area type="monotone" dataKey="count" name="Ocorrências" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.25} />
               </AreaChart>
             </ChartCard>
           </div>
