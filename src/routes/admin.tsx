@@ -7,6 +7,7 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 // Chunk separado: recharts só entra na rede quando a aba de estatísticas abre.
 const AdminCharts = lazy(() => import("@/components/admin/AdminCharts"));
+const IntelligenceTrends = lazy(() => import("@/components/admin/IntelligenceTrends"));
 
 import { adminLogin, adminLogout, adminSessionStatus } from "@/lib/admin-gate.functions";
 import {
@@ -212,10 +213,11 @@ function DashboardView() {
            * snap no mobile — padrão nativo iOS/Android — e só promovemos para
            * grid de 7 colunas quando há largura real (lg+).
            */}
-          <TabsList className="scroll-row -mx-2 flex h-auto w-[calc(100%+1rem)] justify-start gap-1 px-2 lg:mx-0 lg:grid lg:w-full lg:grid-cols-7">
+          <TabsList className="scroll-row -mx-2 flex h-auto w-[calc(100%+1rem)] justify-start gap-1 px-2 lg:mx-0 lg:grid lg:w-full lg:grid-cols-8">
             {(
               [
                 ["stats", "Dashboard"],
+                ["intel", "Inteligência"],
                 ["monitoring", "Monitoramento"],
                 ["users", "Usuários"],
                 ["pix", "Pagamentos Pix"],
@@ -236,6 +238,11 @@ function DashboardView() {
 
           <TabsContent value="stats" className="mt-6">
             <StatsPanel />
+          </TabsContent>
+          <TabsContent value="intel" className="mt-6">
+            <Suspense fallback={<Loader2 className="h-5 w-5 animate-spin" />}>
+              <IntelligenceTrends />
+            </Suspense>
           </TabsContent>
           <TabsContent value="monitoring" className="mt-6">
             <MonitoringPanel />

@@ -544,3 +544,67 @@ export const adminBackfillCommunityKnowledge = createServerFn({ method: "POST" }
     return { scanned: r.scanned ?? 0, inserted: r.inserted ?? 0 };
   },
 );
+
+// Painel de Inteligência: apenas números agregados, nunca nomes, textos,
+// endereços ou IDs de usuários saem do servidor.
+export const adminGetIntelligenceTrends = createServerFn({ method: "POST" })
+  .inputValidator((d: { days: number }) => ({
+    days: [7, 30, 90, 0].includes(Number(d?.days)) ? Number(d.days) : 30,
+  }))
+  .handler(async ({ data }) => {
+    await requireAdminSession();
+    const sb = await admin();
+    let q = sb
+      .from("bulletins")
+      .select("bulletin_type, category, occurrence_at, created_at, vehicle_prefix, support_crew, seized_items")
+      .is("deleted_at", null)
+      .in("bulletin_type", ["BA", "BO-COP", "BO-TC"])
+      .limit(20000);
+    if (data.days > 0) q = q.gte("created_at", new Date(Date.now() - data.days * 86400000).toISOString());
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const fmt = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", hour12: false });
+    const dayFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
+    const cat = new Map<string, number>();
+    const type = new Map<string, number>();
+    const day = new Map<string, number>();
+    const hours = Array(24).fill(0) as number[];
+    const shifts = { Madrugada: 0, Manhã: 0, Tarde: 0, Noite: 0 };
+    const seized: Record<string, number> = { arma: 0, entorpecente: 0, dinheiro: 0, eletronico: 0, outro: 0 };
+    let withSupport = 0, motorized = 0, withSeizure = 0;
+
+    for (const r of rows ?? []) {
+      const c = (r.category as string)?.trim() || "Sem categoria";
+      cat.set(c, (cat.get(c) ?? 0) + 1);
+      type.set(r.bulletin_type as string, (type.get(r.bulletin_type as string) ?? 0) + 1);
+      const when = new Date((r.occurrence_at as string) || (r.created_at as string));
+      const h = Number(fmt.format(when)) % 24;
+      hours[h]++;
+      if (h < 6) shifts.Madrugada++; else if (h < 12) shifts.Manhã++; else if (h < 18) shifts.Tarde++; else shifts.Noite++;
+      const dk = dayFmt.format(new Date(r.created_at as string));
+      day.set(dk, (day.get(dk) ?? 0) + 1);
+      if ((r.support_crew as string)?.trim()) withSupport++;
+      if ((r.vehicle_prefix as string)?.trim()) motorized++;
+      const items = Array.isArray(r.seized_items) ? (r.seized_items as Array<{ kind?: string }>) : [];
+      if (items.length) withSeizure++;
+      for (const it of items) {
+        const k = it?.kind && it.kind in seized ? it.kind : "outro";
+        seized[k]++;
+      }
+    }
+    const total = rows?.length ?? 0;
+    return {
+      total,
+      withSupport,
+      motorized,
+      withSeizure,
+      topCategories: [...cat.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10)
+        .map(([name, count]) => ({ name, count, pct: total ? Math.round((count / total) * 100) : 0 })),
+      byType: [...type.entries()].map(([name, count]) => ({ name, count })),
+      byHour: hours.map((count, h) => ({ hour: `${h}h`, count })),
+      byShift: Object.entries(shifts).map(([name, count]) => ({ name, count })),
+      byDay: [...day.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([d, count]) => ({ day: d.slice(5), count })),
+      seized,
+    };
+  });
