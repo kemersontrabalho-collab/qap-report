@@ -28,6 +28,10 @@ export const getMySubscriptionStatus = createServerFn({ method: "GET" })
       supabase.rpc("is_premium_user", { _user_id: userId }),
     ]);
 
+    if (subRes.error || pendingRes.error || premiumRes.error) {
+      throw new Error("Não foi possível consultar sua assinatura. Tente novamente.");
+    }
+
     return {
       subscription: subRes.data ?? null,
       pendingPix: pendingRes.data ?? null,

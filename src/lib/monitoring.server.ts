@@ -23,7 +23,7 @@ export function hashIp(ip: string | null | undefined): string | null {
 
 export async function logError(input: LogErrorInput): Promise<void> {
   try {
-    await supabaseAdmin.from("error_logs").insert({
+    const { error } = await supabaseAdmin.from("error_logs").insert({
       category: input.category,
       severity: input.severity ?? "error",
       message: (input.message ?? "unknown").slice(0, 4000),
@@ -34,6 +34,7 @@ export async function logError(input: LogErrorInput): Promise<void> {
       user_agent: input.userAgent ? String(input.userAgent).slice(0, 512) : null,
       ip_hash: hashIp(input.ip ?? null),
     });
+    if (error) throw error;
   } catch (err) {
     console.error("[monitoring] failed to persist error log:", err);
   }
