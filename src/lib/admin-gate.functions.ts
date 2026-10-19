@@ -1,7 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+const adminLoginInput = z.object({
+  username: z.string().min(1).max(256),
+  password: z.string().min(1).max(1024),
+});
 
 export const adminLogin = createServerFn({ method: "POST" })
-  .inputValidator((data: { username: string; password: string }) => data)
+  .inputValidator((data: unknown) => adminLoginInput.parse(data))
   .handler(async ({ data }) => {
     const { getAdminSession, equalsCT } = await import("./admin-gate.server");
     const expectedUser = process.env.ADMIN_USERNAME;
