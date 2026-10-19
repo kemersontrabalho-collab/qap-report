@@ -38,7 +38,6 @@ const serverFnErrorLogger = createMiddleware({ type: "function" }).server(
             stack: error instanceof Error ? (error.stack ?? null) : null,
             route: url?.pathname ?? null,
             userId: ctx?.userId ?? null,
-            metadata: { search: url?.search ?? "" },
             userAgent: getRequestHeader("user-agent") ?? null,
             ip: getRequestIP({ xForwardedFor: true }) ?? null,
           });
