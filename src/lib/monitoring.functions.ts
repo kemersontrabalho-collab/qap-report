@@ -185,7 +185,7 @@ export const adminRepairBulletin = createServerFn({ method: "POST" })
 
     const problems: string[] = [];
     if (b.deleted_at) problems.push("Está na lixeira");
-    if (!["draft", "completed"].includes(b.status)) problems.push(`Status inválido: ${b.status}`);
+    if (!["draft", "done"].includes(b.status)) problems.push(`Status inválido: ${b.status}`);
     if (!Array.isArray(b.seized_items)) problems.push("Lista de apreensões corrompida");
     if (!Array.isArray(b.involved_parties)) problems.push("Lista de envolvidos corrompida");
     if ((b.content ?? "").length > 60000) problems.push("Texto excessivamente longo");
