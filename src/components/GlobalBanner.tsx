@@ -4,19 +4,31 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Banner = { text: string; level: "info" | "warning" | "critical"; active: boolean };
 
+function isBanner(value: unknown): value is Banner {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+  const banner = value as Record<string, unknown>;
+  return (
+    typeof banner.text === "string" &&
+    typeof banner.active === "boolean" &&
+    (banner.level === "info" || banner.level === "warning" || banner.level === "critical")
+  );
+}
+
 /** Aviso global definido pelo administrador (aba Monitoramento → Autocura). */
 export function GlobalBanner() {
   const { data } = useQuery({
     queryKey: ["global-banner"],
     queryFn: async (): Promise<Banner | null> => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("app_settings")
         .select("value")
         .eq("key", "global_banner")
         .maybeSingle();
+      if (error) throw error;
       if (!data?.value) return null;
       try {
-        return JSON.parse(data.value) as Banner;
+        const parsed: unknown = JSON.parse(data.value);
+        return isBanner(parsed) ? parsed : null;
       } catch {
         return null;
       }
