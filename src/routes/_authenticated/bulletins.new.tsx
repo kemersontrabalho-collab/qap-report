@@ -63,7 +63,10 @@ function NewBulletin() {
           {BULLETIN_TYPES.map((t) => (
             <button
               key={t.code}
-              onClick={() => setType(t.code)}
+              onClick={() => {
+                setType(t.code);
+                if (preset && preset.bulletin_type !== t.code) setPresetId("");
+              }}
               className={`rounded-2xl border p-4 text-left transition-all ${
                 type === t.code
                   ? "border-primary bg-primary/5 ring-2 ring-primary/30"
