@@ -38,6 +38,7 @@ import {
   adminResolveAllErrorLogs,
   adminClearResolvedLogs,
 } from "@/lib/monitoring.functions";
+import { LogActions, SelfHealingTools } from "@/components/admin/MonitoringTools";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -846,6 +847,8 @@ function MonitoringPanel() {
         <StatCard label="Segurança 24h" value={stats.data?.byCategory?.security ?? 0} />
       </div>
 
+      <SelfHealingTools />
+
       {(stats.data?.critical ?? 0) > 0 && (
         <div className="flex items-center gap-2 rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300">
           <AlertTriangle className="h-4 w-4" />
@@ -964,6 +967,7 @@ function MonitoringPanel() {
                   </details>
                 )}
 
+                <LogActions row={row} />
                 <div className="flex justify-end">
                   <Button
                     size="sm"

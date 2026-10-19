@@ -7,6 +7,7 @@ import { usePresence } from "@/lib/usePresence";
 
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { GlobalBanner } from "@/components/GlobalBanner";
 import { NotificationBell } from "@/components/NotificationBell";
 import type { ReactNode } from "react";
 
@@ -131,6 +132,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
+      <GlobalBanner />
 
       {/* Um único landmark <main> por página. max-w-6xl trava a medida de
        * leitura em ultrawide; px-fluid escala o gutter e respeita o notch. */}
