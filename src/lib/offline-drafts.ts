@@ -1,5 +1,5 @@
 // Fila local (IndexedDB) de alterações de boletins feitas sem sinal.
-// Cada boletim guarda apenas o último patch pendente.
+// Cada boletim guarda o patch acumulado das alterações pendentes.
 
 const DB = "qap-offline";
 const STORE = "pending";
@@ -40,8 +40,40 @@ async function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBReq
 
 export type PendingPatch = { id: string; patch: Record<string, unknown>; savedAt: number };
 
-export function savePending(id: string, patch: Record<string, unknown>) {
-  return tx("readwrite", (s) => s.put({ id, patch, savedAt: Date.now() } satisfies PendingPatch, id));
+export async function savePending(id: string, patch: Record<string, unknown>): Promise<IDBValidKey> {
+  const db = await open();
+  return new Promise((resolve, reject) => {
+    try {
+      const t = db.transaction(STORE, "readwrite");
+      const store = t.objectStore(STORE);
+      let failure: unknown;
+      t.oncomplete = () => {
+        db.close();
+        resolve(id);
+      };
+      t.onabort = () => {
+        db.close();
+        reject(failure ?? t.error ?? new Error("A transação de rascunhos offline foi abortada."));
+      };
+      const request = store.get(id);
+      request.onsuccess = () => {
+        try {
+          const previous = request.result as PendingPatch | undefined;
+          store.put({
+            id,
+            patch: { ...(previous?.patch ?? {}), ...patch },
+            savedAt: Date.now(),
+          } satisfies PendingPatch, id);
+        } catch (error) {
+          failure = error;
+          t.abort();
+        }
+      };
+    } catch (error) {
+      db.close();
+      reject(error);
+    }
+  });
 }
 export function getPending(id: string) {
   return tx<PendingPatch | undefined>("readonly", (s) => s.get(id));
