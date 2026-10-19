@@ -16,10 +16,25 @@ function open(): Promise<IDBDatabase> {
 async function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRequest<T>): Promise<T> {
   const db = await open();
   return new Promise((resolve, reject) => {
-    const t = db.transaction(STORE, mode);
-    const r = fn(t.objectStore(STORE));
-    r.onsuccess = () => resolve(r.result);
-    r.onerror = () => reject(r.error);
+    try {
+      const t = db.transaction(STORE, mode);
+      let result: T;
+      t.oncomplete = () => {
+        db.close();
+        resolve(result);
+      };
+      t.onabort = () => {
+        db.close();
+        reject(t.error ?? new Error("A transação de rascunhos offline foi abortada."));
+      };
+      const r = fn(t.objectStore(STORE));
+      r.onsuccess = () => {
+        result = r.result;
+      };
+    } catch (error) {
+      db.close();
+      reject(error);
+    }
   });
 }
 
