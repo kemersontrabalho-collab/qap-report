@@ -51,7 +51,7 @@ const STEPS: Step[] = [
   },
   {
     title: "Editor: texto corrido e contexto",
-    body: "Na caixa "Texto corrido" escreva o que aconteceu do seu jeito, como um relato contínuo, sem precisar de vírgulas. No contexto, acrescente detalhes (versões dos envolvidos, fundada suspeita, uso de algemas). Use o microfone para ditar. A IA só redige o que você informou, sem inventar.",
+    body: "Na caixa “Texto corrido” escreva o que aconteceu do seu jeito, como um relato contínuo, sem precisar de vírgulas. No contexto, acrescente detalhes (versões dos envolvidos, fundada suspeita, uso de algemas). Use o microfone para ditar. A IA só redige o que você informou, sem inventar.",
     route: "/dashboard",
   },
   {
