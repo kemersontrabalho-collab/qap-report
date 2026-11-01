@@ -342,7 +342,7 @@ function EditBulletin() {
   async function generate() {
     if (!b) return;
     if (!b.keywords || b.keywords.trim().length < 3) {
-      toast.error("Informe as palavras-chave antes de gerar.");
+      toast.error("Preencha o texto corrido antes de gerar.");
       return;
     }
     setGenerating(true);
@@ -559,14 +559,14 @@ function EditBulletin() {
             <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold tracking-wide text-primary ring-1 ring-inset ring-primary/15">
               {b.bulletin_type}
             </span>
-            <h2 className="mt-2 font-semibold tracking-tight">{typeInfo?.name}</h2>
+            <h2 className="field-title mt-2">{typeInfo?.name}</h2>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{typeInfo?.desc}</p>
           </div>
 
 
           <div className="surface-card reveal relative z-30 space-y-3 rounded-2xl p-4">
             <div>
-              <label className="text-sm font-medium">Título do Boletim *</label>
+              <label className="field-title">Título do Boletim *</label>
               <input
                 value={b.title}
                 onChange={(e) => update("title", e.target.value)}
@@ -575,7 +575,7 @@ function EditBulletin() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Categoria *</label>
+              <label className="field-title">Categoria *</label>
               <CategorySearch
                 categories={categories}
                 value={b.category}
@@ -593,9 +593,9 @@ function EditBulletin() {
           </div>
 
           <div className="surface-card reveal space-y-3 rounded-2xl p-4">
-            <h3 className="text-sm font-semibold">Dados operacionais</h3>
+            <h3 className="field-title">Dados operacionais</h3>
             <div>
-              <label className="text-sm font-medium">Composição da Guarnição *</label>
+              <label className="field-title">Composição da Guarnição *</label>
               <input
                 value={b.crew_composition ?? ""}
                 onChange={(e) => update("crew_composition", e.target.value)}
@@ -608,7 +608,7 @@ function EditBulletin() {
                 não é utilizável com menos de ~150px. */}
             <div className="grid grid-cols-1 gap-3 xs:grid-cols-2">
               <div>
-                <label className="text-sm font-medium">Prefixo da viatura</label>
+                <label className="field-title">Prefixo da viatura</label>
                 <input
                   value={b.vehicle_prefix ?? ""}
                   onChange={(e) => update("vehicle_prefix", e.target.value)}
@@ -617,7 +617,7 @@ function EditBulletin() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Data e Hora *</label>
+                <label className="field-title">Data e Hora *</label>
                 <input
                   type="datetime-local"
                   value={toLocalInput(b.occurrence_at)}
@@ -628,7 +628,7 @@ function EditBulletin() {
             </div>
 
             <div>
-              <label className="text-sm font-medium">APOIO DA GUARNIÇÃO</label>
+              <label className="field-title">Apoio da Guarnição</label>
               <textarea
                 value={b.support_crew ?? ""}
                 onChange={(e) => update("support_crew", e.target.value)}
@@ -642,7 +642,7 @@ function EditBulletin() {
             </div>
 
             <div>
-              <label className="text-sm font-medium">LOCALIZAÇÃO DA GUARNIÇÃO *</label>
+              <label className="field-title">Localização da Guarnição *</label>
               <textarea
                 value={b.crew_address ?? ""}
                 onChange={(e) => update("crew_address", e.target.value)}
@@ -673,7 +673,7 @@ function EditBulletin() {
             </div>
 
             <div>
-              <label className="text-sm font-medium">Localização da Ocorrência *</label>
+              <label className="field-title">Localização da Ocorrência *</label>
               <textarea
                 value={b.occurrence_address ?? ""}
                 onChange={(e) => update("occurrence_address", e.target.value)}
@@ -714,7 +714,7 @@ function EditBulletin() {
           <div className="surface-card reveal space-y-3 rounded-2xl p-4">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <label className="text-sm font-medium">Palavras-chave *</label>
+                <label className="field-title">Texto corrido *</label>
                 <Suspense fallback={<div className="h-8 w-8" aria-hidden />}>
                   <VoiceDictateButton
                     value={b.keywords ?? ""}
@@ -726,16 +726,16 @@ function EditBulletin() {
                 value={b.keywords ?? ""}
                 onChange={(e) => update("keywords", e.target.value)}
                 rows={4}
-                placeholder="Escreva livremente: palavras soltas ou o relato completo dos fatos, ações, indivíduos e objetos apreendidos."
+                placeholder="Descreva os fatos em texto corrido: o que aconteceu, ações da guarnição, envolvidos e objetos apreendidos."
                 className="mt-1 w-full resize-y rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                Pode escrever em texto corrido ou em tópicos — a IA interpreta o conteúdo como um
+                Escreva do seu jeito, como um relato contínuo — a IA interpreta o texto como um
                 todo. Nada será inventado.
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium">Sugestões de melhoria</label>
+              <label className="field-title">Sugestões de melhoria</label>
               {(() => {
                 const suggestions = extractImprovementSuggestions(b.content);
                 if (!b.content) {
@@ -801,7 +801,7 @@ function EditBulletin() {
 
         <section className="surface-card reveal rounded-2xl">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b p-3">
-            <div className="flex items-center gap-2 text-sm font-medium">
+            <div className="field-title flex items-center gap-2">
               Documento
               {(!online || localOnly) && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-warning/15 px-2 py-0.5 text-xs text-warning-foreground dark:text-warning">
@@ -882,7 +882,7 @@ function EditBulletin() {
             onChange={(e) => update("content", e.target.value)}
             rows={28}
             placeholder="O texto gerado aparecerá aqui. Marcadores entre chaves {…} serão removidos ao salvar."
-            className="w-full resize-y rounded-b-2xl bg-transparent p-4 font-mono text-sm leading-relaxed outline-none"
+            className="w-full resize-y rounded-b-2xl bg-transparent p-4 font-sans text-sm leading-relaxed outline-none"
           />
         </section>
       </div>

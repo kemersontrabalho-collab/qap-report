@@ -25,6 +25,7 @@ import { Route as AuthenticatedAiChatRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAssinarRouteImport } from './routes/_authenticated/assinar'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as AuthenticatedBulletinsIdRouteImport } from './routes/_authenticated/bulletins.$id'
 import { Route as AuthenticatedBulletinsNewRouteImport } from './routes/_authenticated/bulletins.new'
 import { Route as ApiPublicLogErrorRouteImport } from './routes/api/public/log-error'
@@ -109,6 +110,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
+  id: '/api/transcribe',
+  path: '/api/transcribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedBulletinsIdRoute =
   AuthenticatedBulletinsIdRouteImport.update({
     id: '/bulletins/$id',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/assinar': typeof AuthenticatedAssinarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/bulletins/new': typeof AuthenticatedBulletinsNewRoute
   '/api/public/log-error': typeof ApiPublicLogErrorRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/assinar': typeof AuthenticatedAssinarRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/bulletins/new': typeof AuthenticatedBulletinsNewRoute
   '/api/public/log-error': typeof ApiPublicLogErrorRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/assinar': typeof AuthenticatedAssinarRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/_authenticated/bulletins/$id': typeof AuthenticatedBulletinsIdRoute
   '/_authenticated/bulletins/new': typeof AuthenticatedBulletinsNewRoute
   '/api/public/log-error': typeof ApiPublicLogErrorRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/assinar'
     | '/dashboard'
     | '/settings'
+    | '/api/transcribe'
     | '/bulletins/$id'
     | '/bulletins/new'
     | '/api/public/log-error'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/assinar'
     | '/dashboard'
     | '/settings'
+    | '/api/transcribe'
     | '/bulletins/$id'
     | '/bulletins/new'
     | '/api/public/log-error'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/assinar'
     | '/_authenticated/dashboard'
     | '/_authenticated/settings'
+    | '/api/transcribe'
     | '/_authenticated/bulletins/$id'
     | '/_authenticated/bulletins/new'
     | '/api/public/log-error'
@@ -266,6 +278,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermosRoute: typeof TermosRoute
+  ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiPublicLogErrorRoute: typeof ApiPublicLogErrorRoute
 }
 
@@ -383,6 +396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/transcribe': {
+      id: '/api/transcribe'
+      path: '/api/transcribe'
+      fullPath: '/api/transcribe'
+      preLoaderRoute: typeof ApiTranscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/bulletins/$id': {
       id: '/_authenticated/bulletins/$id'
       path: '/bulletins/$id'
@@ -441,6 +461,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermosRoute: TermosRoute,
+  ApiTranscribeRoute: ApiTranscribeRoute,
   ApiPublicLogErrorRoute: ApiPublicLogErrorRoute,
 }
 export const routeTree = rootRouteImport

@@ -70,7 +70,7 @@ FORMATO DE SAÍDA:
 const genInput = z.object({
   bulletinType: z.enum(["BA", "BO-COP", "BO-TC"]),
   category: z.string().optional(),
-  keywords: z.string().min(3, "Informe palavras-chave"),
+  keywords: z.string().min(3, "Preencha o texto corrido"),
   context: z.string().optional(),
   crewComposition: z.string().optional(),
   vehiclePrefix: z.string().optional(),

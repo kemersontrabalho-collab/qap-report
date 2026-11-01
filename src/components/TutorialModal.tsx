@@ -50,8 +50,8 @@ const STEPS: Step[] = [
     route: "/dashboard",
   },
   {
-    title: "Editor: palavras-chave e contexto",
-    body: "Na caixa de palavras-chave escreva o que aconteceu do seu jeito — frases soltas ou um relato corrido, sem precisar de vírgulas. No contexto, acrescente detalhes (versões dos envolvidos, fundada suspeita, uso de algemas). Use o microfone para ditar. A IA só redige o que você informou, sem inventar.",
+    title: "Editor: texto corrido e contexto",
+    body: "Na caixa “Texto corrido” escreva o que aconteceu do seu jeito, como um relato contínuo, sem precisar de vírgulas. No contexto, acrescente detalhes (versões dos envolvidos, fundada suspeita, uso de algemas). Use o microfone para ditar. A IA só redige o que você informou, sem inventar.",
     route: "/dashboard",
   },
   {

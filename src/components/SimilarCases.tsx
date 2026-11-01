@@ -54,7 +54,7 @@ export function SimilarCases({ bulletinType, keywords, category, context, onUseR
     <div className="rounded-2xl border bg-card p-4">
       <div className="flex items-center gap-2">
         <Lightbulb className="h-4 w-4 text-warning" />
-        <h3 className="text-sm font-semibold">Casos semelhantes na base</h3>
+        <h3 className="field-title">Casos semelhantes na base</h3>
         {loading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
       </div>
       <p className="mt-1 text-xs text-muted-foreground">

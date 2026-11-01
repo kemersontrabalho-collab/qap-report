@@ -527,3 +527,15 @@
 @utility pb-fluid-section {
   padding-bottom: clamp(2.5rem, 1.5rem + 5vw, 6rem);
 }
+
+/* Título padrão de campos e seções dentro do editor de boletins:
+ * mesma fonte, tamanho, peso e capitalização em todas as caixas. */
+@utility field-title {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--foreground);
+}

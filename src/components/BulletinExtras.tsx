@@ -49,7 +49,7 @@ function Collapsible({
         aria-expanded={open}
         className="flex w-full items-center justify-between gap-2 p-4 text-left"
       >
-        <span className="text-sm font-semibold">
+        <span className="field-title">
           {title}
           {count > 0 && (
             <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
@@ -313,7 +313,7 @@ export function AuditPanel({
   return (
     <div className="border-b p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-sm font-medium">
+        <div className="field-title flex items-center gap-2">
           <ShieldCheck className="h-4 w-4 text-primary" /> Auditoria Jurídica
           <span className="text-xs font-normal text-muted-foreground">
             {issues ? "análise completa" : "verificação rápida"}
