@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   getMySubscriptionStatus,
@@ -345,6 +345,31 @@ function CouponStep({ onBack, onRedeemed }: { onBack: () => void; onRedeemed: ()
 }
 
 // ============================================================
+/** E-mail do usuário lido da sessão local (sem chamada de rede). */
+function useUserEmailRef() {
+  const ref = useRef<string>("");
+  useEffect(() => {
+    void supabase.auth.getSession().then(({ data }) => {
+      ref.current = data.session?.user?.email ?? "";
+    });
+  }, []);
+  return ref;
+}
+
+/**
+ * Abre o WhatsApp com a mensagem do comprovante. Precisa ser chamado
+ * de forma síncrona dentro do clique: qualquer await antes do window.open
+ * faz o navegador (principalmente iPhone/app instalado) bloquear a abertura.
+ */
+function openWhatsAppReceipt(planLabel: string, priceLabel: string, email: string) {
+  const msg = `Olá, fiz o pagamento do plano ${planLabel} (${priceLabel}) do app QAP Report. Meu e-mail é ${
+    email || "(informe seu e-mail)"
+  } e segue o comprovante.`;
+  const url = `https://wa.me/${WHATSAPP_FULL}?text=${encodeURIComponent(msg)}`;
+  const w = window.open(url, "_blank");
+  if (!w) window.location.href = url;
+}
+
 function PixStep({
   plan,
   onBack,
@@ -382,12 +407,9 @@ function PixStep({
     }
   }
 
-  async function openWhatsApp() {
-    const { data: userData } = await supabase.auth.getUser();
-    const email = userData.user?.email ?? "(email não disponível)";
-    const msg = `Olá, fiz o pagamento do plano ${p.label} (${p.priceLabel}) do app QAP Report. Meu e-mail é ${email} e segue o comprovante.`;
-    const url = `https://wa.me/${WHATSAPP_FULL}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+  const emailRef = useUserEmailRef();
+  function openWhatsApp() {
+    openWhatsAppReceipt(p.label, p.priceLabel, emailRef.current);
   }
 
   return (
@@ -477,6 +499,8 @@ function PendingPixCard({
   onCanceled: () => void;
 }) {
   const cancelFn = useServerFn(cancelPixRequest);
+  const emailRef = useUserEmailRef();
+  const amountLabel = `R$ ${Number(pendingPix.amount_brl).toFixed(2).replace(".", ",")}`;
   const mut = useMutation({
     mutationFn: () => cancelFn({ data: { requestId: pendingPix.id } }),
     onSuccess: () => {
@@ -497,6 +521,14 @@ function PendingPixCard({
             {new Date(pendingPix.created_at).toLocaleString("pt-BR")}. Aguarde a confirmação do
             administrador ou envie o comprovante pelo WhatsApp.
           </p>
+          <button
+            onClick={() => openWhatsAppReceipt(pendingPix.plan, amountLabel, emailRef.current)}
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-medium text-white hover:bg-emerald-700 sm:w-auto"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Enviar comprovante via WhatsApp
+          </button>
+          <br />
           <button
             onClick={() => mut.mutate()}
             disabled={mut.isPending}
