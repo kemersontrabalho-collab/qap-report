@@ -17,6 +17,7 @@ export function usePresence(intervalMs = 120_000) {
     let cancelled = false;
     let running = false;
     let timer: number | undefined;
+    let lastPing = 0;
 
     function schedule() {
       if (cancelled || document.visibilityState !== "visible") return;
@@ -30,7 +31,10 @@ export function usePresence(intervalMs = 120_000) {
     async function ping() {
       if (cancelled || running) return;
       if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      // Alternar abas rapidamente não deve gerar uma escrita a cada troca.
+      if (Date.now() - lastPing < 60_000) return;
       running = true;
+      lastPing = Date.now();
       try {
         const { data } = await supabase.auth.getSession();
         const uid = data.session?.user?.id;
