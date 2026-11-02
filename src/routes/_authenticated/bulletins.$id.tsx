@@ -22,6 +22,7 @@ const VoiceDictateButton = lazy(() =>
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import { copyWithFeedback } from "@/lib/clipboard";
 import { printBulletin } from "@/lib/print-bulletin";
+import { finalizeBulletinText, stripMarkdown } from "@/lib/bulletin-text";
 import { playUiSound, prepareUiSounds } from "@/lib/ui-sounds";
 import { AuditPanel, InvolvedPartiesSection, SeizedItemsSection } from "@/components/BulletinExtras";
 import {
@@ -108,27 +109,6 @@ function toLocalInput(iso: string | null): string {
 function fromLocalInput(v: string): string | null {
   if (!v) return null;
   return new Date(v).toISOString();
-}
-
-// Remove textos entre chaves como {DADO AUSENTE} e limpa marcações
-// markdown (# de títulos e * de negrito/itálico/listas) que não pertencem
-// ao histórico final do boletim.
-function stripBraces(text: string): string {
-  return (
-    text
-      .replace(/\{[^{}]*\}/g, "")
-      // Remove marcadores de título markdown no início de linha (# até ######)
-      .replace(/^\s{0,3}#{1,6}\s*/gm, "")
-      // Remove ênfase markdown: **negrito**, __negrito__, *itálico*, _itálico_
-      .replace(/(\*\*|__)(.*?)\1/g, "$2")
-      .replace(/(\*|_)(?=\S)(.+?)(?<=\S)\1/g, "$2")
-      // Remove asteriscos remanescentes (bullets soltos, ênfases mal formadas)
-      .replace(/\*+/g, "")
-      // Limpa espaços/linhas em excesso
-      .replace(/[ \t]+\n/g, "\n")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim()
-  );
 }
 
 // Extrai a seção "PERGUNTAS COMPLEMENTARES" e os marcadores {DADO AUSENTE}
@@ -235,9 +215,9 @@ function EditBulletin() {
     savingRef.current = true;
     setSaving(true);
     try {
-      // Só limpa marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
+      // Só remove perguntas complementares e marcadores {…} ao CONCLUIR — evita "cursor pulando" durante
       // o autosave enquanto o usuário ainda está digitando.
-      const finalContent = nextStatus === "done" ? stripBraces(current.content) : current.content;
+      const finalContent = nextStatus === "done" ? finalizeBulletinText(current.content) : current.content;
       const patch: Partial<Bulletin> = {
         title: current.title,
         category: current.category,
@@ -366,7 +346,7 @@ function EditBulletin() {
           involvedParties: partiesToText(b.involved_parties) || undefined,
         },
       });
-      update("content", res.content);
+      update("content", stripMarkdown(res.content).trim());
       playUiSound("generated");
       toast.success("Texto gerado. Revise antes de concluir.");
     } catch (e) {
@@ -381,7 +361,7 @@ function EditBulletin() {
       toast.error("Não há texto para copiar.");
       return;
     }
-    await copyWithFeedback(stripBraces(b.content));
+    await copyWithFeedback(finalizeBulletinText(b.content));
   }
 
   async function copyWhatsApp() {
@@ -444,7 +424,7 @@ function EditBulletin() {
       occurrenceAt: b.occurrence_at,
       crewAddress: b.crew_address,
       occurrenceAddress: b.occurrence_address,
-      content: stripBraces(b.content),
+      content: finalizeBulletinText(b.content),
       seizedItems: b.seized_items,
       involvedParties: b.involved_parties,
     });
@@ -566,7 +546,7 @@ function EditBulletin() {
 
           <div className="surface-card reveal relative z-30 space-y-3 rounded-2xl p-4">
             <div>
-              <label className="field-title">Título do Boletim *</label>
+              <label className="field-title">Título do Boletim</label>
               <input
                 value={b.title}
                 onChange={(e) => update("title", e.target.value)}
@@ -575,7 +555,7 @@ function EditBulletin() {
               />
             </div>
             <div>
-              <label className="field-title">Categoria *</label>
+              <label className="field-title">Categoria</label>
               <CategorySearch
                 categories={categories}
                 value={b.category}
@@ -595,7 +575,7 @@ function EditBulletin() {
           <div className="surface-card reveal space-y-3 rounded-2xl p-4">
             <h3 className="field-title">Dados operacionais</h3>
             <div>
-              <label className="field-title">Composição da Guarnição *</label>
+              <label className="field-title">Composição da Guarnição</label>
               <input
                 value={b.crew_composition ?? ""}
                 onChange={(e) => update("crew_composition", e.target.value)}
@@ -617,7 +597,7 @@ function EditBulletin() {
                 />
               </div>
               <div>
-                <label className="field-title">Data e Hora *</label>
+                <label className="field-title">Data e Hora</label>
                 <input
                   type="datetime-local"
                   value={toLocalInput(b.occurrence_at)}
@@ -642,7 +622,7 @@ function EditBulletin() {
             </div>
 
             <div>
-              <label className="field-title">Localização da Guarnição *</label>
+              <label className="field-title">Localização da Guarnição</label>
               <textarea
                 value={b.crew_address ?? ""}
                 onChange={(e) => update("crew_address", e.target.value)}
@@ -673,7 +653,7 @@ function EditBulletin() {
             </div>
 
             <div>
-              <label className="field-title">Localização da Ocorrência *</label>
+              <label className="field-title">Localização da Ocorrência</label>
               <textarea
                 value={b.occurrence_address ?? ""}
                 onChange={(e) => update("occurrence_address", e.target.value)}
@@ -714,7 +694,7 @@ function EditBulletin() {
           <div className="surface-card reveal space-y-3 rounded-2xl p-4">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <label className="field-title">Texto corrido *</label>
+                <label className="field-title">Texto corrido</label>
                 <Suspense fallback={<div className="h-8 w-8" aria-hidden />}>
                   <VoiceDictateButton
                     value={b.keywords ?? ""}
