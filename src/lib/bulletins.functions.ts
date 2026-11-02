@@ -61,7 +61,8 @@ ESTRUTURA DO RELATÓRIO/HISTÓRICO (NI 2.22/EMBM/2023 — Anexo A, obrigatório)
 - Quando houver complemento em anexo, indique-o expressamente no corpo do relatório.
 
 FORMATO DE SAÍDA:
-- Título do documento (uma linha, ex.: "**Título do Boletim:** <categoria>")
+- Título do documento (uma linha, ex.: "Título do Boletim: <categoria>")
+- Texto puro: NÃO use markdown, asteriscos (*), negrito, itálico, # ou marcadores de lista com *. Use hífen (-) para listas.
 - HISTÓRICO / VERSÃO POLICIAL: texto corrido, técnico, cronológico e coeso. TODAS as informações estruturadas (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) DEVEM estar incorporadas naturalmente ao longo da narrativa — jamais listadas em cabeçalho, bullets ou bloco separado acima do histórico.
 - (Se aplicável) GARANTIAS LEGAIS
 - (Se aplicável) TIPIFICAÇÃO LEGAL (artigos e leis pertinentes)
@@ -241,8 +242,9 @@ ${data.keywords}
 ${data.context ? `\nContexto adicional:\n${data.context}` : ""}
 
 Produza o boletim seguindo rigorosamente as regras. Estrutura obrigatória:
-1) Uma única linha de título no formato "**Título do Boletim:** <categoria ou descrição curta>".
-2) Em seguida, "## HISTÓRICO / VERSÃO POLICIAL" e o texto corrido.
+1) Uma única linha de título no formato "Título do Boletim: <categoria ou descrição curta>".
+2) Em seguida, a linha "HISTÓRICO / VERSÃO POLICIAL" e o texto corrido.
+Não use asteriscos (*), # nem qualquer marcação markdown.
 Todos os dados padronizados acima (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) devem estar EMBASADOS/EMBUTIDOS na narrativa do histórico — NÃO crie cabeçalho, lista ou bloco de campos acima do histórico. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — exceto Prefixo da viatura e APOIO DA GUARNIÇÃO, que seguem as regras 4.1 e 4.2. Jamais invente informação.`;
 
     const messages: GatewayMessage[] = [
