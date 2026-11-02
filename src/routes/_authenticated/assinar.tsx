@@ -407,12 +407,9 @@ function PixStep({
     }
   }
 
-  async function openWhatsApp() {
-    const { data: userData } = await supabase.auth.getUser();
-    const email = userData.user?.email ?? "(email não disponível)";
-    const msg = `Olá, fiz o pagamento do plano ${p.label} (${p.priceLabel}) do app QAP Report. Meu e-mail é ${email} e segue o comprovante.`;
-    const url = `https://wa.me/${WHATSAPP_FULL}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+  const emailRef = useUserEmailRef();
+  function openWhatsApp() {
+    openWhatsAppReceipt(p.label, p.priceLabel, emailRef.current);
   }
 
   return (
