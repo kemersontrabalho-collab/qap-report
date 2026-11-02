@@ -81,9 +81,6 @@ export function getPending(id: string) {
 export function removePending(id: string) {
   return tx("readwrite", (s) => s.delete(id));
 }
-export function allPending() {
-  return tx<PendingPatch[]>("readonly", (s) => s.getAll());
-}
 
 export function isNetworkError(e: unknown): boolean {
   if (typeof navigator !== "undefined" && navigator.onLine === false) return true;

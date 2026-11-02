@@ -7,12 +7,12 @@ const SYSTEM_PROMPT = `Você é um assistente especializado em redação de bole
 
 REGRAS FUNDAMENTAIS (obrigatórias, nunca as viole):
 1. Use linguagem formal, impessoal (3ª pessoa), técnica, jurídica e policial. Evite coloquialismos, gírias, opiniões pessoais e adjetivações desnecessárias.
-2. NUNCA invente fatos, nomes, horários, locais, modelos de veículos, marcas ou qualquer dado circunstancial. Restrinja-se rigorosamente ao que foi informado nos campos estruturados, palavras-chave e no contexto.
-2.1. O campo de palavras-chave pode vir como texto corrido, relato narrativo, frases soltas, tópicos ou termos separados por vírgula, ponto, quebra de linha ou espaço. INTERPRETE SEMPRE O CONTEÚDO COMO UM TODO, extraindo o sentido global dos fatos — não trate cada palavra isoladamente nem exija separação por vírgulas. Preserve integralmente todos os fatos ali descritos, mesmo os mencionados de forma informal ou abreviada, convertendo-os para linguagem técnica formal.
+2. NUNCA invente fatos, nomes, horários, locais, modelos de veículos, marcas ou qualquer dado circunstancial. Restrinja-se rigorosamente ao que foi informado nos campos estruturados, no texto corrido e no contexto.
+2.1. O campo "Texto corrido" traz o relato do policial (pode vir como narrativa, frases soltas ou tópicos, inclusive ditado por voz). INTERPRETE SEMPRE O CONTEÚDO COMO UM TODO, extraindo o sentido global dos fatos — não trate cada palavra isoladamente. Preserve integralmente todos os fatos ali descritos, mesmo os mencionados de forma informal ou abreviada, convertendo-os para linguagem técnica formal.
 3. Se faltarem dados essenciais, encerre o texto e, em uma seção "PERGUNTAS COMPLEMENTARES:", liste as informações que faltam.
 4. Comece SEMPRE o Histórico com: composição da guarnição, prefixo da viatura (quando informado), data e hora, endereço da guarnição no momento do despacho e endereço do local da ocorrência — usando somente o que foi informado. Se algum dado não foi fornecido, use um marcador entre chaves como {COMPOSIÇÃO DA GUARNIÇÃO} — nunca invente.
-4.2. APOIO DA GUARNIÇÃO: se o campo "APOIO DA GUARNIÇÃO" for informado, registre na narrativa, no momento cronológico adequado, a solicitação e a chegada da guarnição de apoio, identificando-a exatamente como informado (sem inventar prefixos, nomes ou quantidade de policiais) e descrevendo sua atuação apenas conforme o relato. Se o campo NÃO for informado, NÃO cite apoio, reforço, outra guarnição, acionamento de apoio nem marcador algum, e não pergunte por isso nas PERGUNTAS COMPLEMENTARES.
 4.1. PREFIXO DE VIATURA: se o prefixo da viatura NÃO for informado, presuma que a guarnição estava a pé (patrulhamento/policiamento a pé). NÃO cite viatura, prefixo, marcador {PREFIXO} nem deslocamento motorizado. Escreva naturalmente que "a guarnição deslocou-se ao local", "a guarnição aproximou-se do local" ou "a guarnição compareceu ao local", conforme melhor couber ao texto. Nunca pergunte pelo prefixo nas PERGUNTAS COMPLEMENTARES.
+4.2. APOIO DA GUARNIÇÃO: se o campo "APOIO DA GUARNIÇÃO" for informado, registre na narrativa, no momento cronológico adequado, a solicitação e a chegada da guarnição de apoio, identificando-a exatamente como informado (sem inventar prefixos, nomes ou quantidade de policiais) e descrevendo sua atuação apenas conforme o relato. Se o campo NÃO for informado, NÃO cite apoio, reforço, outra guarnição, acionamento de apoio nem marcador algum, e não pergunte por isso nas PERGUNTAS COMPLEMENTARES.
 5. Em ocorrências com prisão, condução ou uso de algemas, inclua expressamente:
    - "O uso de algemas foi empregado estritamente nos termos da Súmula Vinculante nº 11 do STF..."
    - "Foram informados ao indivíduo seus direitos constitucionais (Art. 5º, LXIII, da CF/88), em especial o direito ao silêncio, à assistência de advogado e à comunicação da prisão a familiar ou representante legal."
@@ -181,7 +181,7 @@ async function buildReferences(
 
   return `REFERÊNCIAS DE ESTILO E ESTRUTURA (uso restrito):
 Abaixo estão trechos de boletins semelhantes já validados. Use-os APENAS como referência de estrutura, terminologia técnica, encadeamento cronológico e procedimentos padrão.
-PROIBIDO copiar fatos, nomes, endereços, horários, quantidades, placas ou qualquer dado circunstancial dessas referências. Os fatos do texto final devem vir EXCLUSIVAMENTE dos campos, palavras-chave e contexto informados pelo usuário.
+PROIBIDO copiar fatos, nomes, endereços, horários, quantidades, placas ou qualquer dado circunstancial dessas referências. Os fatos do texto final devem vir EXCLUSIVAMENTE dos campos, do texto corrido e do contexto informados pelo usuário.
 
 ${blocks.join("\n\n---\n\n")}`;
 }
@@ -236,14 +236,14 @@ export const generateBulletin = createServerFn({ method: "POST" })
 Dados padronizados do boletim (use EXATAMENTE estes rótulos ao mencioná-los DENTRO do texto do histórico):
 ${structured}
 
-Relato/palavras-chave informados pelo policial (INTERPRETE COMO TEXTO ÚNICO E CONTÍNUO):
+Texto corrido informado pelo policial (INTERPRETE COMO TEXTO ÚNICO E CONTÍNUO):
 ${data.keywords}
 ${data.context ? `\nContexto adicional:\n${data.context}` : ""}
 
 Produza o boletim seguindo rigorosamente as regras. Estrutura obrigatória:
 1) Uma única linha de título no formato "**Título do Boletim:** <categoria ou descrição curta>".
 2) Em seguida, "## HISTÓRICO / VERSÃO POLICIAL" e o texto corrido.
-Todos os dados padronizados acima (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) devem estar EMBASADOS/EMBUTIDOS na narrativa do histórico — NÃO crie cabeçalho, lista ou bloco de campos acima do histórico. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — jamais invente informação.`;
+Todos os dados padronizados acima (Categoria, Composição da Guarnição, Prefixo da viatura, LOCALIZAÇÃO DA GUARNIÇÃO, Localização da Ocorrência, Data e Hora) devem estar EMBASADOS/EMBUTIDOS na narrativa do histórico — NÃO crie cabeçalho, lista ou bloco de campos acima do histórico. Para dados ausentes, use marcadores entre chaves como {DADO AUSENTE} — exceto Prefixo da viatura e APOIO DA GUARNIÇÃO, que seguem as regras 4.1 e 4.2. Jamais invente informação.`;
 
     const messages: GatewayMessage[] = [
       { role: "system", content: SYSTEM_PROMPT },
