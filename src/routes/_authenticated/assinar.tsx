@@ -499,6 +499,8 @@ function PendingPixCard({
   onCanceled: () => void;
 }) {
   const cancelFn = useServerFn(cancelPixRequest);
+  const emailRef = useUserEmailRef();
+  const amountLabel = `R$ ${Number(pendingPix.amount_brl).toFixed(2).replace(".", ",")}`;
   const mut = useMutation({
     mutationFn: () => cancelFn({ data: { requestId: pendingPix.id } }),
     onSuccess: () => {
@@ -519,6 +521,14 @@ function PendingPixCard({
             {new Date(pendingPix.created_at).toLocaleString("pt-BR")}. Aguarde a confirmação do
             administrador ou envie o comprovante pelo WhatsApp.
           </p>
+          <button
+            onClick={() => openWhatsAppReceipt(pendingPix.plan, amountLabel, emailRef.current)}
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-medium text-white hover:bg-emerald-700 sm:w-auto"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Enviar comprovante via WhatsApp
+          </button>
+          <br />
           <button
             onClick={() => mut.mutate()}
             disabled={mut.isPending}
