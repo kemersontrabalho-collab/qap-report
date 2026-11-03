@@ -31,6 +31,8 @@ const initialState: LiveState = {
 export function useLiveVoice(
   options: {
     url?: string;
+    /** Token da sessão do usuário, verificado no servidor antes de abrir a chamada. */
+    getToken?: () => Promise<string>;
     onEvent?: (event: LiveEvent) => void | Promise<void>;
   } = {},
 ) {
@@ -57,7 +59,7 @@ export function useLiveVoice(
     if (!mounted.current || controller.current) return;
     const audio = audioRef.current;
     if (!audio) {
-      setCall((previous) => ({ ...previous, error: "Voice playback is not mounted." }));
+      setCall((previous) => ({ ...previous, error: "O áudio da chamada não está pronto." }));
       return;
     }
     let endpoint: URL;
@@ -72,6 +74,7 @@ export function useLiveVoice(
     const voice = createLiveVoice({
       url: endpoint.href,
       audio,
+      getToken: () => latest.current.getToken?.() ?? Promise.resolve(""),
       onEvent(event) {
         if (!mounted.current || controller.current !== voice) return;
         if (event.type === "app.connected") {
@@ -90,7 +93,7 @@ export function useLiveVoice(
         } else if (event.type === "app.playback.blocked" || event.type === "app.playback.resumed") {
           setCall((previous) => ({ ...previous, playbackBlocked: event.type === "app.playback.blocked" }));
         } else if (["app.error", "gateway.error", "error"].includes(event.type)) {
-          setCall((previous) => ({ ...previous, error: event.error?.message ?? "Voice request failed." }));
+          setCall((previous) => ({ ...previous, error: event.error?.message ?? "Falha na chamada de voz." }));
         }
         try {
           void Promise.resolve(latest.current.onEvent?.(event)).catch(() => {
@@ -122,6 +125,7 @@ export function useLiveVoice(
 type LiveOptions = {
   url: string;
   audio: HTMLAudioElement;
+  getToken: () => Promise<string>;
   onEvent: (event: LiveEvent) => void;
 };
 
@@ -216,16 +220,16 @@ function createLiveVoice(options: LiveOptions) {
   function reportUnexpectedClosure(reason?: string) {
     if (state === "stopping" || state === "closed") return;
     const messages: Record<string, string> = {
-      startup_timeout: "Voice startup timed out. Start a new call to retry.",
-      initial_heartbeat_timeout: "Voice media did not connect. Start a new call to retry.",
-      heartbeat_timeout: "Voice connection was lost. Start a new call to retry.",
-      gateway_shutdown: "The voice service restarted. Start a new call to reconnect.",
-      inactivity_timeout: "The voice call ended after inactivity.",
-      duration_limit: "The voice call reached its duration limit. Start a new call to continue.",
+      startup_timeout: "A chamada demorou para iniciar. Tente de novo.",
+      initial_heartbeat_timeout: "O áudio não conectou. Tente de novo.",
+      heartbeat_timeout: "A conexão caiu. Inicie uma nova conversa.",
+      gateway_shutdown: "O serviço de voz reiniciou. Inicie uma nova conversa.",
+      inactivity_timeout: "A conversa foi encerrada por inatividade.",
+      duration_limit: "A conversa atingiu o tempo máximo. Inicie outra para continuar.",
     };
     options.onEvent({
       type: "app.error",
-      error: { message: messages[reason ?? ""] ?? "The voice call ended unexpectedly. Start a new call to retry." },
+      error: { message: messages[reason ?? ""] ?? "A conversa terminou inesperadamente. Tente de novo." },
     });
   }
 
@@ -269,7 +273,7 @@ function createLiveVoice(options: LiveOptions) {
     answerReceived = true;
     clearTimeout(deadline);
     deadline = setTimeout(
-      () => fail("Voice media did not connect within 12 seconds. Start a new call to retry."),
+      () => fail("O áudio não conectou em 12 segundos. Tente de novo."),
       12_000,
     );
     await peer.setRemoteDescription({ type: "answer", sdp: event.transport.sdp });
@@ -347,11 +351,13 @@ function createLiveVoice(options: LiveOptions) {
       if (!starting()) return;
       const sdp = connection.localDescription?.sdp;
       if (!sdp) throw new Error("Missing voice session offer");
+      const token = await options.getToken();
+      if (!starting()) return;
       socket = new WebSocket(options.url);
       deadline = setTimeout(() => fail("Voice session did not start"), 50_000);
       socket.onopen = () => {
         if (!starting()) return release();
-        send({ type: "app.start", sdp });
+        send({ type: "app.start", sdp, token });
       };
       socket.onmessage = ({ data }) => {
         try {
@@ -384,15 +390,15 @@ function createLiveVoice(options: LiveOptions) {
           fail("Invalid voice event");
         }
       };
-      socket.onerror = () => fail("Voice connection failed");
+      socket.onerror = () => fail("Falha na conexão da conversa.");
       socket.onclose = () => {
         if (state !== "stopping" && state !== "closed") {
-          options.onEvent({ type: "app.error", error: { message: "Voice control connection closed" } });
+          options.onEvent({ type: "app.error", error: { message: "A conexão da conversa foi fechada." } });
         }
         release();
       };
     } catch (error) {
-      fail(error instanceof Error ? error.message : "Microphone startup failed");
+      fail(error instanceof Error ? error.message : "Não foi possível acessar o microfone.");
     }
   }
 
