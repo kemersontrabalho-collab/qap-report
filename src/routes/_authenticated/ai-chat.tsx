@@ -4,7 +4,12 @@ import { AppShell } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { askAI } from "@/lib/bulletins.functions";
 import { toast } from "sonner";
-import { Send, Loader2, MessageCircle, Trash2 } from "lucide-react";
+import { Send, Loader2, MessageCircle, Trash2, Keyboard, AudioLines } from "lucide-react";
+import { VoiceConversation } from "@/components/VoiceConversation";
+
+const VoiceDictateButton = lazy(() =>
+  import("@/components/VoiceDictateButton").then((m) => ({ default: m.VoiceDictateButton })),
+);
 
 const MarkdownRenderer = lazy(() => import("@/components/MarkdownRenderer"));
 
@@ -43,6 +48,7 @@ function AIChatPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<"text" | "voice">("text");
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -109,6 +115,29 @@ function AIChatPage() {
           </div>
         </div>
 
+        <div role="tablist" aria-label="Modo da conversa" className="mb-3 grid grid-cols-2 gap-1 rounded-xl border border-[var(--surface-line)] bg-card/60 p-1">
+          {([
+            ["text", "Digitar", Keyboard],
+            ["voice", "Conversar por voz", AudioLines],
+          ] as const).map(([value, label, Icon]) => (
+            <button
+              key={value}
+              role="tab"
+              aria-selected={mode === value}
+              onClick={() => setMode(value)}
+              className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors ${
+                mode === value ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Icon className="h-4 w-4" /> {label}
+            </button>
+          ))}
+        </div>
+
+        {mode === "voice" ? (
+          <VoiceConversation />
+        ) : (
+        <>
         <div className="surface-card min-h-[420px] rounded-2xl p-4 sm:p-5">
           {messages.length === 0 && (
             <div className="reveal py-10 text-center">
@@ -187,6 +216,9 @@ function AIChatPage() {
             placeholder="Escreva sua pergunta..."
             className="flex-1 resize-none rounded-xl bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/70"
           />
+          <Suspense fallback={null}>
+            <VoiceDictateButton value={input} onChange={setInput} label="Falar" className="shrink-0" />
+          </Suspense>
           <button
             type="submit"
             disabled={loading || !input.trim()}
@@ -198,6 +230,8 @@ function AIChatPage() {
         <p className="mt-2 text-xs text-muted-foreground">
           Respostas geradas por IA. Sem histórico persistente — cada sessão começa em branco.
         </p>
+        </>
+        )}
       </div>
     </AppShell>
   );
