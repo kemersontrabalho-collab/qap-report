@@ -78,7 +78,9 @@ export function VoiceConversation() {
           )}
         </span>
         <p role="status" className="mt-3 text-sm font-medium">
-          {voice.muted && voice.status === "connected" ? "Microfone silenciado" : STATUS_LABEL[voice.status]}
+          {voice.muted && voice.status === "connected"
+            ? "Microfone silenciado"
+            : STATUS_LABEL[voice.status]}
         </p>
         {thinking && voice.status === "connected" && (
           <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -97,7 +99,8 @@ export function VoiceConversation() {
               onClick={start}
               className="btn-brand inline-flex min-h-12 items-center gap-2 rounded-xl px-6 text-sm font-medium"
             >
-              <Mic className="h-4 w-4" /> {voice.status === "closed" ? "Nova conversa" : "Começar a conversar"}
+              <Mic className="h-4 w-4" />{" "}
+              {voice.status === "closed" ? "Nova conversa" : "Começar a conversar"}
             </button>
           ) : (
             <>
@@ -129,8 +132,8 @@ export function VoiceConversation() {
         </div>
         {idle && (
           <p className="measure mt-4 text-xs text-muted-foreground">
-            Fale sua dúvida em voz alta e a assistente responde falando. Você pode interromper a qualquer
-            momento. Nada da conversa é salvo.
+            Fale sua dúvida em voz alta e a assistente responde falando. Você pode interromper a
+            qualquer momento. Nada da conversa é salvo.
           </p>
         )}
       </div>
@@ -138,7 +141,10 @@ export function VoiceConversation() {
       {rows.length > 0 && (
         <div className="mt-2 max-h-[340px] space-y-3 overflow-y-auto border-t border-[var(--surface-line)] pt-4">
           {rows.map((r) => (
-            <div key={r.id} className={`flex ${r.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div
+              key={r.id}
+              className={`flex ${r.role === "user" ? "justify-end" : "justify-start"}`}
+            >
               <p
                 className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-sm ${
                   r.role === "user"

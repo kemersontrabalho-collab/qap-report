@@ -115,18 +115,26 @@ function AIChatPage() {
           </div>
         </div>
 
-        <div role="tablist" aria-label="Modo da conversa" className="mb-3 grid grid-cols-2 gap-1 rounded-xl border border-[var(--surface-line)] bg-card/60 p-1">
-          {([
-            ["text", "Digitar", Keyboard],
-            ["voice", "Conversar por voz", AudioLines],
-          ] as const).map(([value, label, Icon]) => (
+        <div
+          role="tablist"
+          aria-label="Modo da conversa"
+          className="mb-3 grid grid-cols-2 gap-1 rounded-xl border border-[var(--surface-line)] bg-card/60 p-1"
+        >
+          {(
+            [
+              ["text", "Digitar", Keyboard],
+              ["voice", "Conversar por voz", AudioLines],
+            ] as const
+          ).map(([value, label, Icon]) => (
             <button
               key={value}
               role="tab"
               aria-selected={mode === value}
               onClick={() => setMode(value)}
               className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors ${
-                mode === value ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]" : "text-muted-foreground hover:text-foreground"
+                mode === value
+                  ? "bg-primary text-primary-foreground shadow-[var(--shadow-sm)]"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Icon className="h-4 w-4" /> {label}
@@ -137,103 +145,107 @@ function AIChatPage() {
         {mode === "voice" ? (
           <VoiceConversation />
         ) : (
-        <>
-        <div className="surface-card min-h-[420px] rounded-2xl p-4 sm:p-5">
-          {messages.length === 0 && (
-            <div className="reveal py-10 text-center">
-              <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[var(--gradient-brand)] p-[1px] shadow-[var(--shadow-sm)]">
-                <span className="grid h-full w-full place-items-center rounded-[0.9rem] bg-card">
-                  <MessageCircle className="h-6 w-6 text-primary" />
-                </span>
-              </span>
-              <p className="mt-4 text-sm text-muted-foreground">Comece com uma pergunta:</p>
-              <div className="mt-5 grid gap-2 sm:grid-cols-2">
-                {SUGGESTIONS.map((s, i) => (
-                  <button
-                    key={s}
-                    onClick={() => send(s)}
-                    style={{ ["--d" as string]: `${80 + i * 60}ms` }}
-                    className="reveal lift group rounded-xl border border-[var(--surface-line)] bg-background/50 p-3 text-left text-xs leading-relaxed transition-colors duration-300 hover:border-primary/40 hover:bg-accent/60"
+          <>
+            <div className="surface-card min-h-[420px] rounded-2xl p-4 sm:p-5">
+              {messages.length === 0 && (
+                <div className="reveal py-10 text-center">
+                  <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[var(--gradient-brand)] p-[1px] shadow-[var(--shadow-sm)]">
+                    <span className="grid h-full w-full place-items-center rounded-[0.9rem] bg-card">
+                      <MessageCircle className="h-6 w-6 text-primary" />
+                    </span>
+                  </span>
+                  <p className="mt-4 text-sm text-muted-foreground">Comece com uma pergunta:</p>
+                  <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                    {SUGGESTIONS.map((s, i) => (
+                      <button
+                        key={s}
+                        onClick={() => send(s)}
+                        style={{ ["--d" as string]: `${80 + i * 60}ms` }}
+                        className="reveal lift group rounded-xl border border-[var(--surface-line)] bg-background/50 p-3 text-left text-xs leading-relaxed transition-colors duration-300 hover:border-primary/40 hover:bg-accent/60"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {messages.map((m, i) => (
+                  <div
+                    key={i}
+                    className={`flex animate-fade-in ${m.role === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    {s}
-                  </button>
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-[var(--shadow-sm)] ${
+                        m.role === "user"
+                          ? "rounded-br-md bg-[var(--gradient-brand)] text-primary-foreground"
+                          : "rounded-bl-md border border-[var(--surface-line)] bg-muted/50 text-foreground"
+                      }`}
+                    >
+                      {m.role === "assistant" ? (
+                        <Suspense fallback={<p className="whitespace-pre-wrap">{m.content}</p>}>
+                          <MarkdownRenderer content={m.content} />
+                        </Suspense>
+                      ) : (
+                        <p className="whitespace-pre-wrap">{m.content}</p>
+                      )}
+                    </div>
+                  </div>
                 ))}
+                {loading && (
+                  <div className="flex justify-start">
+                    <div className="inline-flex items-center gap-2 rounded-2xl rounded-bl-md border border-[var(--surface-line)] bg-muted/50 px-4 py-2.5 text-sm text-muted-foreground">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Consultando...
+                    </div>
+                  </div>
+                )}
+                <div ref={endRef} />
               </div>
             </div>
-          )}
 
-          <div className="space-y-4">
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`flex animate-fade-in ${m.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-[var(--shadow-sm)] ${
-                    m.role === "user"
-                      ? "rounded-br-md bg-[var(--gradient-brand)] text-primary-foreground"
-                      : "rounded-bl-md border border-[var(--surface-line)] bg-muted/50 text-foreground"
-                  }`}
-                >
-                  {m.role === "assistant" ? (
-                    <Suspense fallback={<p className="whitespace-pre-wrap">{m.content}</p>}>
-                      <MarkdownRenderer content={m.content} />
-                    </Suspense>
-                  ) : (
-                    <p className="whitespace-pre-wrap">{m.content}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="flex justify-start">
-                <div className="inline-flex items-center gap-2 rounded-2xl rounded-bl-md border border-[var(--surface-line)] bg-muted/50 px-4 py-2.5 text-sm text-muted-foreground">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> Consultando...
-                </div>
-              </div>
-            )}
-            <div ref={endRef} />
-          </div>
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            send(input);
-          }}
-          className="glass mt-3 flex items-end gap-2 rounded-2xl border border-[var(--surface-line)] p-2"
-        >
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+            <form
+              onSubmit={(e) => {
                 e.preventDefault();
                 send(input);
-              }
-            }}
-            rows={2}
-            placeholder="Escreva sua pergunta..."
-            className="flex-1 resize-none rounded-xl bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/70"
-          />
-          <Suspense fallback={null}>
-            <VoiceDictateButton value={input} onChange={setInput} label="Falar" className="shrink-0" />
-          </Suspense>
-          <button
-            type="submit"
-            disabled={loading || !input.trim()}
-            className="btn-brand inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl px-4 text-sm font-medium disabled:opacity-50"
-          >
-            <Send className="h-4 w-4" /> <span className="hidden sm:inline">Enviar</span>
-          </button>
-        </form>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Respostas geradas por IA. Sem histórico persistente — cada sessão começa em branco.
-        </p>
-        </>
+              }}
+              className="glass mt-3 flex items-end gap-2 rounded-2xl border border-[var(--surface-line)] p-2"
+            >
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    send(input);
+                  }
+                }}
+                rows={2}
+                placeholder="Escreva sua pergunta..."
+                className="flex-1 resize-none rounded-xl bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/70"
+              />
+              <Suspense fallback={null}>
+                <VoiceDictateButton
+                  value={input}
+                  onChange={setInput}
+                  label="Falar"
+                  className="min-h-11 shrink-0 rounded-xl px-3"
+                />
+              </Suspense>
+              <button
+                type="submit"
+                disabled={loading || !input.trim()}
+                className="btn-brand inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl px-4 text-sm font-medium disabled:opacity-50"
+              >
+                <Send className="h-4 w-4" /> <span className="hidden sm:inline">Enviar</span>
+              </button>
+            </form>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Respostas geradas por IA. Sem histórico persistente — cada sessão começa em branco.
+            </p>
+          </>
         )}
       </div>
     </AppShell>
   );
 }
-
