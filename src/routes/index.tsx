@@ -400,7 +400,7 @@ function Landing() {
               Plano Mensal
             </p>
             <p className="mt-2 flex items-baseline gap-2">
-              <span className="text-4xl font-bold">R$ 1,99</span>
+              <span className="text-4xl font-bold">R$ 10,00</span>
               <span className="text-sm text-muted-foreground">por mês</span>
             </p>
             <ul className="mt-5 space-y-2 text-sm text-muted-foreground">

@@ -93,7 +93,7 @@ function TermsPage() {
 
       <h2>8. Pagamento, assinatura e impostos</h2>
       <p>
-        O plano é mensal, no valor de R$ 1,99 por mês, com renovação a cada ciclo até o cancelamento.
+        O plano é mensal, no valor de R$ 10,00 por mês, com renovação a cada ciclo até o cancelamento.
         Novos usuários têm 24 horas de teste gratuito. Condições de cobrança, faturamento, impostos,
         cancelamento e reembolso são conduzidas pelo nosso revendedor: consulte os{" "}
         <a
