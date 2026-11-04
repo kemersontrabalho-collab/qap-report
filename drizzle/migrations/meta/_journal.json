@@ -15,6 +15,13 @@
       "when": 1793697786606,
       "tag": "0001_plano_mensal_10_reais",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793761505706,
+      "tag": "0002_community_knowledge_respects_withdrawal",
+      "breakpoints": true
     }
   ]
 }
