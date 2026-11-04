@@ -220,6 +220,15 @@
     /* Base fluida: toda medida em rem escala junto entre 320px e 1600px. */
     font-size: clamp(15px, 0.9rem + 0.18vw, 17px);
     scroll-behavior: smooth;
+    touch-action: manipulation;
+    overscroll-behavior-y: none;
+  }
+
+  /* Anti-zoom: navegadores mobile dão zoom ao focar campos com fonte < 16px. */
+  @media (max-width: 767px) {
+    input, textarea, select, [contenteditable="true"] {
+      font-size: 16px !important;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
