@@ -12,20 +12,10 @@ const TutorialModal = lazy(() =>
 
 // Rotas que NÃO exigem assinatura ativa (usuário sem plano ainda pode acessar).
 const FREE_PATHS = ["/assinar", "/settings"];
-const PREMIUM_CACHE_MS = 30_000;
-let premiumCache: { userId: string; value: boolean; checkedAt: number } | null = null;
-
+// Sem cache: a revogação de assinatura pelo admin vale na próxima navegação.
 async function getPremiumStatus(userId: string): Promise<boolean> {
-  if (
-    premiumCache?.userId === userId &&
-    Date.now() - premiumCache.checkedAt < PREMIUM_CACHE_MS
-  ) {
-    return premiumCache.value;
-  }
   const { data } = await supabase.rpc("is_premium_user", { _user_id: userId });
-  const value = data === true;
-  premiumCache = { userId, value, checkedAt: Date.now() };
-  return value;
+  return data === true;
 }
 
 function AuthenticatedLayout() {
