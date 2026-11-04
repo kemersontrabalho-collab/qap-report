@@ -275,6 +275,7 @@ export type Database = {
           id: string
           keywords: string | null
           search_tsv: unknown
+          source_bulletin_id: string | null
           status: string
           title: string
           updated_at: string
@@ -291,6 +292,7 @@ export type Database = {
           id?: string
           keywords?: string | null
           search_tsv?: unknown
+          source_bulletin_id?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -307,11 +309,20 @@ export type Database = {
           id?: string
           keywords?: string | null
           search_tsv?: unknown
+          source_bulletin_id?: string | null
           status?: string
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "community_knowledge_source_bulletin_id_fkey"
+            columns: ["source_bulletin_id"]
+            isOneToOne: false
+            referencedRelation: "bulletins"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       coupon_redemptions: {
         Row: {
