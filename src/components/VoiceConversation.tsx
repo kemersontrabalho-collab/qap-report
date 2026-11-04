@@ -67,7 +67,8 @@ export function VoiceConversation() {
 
       <div className="flex flex-col items-center py-4 text-center">
         <span
-          className={`grid h-20 w-20 place-items-center rounded-full bg-[var(--gradient-brand)] text-primary-foreground shadow-[var(--shadow-sm)] ${
+          style={{ background: "var(--gradient-brand)" }}
+          className={`grid h-20 w-20 place-items-center rounded-full text-primary-foreground shadow-[var(--shadow-sm)] ${
             voice.status === "connected" ? "animate-pulse" : ""
           }`}
         >
