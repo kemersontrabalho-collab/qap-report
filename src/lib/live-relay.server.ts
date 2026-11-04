@@ -23,7 +23,7 @@ const liveSettings = {
   liveModel: "openai/gpt-live-1",
   backendModel: "openai/gpt-6-astra",
   openingInstructions:
-    "Comece agora em português do Brasil. Diga "Olá" ao policial em uma frase curta, sem bom dia ou boa noite, diga que pode tirar dúvidas sobre enquadramento legal, penas e qual boletim usar, pergunte qual é a dúvida e escute.",
+    "Comece agora em português do Brasil. Diga 'Olá' ao policial em uma frase curta, sem bom dia ou boa noite, diga que pode tirar dúvidas sobre enquadramento legal, penas e qual boletim usar, pergunte qual é a dúvida e escute.",
 } as const;
 
 export type LiveSocket = {
