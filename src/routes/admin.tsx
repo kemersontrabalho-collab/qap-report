@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tansta
 import { useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { AdminActivityBell } from "@/components/admin/AdminActivityBell";
 
 // Chunk separado: recharts só entra na rede quando a aba de estatísticas abre.
 const AdminCharts = lazy(() => import("@/components/admin/AdminCharts"));
@@ -90,6 +91,10 @@ export const Route = createFileRoute("/admin")({
           "Painel administrativo interno do QAP Report para gestão de usuários, cupons, notificações e monitoramento da plataforma.",
       },
       { name: "robots", content: "noindex, nofollow" },
+      { property: "og:title", content: "Painel Administrativo — QAP Report" },
+      { property: "og:description", content: "Gestão de usuários, pagamentos e avisos do QAP Report." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AdminPanel,
@@ -201,9 +206,12 @@ function DashboardView() {
             <Shield className="h-5 w-5 shrink-0 text-primary" />
             <h1 className="truncate text-fluid-lg font-semibold">Painel Administrativo</h1>
           </div>
+          <div className="flex items-center gap-2">
+          <AdminActivityBell />
           <Button variant="ghost" size="sm" className="shrink-0" onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" /> Sair
           </Button>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-fluid py-6">

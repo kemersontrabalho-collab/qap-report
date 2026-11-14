@@ -29,6 +29,13 @@
       "when": 1794660031506,
       "tag": "0003_free_trial_and_atomic_pix_access",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794660314639,
+      "tag": "0004_admin_activity_notifications",
+      "breakpoints": true
     }
   ]
 }
