@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { assertPremium } from "./premium.server";
 
 const saveInput = z.object({
   bulletinType: z.enum(["BA", "BO-COP", "BO-TC"]),
@@ -20,6 +21,7 @@ export const saveExistingBulletin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => saveInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertPremium(context.supabase, context.userId);
     const { error, data: row } = await context.supabase
       .from("bulletins")
       .insert({

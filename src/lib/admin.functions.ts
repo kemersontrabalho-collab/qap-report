@@ -356,54 +356,14 @@ export const adminApprovePixRequest = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdminSession();
     const sb = await admin();
-    // Lê a solicitação para pegar plano/usuário
-    const { data: req, error: readErr } = await sb
-      .from("pix_payment_requests")
-      .select("id, user_id, plan, status")
-      .eq("id", data.requestId)
-      .single();
-    if (readErr) throw new Error(readErr.message);
-    if (req.status !== "aguardando_aprovacao") {
-      throw new Error("Esta solicitação já foi processada.");
-    }
-    const now = new Date();
-    const days = req.plan === "mensal" ? 30 : 365;
-    const end = new Date(now.getTime() + days * 86400000);
+    // Uma única transação: falhas nunca deixam acesso liberado sem aprovação.
+    const { data: result, error } = await sb.rpc("approve_pix_payment_request", {
+      _request_id: z.string().uuid().parse(data.requestId),
+    });
+    if (error) throw new Error(error.message);
+    const req = z.object({ ok: z.literal(true), user_id: z.string().uuid(), plan: z.string() }).parse(result);
 
-    // 1) Ativa/atualiza assinatura mantendo a maior data de validade
-    const { data: existing } = await sb
-      .from("subscriptions")
-      .select("current_period_end")
-      .eq("user_id", req.user_id)
-      .maybeSingle();
-    const finalEnd =
-      existing?.current_period_end &&
-      new Date(existing.current_period_end).getTime() > end.getTime()
-        ? existing.current_period_end
-        : end.toISOString();
-
-    const { error: subErr } = await sb.from("subscriptions").upsert(
-      {
-        user_id: req.user_id,
-        status: "active",
-        plan: req.plan,
-        current_period_start: now.toISOString(),
-        current_period_end: finalEnd,
-        payment_method: "pix",
-        canceled_at: null,
-      },
-      { onConflict: "user_id" },
-    );
-    if (subErr) throw new Error(subErr.message);
-
-    // 2) Marca a solicitação como aprovada
-    const { error: updErr } = await sb
-      .from("pix_payment_requests")
-      .update({ status: "aprovado", decided_at: now.toISOString() })
-      .eq("id", data.requestId);
-    if (updErr) throw new Error(updErr.message);
-
-    // 3) Notifica o usuário
+    // A notificação não altera o resultado da aprovação já confirmada.
     await sb.from("notifications").insert({
       title: "Assinatura ativada",
       body: `Seu pagamento do plano ${req.plan} foi confirmado. Bom trabalho!`,
