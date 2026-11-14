@@ -33,11 +33,19 @@ import { useServerFn } from "@tanstack/react-start";
 import { sendSupportMessage } from "@/lib/support.functions";
 import { deleteMyAccount } from "@/lib/account.functions";
 import { saveExistingBulletin } from "@/lib/library.functions";
+import { getMySubscriptionStatus } from "@/lib/subscription.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { CategorySearch } from "@/components/CategorySearch";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Configurações · QAP Report" }] }),
+  head: () => ({ meta: [
+    { title: "Configurações · QAP Report" },
+    { name: "description", content: "Gerencie seu perfil, assinatura e preferências do QAP Report." },
+    { property: "og:title", content: "Configurações · QAP Report" },
+    { property: "og:description", content: "Perfil, assinatura e preferências do assistente de redação policial." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SettingsPage,
 });
 
@@ -55,6 +63,12 @@ function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const subscriptionFn = useServerFn(getMySubscriptionStatus);
+  const { data: access } = useQuery({
+    queryKey: ["my-subscription"],
+    queryFn: () => subscriptionFn(),
+    refetchInterval: 15_000,
+  });
   const [profile, setProfile] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -233,9 +247,9 @@ function SettingsPage() {
           </Link>
         </section>
 
-        <SavedBulletinsSection />
+        {access?.isPremium && <SavedBulletinsSection />}
 
-        <PresetsSection />
+        {access?.isPremium && <PresetsSection />}
 
         <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="font-semibold">Aparência</h2>
