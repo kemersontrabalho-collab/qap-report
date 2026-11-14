@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          event_type: string
+          id: string
+          read_at: string | null
+          source_id: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          event_type: string
+          id?: string
+          read_at?: string | null
+          source_id: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          read_at?: string | null
+          source_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
