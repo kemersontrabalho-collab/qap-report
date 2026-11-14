@@ -22,6 +22,13 @@
       "when": 1793761505706,
       "tag": "0002_community_knowledge_respects_withdrawal",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794660031506,
+      "tag": "0003_free_trial_and_atomic_pix_access",
+      "breakpoints": true
     }
   ]
 }

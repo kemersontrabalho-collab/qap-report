@@ -32,8 +32,12 @@ export const Route = createFileRoute("/_authenticated/assinar")({
       {
         name: "description",
         content:
-          "Ative seu plano mensal do QAP Report — código promocional ou pagamento via Pix com liberação imediata.",
+          "Plano mensal do QAP Report por R$ 10,00: Pix com acesso liberado após aprovação administrativa, ou código promocional.",
       },
+      { property: "og:title", content: "Assinatura mensal · QAP Report" },
+      { property: "og:description", content: "Pix mensal de R$ 10,00 com aprovação administrativa. Cupons e cortesias continuam disponíveis." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -60,6 +64,7 @@ function AssinarPage() {
   const { data: status, isLoading } = useQuery({
     queryKey: ["my-subscription"],
     queryFn: () => statusFn(),
+    refetchInterval: 15_000,
   });
 
   const [step, setStep] = useState<Step>("plans");
@@ -72,7 +77,7 @@ function AssinarPage() {
     if (!sub) return null;
     const end = sub.current_period_end ? new Date(sub.current_period_end) : null;
     const now = new Date();
-    if (sub.status === "active" && end && end.getTime() > now.getTime()) {
+    if (status?.isPremium && sub.plan !== "free" && sub.status === "active" && end && end.getTime() > now.getTime()) {
       return {
         plan: sub.plan,
         endsAt: end,
@@ -80,7 +85,7 @@ function AssinarPage() {
       };
     }
     return null;
-  }, [sub]);
+  }, [sub, status?.isPremium]);
 
   if (isLoading) {
     return (
@@ -120,9 +125,8 @@ function AssinarPage() {
                     Seu tempo de teste ACABOU
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    A criação de boletins e o chat de dúvidas estão bloqueados. Escolha um plano
-                    abaixo ou resgate um código promocional para reativar todas as funções do QAP
-                    Report.
+                    As ferramentas estão bloqueadas. O Pix só libera o acesso após aprovação
+                    do administrador. Cupons e cortesias também podem reativar o acesso.
                   </p>
                 </div>
               </div>
