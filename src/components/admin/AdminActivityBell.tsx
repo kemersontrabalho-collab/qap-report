@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell, CheckCheck, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { listAdminActivity, markAdminActivityRead } from "@/lib/admin-activity.functions";
 
 export function AdminActivityBell() {
@@ -18,32 +19,32 @@ export function AdminActivityBell() {
     if (seen.current) {
       for (const item of data.items) {
         if (!item.read_at && !seen.current.has(item.id)) {
-          toast.info(item.title, { description: item.body });
+          if (!open) toast.info(item.title, { description: item.body });
           void qc.invalidateQueries({ queryKey: [item.event_type === "signup" ? "admin-users" : "admin-pix"] });
           void qc.invalidateQueries({ queryKey: ["admin-stats"] });
         }
       }
     }
     seen.current = new Set(data.items.map((item) => item.id));
-  }, [data, qc]);
+  }, [data, qc, open]);
   const read = useMutation({ mutationFn: (id?: string) => mark({ data: { id } }), onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-activity"] }), onError: () => toast.error("Não foi possível marcar o aviso como lido.") });
   return (
     <>
-      <Button variant="outline" size="icon" className="relative shrink-0" aria-label={`Avisos do administrador, ${data?.unread ?? 0} não lidos`} onClick={() => setOpen(true)}>
+      <Button variant="outline" size="icon" className="relative shrink-0" aria-label={`Avisos do administrador, ${data?.unread ?? 0} não lidos`} onClick={() => { toast.dismiss(); setOpen(true); }}>
         <Bell className="h-4 w-4" />
         {!!data?.unread && <span className="absolute -right-1 -top-1 rounded-full bg-destructive px-1 text-xs text-destructive-foreground">{data.unread > 99 ? "99+" : data.unread}</span>}
       </Button>
-      {open && <div className="fixed inset-0 z-50 flex justify-end bg-background/90" role="dialog" aria-modal="true" aria-label="Avisos do administrador">
-        <section className="flex h-dvh w-full max-w-md flex-col border-l bg-card shadow-lg">
-          <header className="flex items-center justify-between gap-2 border-b p-4">
-            <h2 className="font-semibold">Avisos do administrador</h2>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden p-0" showCloseButton={false}>
+          <DialogHeader className="flex-row items-center justify-between gap-2 border-b p-4">
+            <DialogTitle className="text-base">Avisos do administrador</DialogTitle>
             <Button variant="ghost" size="icon" aria-label="Fechar avisos" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
-          </header>
+          </DialogHeader>
           <div className="flex items-center justify-between border-b p-3 text-sm">
             <span>{data?.unread ?? 0} não lidos</span>
             <Button variant="ghost" size="sm" disabled={!data?.unread || read.isPending} onClick={() => read.mutate(undefined)}><CheckCheck className="mr-2 h-4 w-4" />Marcar todos</Button>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             {isPending && <Loader2 className="m-6 h-5 w-5 animate-spin" />}
             {isError && <p className="p-4 text-sm text-destructive">Não foi possível carregar os avisos.</p>}
             {!isPending && !isError && !data?.items.length && <p className="p-6 text-sm text-muted-foreground">Nenhum aviso no momento.</p>}
@@ -56,8 +57,8 @@ export function AdminActivityBell() {
               </div>
             </article>)}
           </div>
-        </section>
-      </div>}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
