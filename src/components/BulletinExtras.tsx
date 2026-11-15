@@ -29,7 +29,7 @@ import {
 } from "@/lib/bulletin-extras";
 
 const input =
-  "w-full rounded-lg border bg-background px-2.5 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring";
+  "min-w-0 w-full max-w-full rounded-lg border bg-background px-2.5 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring";
 
 function Collapsible({
   title,
@@ -42,7 +42,7 @@ function Collapsible({
 }) {
   const [open, setOpen] = useState(count > 0);
   return (
-    <div className="surface-card reveal rounded-2xl">
+    <div className="surface-card reveal min-w-0 max-w-full rounded-2xl">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

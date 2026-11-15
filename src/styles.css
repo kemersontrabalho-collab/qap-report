@@ -225,6 +225,12 @@
   }
 
   /* Anti-zoom: navegadores mobile dão zoom ao focar campos com fonte < 16px. */
+  input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    box-sizing: border-box;
+  }
+
   @media (max-width: 767px) {
     input, textarea, select, [contenteditable="true"] {
       font-size: 16px !important;
