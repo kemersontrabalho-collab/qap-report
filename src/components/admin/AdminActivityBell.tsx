@@ -35,7 +35,7 @@ export function AdminActivityBell() {
         {!!data?.unread && <span className="absolute -right-1 -top-1 rounded-full bg-destructive px-1 text-xs text-destructive-foreground">{data.unread > 99 ? "99+" : data.unread}</span>}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden p-0" showCloseButton={false}>
+        <DialogContent className="flex max-h-[85dvh] flex-col gap-0 overflow-hidden p-0 [&>button]:hidden" aria-describedby={undefined}>
           <DialogHeader className="flex-row items-center justify-between gap-2 border-b p-4">
             <DialogTitle className="text-base">Avisos do administrador</DialogTitle>
             <Button variant="ghost" size="icon" aria-label="Fechar avisos" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
