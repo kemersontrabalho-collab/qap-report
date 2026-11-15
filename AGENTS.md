@@ -14,3 +14,4 @@
 - Use is_premium_user as the shared database access gate, including restrictive bulletin and preset policies; why: protected pages alone cannot prevent direct calls after subscription expiry.
 - Run database access-rule tests with PGlite through the isolated Vitest configuration; why: exercise actual PostgreSQL functions without mutating customer payments or starting the voice relay.
 - Persist signup and reported-Pix admin alerts with unique source IDs via database triggers; expose them only through admin-session functions and poll while the admin panel is open, because manual Pix is not bank-confirmed and alerts must survive closed sessions.
+- Keep device permission checks client-side and stop media tracks immediately after permission requests; browser grants cannot be revoked by the app and checking access must not record users.
