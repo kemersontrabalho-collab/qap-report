@@ -529,8 +529,8 @@ function EditBulletin() {
 
       <h1 className="sr-only">{b.title || `Editar ${b.bulletin_type}`}</h1>
 
-      <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        <aside className="space-y-4">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
+        <aside className="min-w-0 space-y-4">
           <div className="surface-card reveal relative overflow-hidden rounded-2xl p-4">
             <span
               aria-hidden
