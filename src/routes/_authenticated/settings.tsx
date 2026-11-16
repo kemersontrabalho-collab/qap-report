@@ -19,7 +19,6 @@ import {
   Link2,
   BookOpen,
   LifeBuoy,
-  BellRing,
   Send,
   Crown,
   Library,
@@ -36,6 +35,7 @@ import { saveExistingBulletin } from "@/lib/library.functions";
 import { getMySubscriptionStatus } from "@/lib/subscription.functions";
 import { CATEGORIES_BY_TYPE } from "@/lib/bulletin-categories";
 import { CategorySearch } from "@/components/CategorySearch";
+import { DevicePermissions } from "@/components/DevicePermissions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [
@@ -72,11 +72,6 @@ function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const [notifPerm, setNotifPerm] = useState<NotificationPermission | "unsupported">(
-    typeof window !== "undefined" && "Notification" in window
-      ? Notification.permission
-      : "unsupported",
-  );
   const [supportSubject, setSupportSubject] = useState<
     "duvida" | "reclamacao" | "sugestao" | "outro"
   >("duvida");
@@ -85,34 +80,6 @@ function SettingsPage() {
   const sendSupportFn = useServerFn(sendSupportMessage);
   const deleteAccountFn = useServerFn(deleteMyAccount);
   const [deletingAccount, setDeletingAccount] = useState(false);
-
-  async function requestNotifications() {
-    if (!("Notification" in window)) {
-      toast.error("Este dispositivo/navegador não suporta notificações.");
-      return;
-    }
-    try {
-      const perm = await Notification.requestPermission();
-      setNotifPerm(perm);
-      if (perm === "granted") {
-        toast.success("Notificações ativadas neste dispositivo.");
-        try {
-          new Notification("QAP Report", {
-            body: "Notificações ativadas com sucesso.",
-            icon: "/icon-192.png",
-          });
-        } catch {
-          /* alguns navegadores exigem SW para exibir */
-        }
-      } else if (perm === "denied") {
-        toast.error("Permissão negada. Ative manualmente nas configurações do navegador.");
-      } else {
-        toast.info("Permissão não concedida.");
-      }
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Falha ao solicitar permissão");
-    }
-  }
 
   async function submitSupport(e: React.FormEvent) {
     e.preventDefault();
@@ -352,31 +319,7 @@ function SettingsPage() {
           </button>
         </section>
 
-        <section className="surface-card reveal rounded-2xl p-5">
-          <h2 className="flex items-center gap-2 font-semibold">
-            <BellRing className="h-4 w-4" /> Notificações do dispositivo
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ative para receber alertas do administrador e atualizações do app diretamente no seu
-            dispositivo, mesmo com o QAP Report fechado.
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <button
-              onClick={requestNotifications}
-              disabled={notifPerm === "granted" || notifPerm === "unsupported"}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
-            >
-              <BellRing className="h-4 w-4" />
-              {notifPerm === "granted" ? "Notificações ativadas" : "Ativar notificações"}
-            </button>
-            <span className="text-xs text-muted-foreground">
-              {notifPerm === "granted" && "Permissão concedida."}
-              {notifPerm === "denied" && "Permissão negada. Altere nas configurações do navegador."}
-              {notifPerm === "default" && "Aguardando sua permissão."}
-              {notifPerm === "unsupported" && "Não suportado neste dispositivo."}
-            </span>
-          </div>
-        </section>
+        <DevicePermissions />
 
         <section className="surface-card reveal rounded-2xl p-5">
           <h2 className="flex items-center gap-2 font-semibold">
