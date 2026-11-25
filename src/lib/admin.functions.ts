@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAdminSession } from "./admin-gate.server";
+import { subscriptionOrigin } from "./subscription-origin";
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -83,14 +84,22 @@ export const adminListUsers = createServerFn({ method: "POST" })
 
     const { data: subsAll } = await sb
       .from("subscriptions")
-      .select("user_id, status, plan, current_period_end");
-    const subByUser = new Map<string, { status: string; plan: string; end: string | null }>();
+      .select("user_id, status, plan, current_period_end, payment_method");
+    const subByUser = new Map<string, { status: string; plan: string; end: string | null; payment_method: string | null }>();
     for (const s of subsAll ?? [])
       subByUser.set(s.user_id as string, {
         status: s.status as string,
         plan: s.plan as string,
         end: (s.current_period_end as string) ?? null,
+        payment_method: (s.payment_method as string | null) ?? null,
       });
+    const { data: redemptions } = await sb.from("coupon_redemptions").select("user_id");
+    const couponUsers = new Set((redemptions ?? []).map((r) => r.user_id as string));
+    const { data: pendingPix } = await sb
+      .from("pix_payment_requests")
+      .select("user_id")
+      .eq("status", "aguardando_aprovacao");
+    const pendingUsers = new Set((pendingPix ?? []).map((r) => r.user_id as string));
 
     // Purge orphan profiles (users who deleted their auth account) so they
     // don't linger on the admin list.
@@ -124,6 +133,8 @@ export const adminListUsers = createServerFn({ method: "POST" })
           blocked: banned,
           bulletins: countByUser.get(p.id) ?? 0,
           subscription: sub ?? null,
+          origin: subscriptionOrigin({ sub: sub ?? null, redeemedCoupon: couponUsers.has(p.id) }),
+          payment_pending: pendingUsers.has(p.id),
           inactive_days: inactiveDays,
         };
       });
@@ -271,6 +282,7 @@ export const adminGrantSubscription = createServerFn({ method: "POST" })
         plan: data.plan,
         current_period_start: now.toISOString(),
         current_period_end: end.toISOString(),
+        payment_method: "admin",
         canceled_at: null,
       },
       { onConflict: "user_id" },

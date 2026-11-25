@@ -5,6 +5,7 @@ import { useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { AdminActivityBell } from "@/components/admin/AdminActivityBell";
+import { ORIGIN_LABEL } from "@/lib/subscription-origin";
 
 // Chunk separado: recharts só entra na rede quando a aba de estatísticas abre.
 const AdminCharts = lazy(() => import("@/components/admin/AdminCharts"));
@@ -410,6 +411,16 @@ function UsersPanel() {
       ) : (
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">{data?.users.length ?? 0} usuário(s)</p>
+          <div className="flex flex-wrap gap-2 text-xs">
+            {(["pago", "admin", "cupom", "teste", "sem_plano"] as const).map((o) => (
+              <Badge key={o} variant="outline">
+                {ORIGIN_LABEL[o]}: {(data?.users ?? []).filter((u) => u.origin === o).length}
+              </Badge>
+            ))}
+            <Badge variant="outline">
+              Pix pendente: {(data?.users ?? []).filter((u) => u.payment_pending).length}
+            </Badge>
+          </div>
           {(data?.users ?? []).slice(0, visible).map((u) => (
             <Card key={u.id}>
               <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -432,10 +443,16 @@ function UsersPanel() {
                     </span>
                     {u.blocked && <Badge variant="destructive">Bloqueado</Badge>}
                     {u.subscription && (
-                      <Badge variant="secondary">
-                        {u.subscription.plan} · {u.subscription.status}
+                      <Badge variant="secondary" title={`${u.subscription.plan} · ${u.subscription.status}`}>
+                        {ORIGIN_LABEL[u.origin]}
+                        {u.origin !== "sem_plano" && u.subscription.end && u.subscription.plan !== "vitalicio"
+                          ? ` · até ${new Date(u.subscription.end).toLocaleDateString("pt-BR")}`
+                          : u.subscription.plan === "vitalicio" && u.origin !== "sem_plano"
+                            ? " · vitalício"
+                            : ""}
                       </Badge>
                     )}
+                    {u.payment_pending && <Badge variant="destructive">Pix pendente de aprovação</Badge>}
                   </div>
                   <p className="truncate text-sm text-muted-foreground">{u.email}</p>
                   <p className="text-xs text-muted-foreground">
