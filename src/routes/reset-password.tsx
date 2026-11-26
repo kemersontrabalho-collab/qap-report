@@ -22,6 +22,8 @@ export const Route = createFileRoute("/reset-password")({
       },
       { property: "og:url", content: "https://qap-report.lovable.app/reset-password" },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://qap-report.lovable.app/reset-password" }],
   }),

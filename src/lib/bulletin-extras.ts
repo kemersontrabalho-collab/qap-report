@@ -1,3 +1,4 @@
+import { narrativeContradictions, procedureFacts } from "./bulletin-validation";
 // Tipos e formatadores de apreensões, envolvidos, resumo para WhatsApp e
 // verificação jurídica local (sem rede).
 
@@ -135,7 +136,8 @@ export type LocalCheck = { id: string; title: string; suggestion: string };
 
 export function localLegalChecks(content: string): LocalCheck[] {
   const t = content.toLowerCase();
-  const out: LocalCheck[] = [];
+  const facts = procedureFacts(content);
+  const out: LocalCheck[] = narrativeContradictions(content).map((title, i) => ({ id: `contradicao-${i}`, title, suggestion: "Confirme os fatos e retire a afirmação incompatível. Não descreva atos não realizados." }));
   if (/atitude suspeita|em atitude suspeita|comportamento suspeito|nervosismo/.test(t)) {
     out.push({
       id: "suspeita",
@@ -152,7 +154,7 @@ export function localLegalChecks(content: string): LocalCheck[] {
         "Registre a autorização expressa do morador (quem autorizou) ou a situação de flagrante que justificou o ingresso.",
     });
   }
-  if (/algem/.test(t) && !/(s[úu]mula vinculante|resist|fuga|integridade)/.test(t)) {
+  if (facts.handcuffs && !/(s[úu]mula vinculante|resist|fuga|integridade)/.test(t)) {
     out.push({
       id: "algemas",
       title: "Uso de algemas sem fundamentação",
@@ -167,11 +169,11 @@ export function localLegalChecks(content: string): LocalCheck[] {
       suggestion: "Informe acondicionamento, lacre e destino dos materiais apreendidos (Lei 13.964/19).",
     });
   }
-  if (/(pres[oa]|pris[ãa]o|conduzid)/.test(t) && !/(direito|sil[êe]ncio|lxiii)/.test(t)) {
+  if (facts.arrest && !/(direito|sil[êe]ncio|lxiii)/.test(t)) {
     out.push({
       id: "direitos",
       title: "Leitura de direitos não registrada",
-      suggestion: "Registre que foram informados os direitos constitucionais (Art. 5º, LXIII, CF/88).",
+      suggestion: "Confirme se os direitos constitucionais foram informados (Art. 5º, LXIII, CF/88) e registre somente o que foi realizado.",
     });
   }
   return out;

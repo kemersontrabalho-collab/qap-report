@@ -1,4 +1,14 @@
 # Pagamentos e acesso
+- [x] Corrigir procedimentos contraditórios e verificar geração, auditoria, correção e PDF em cenários com e sem prisão.
+- [x] Preparar recuperação da instalação antiga no mesmo endereço, preservando manifesto e arquivos locais.
+- [ ] Validar recuperação de instalações antigas na versão publicada: depende da publicação e de um aparelho instalado; simulação isolada do ciclo não completou.
+- [x] Somar saldo na renovação Pix e testar sem pagamentos reais.
+- [x] Restaurar e persistir consentimento coletivo.
+- [x] Impedir conclusão vazia e avisar sobre campos essenciais.
+- [x] Atualizar lixeira imediatamente após exclusão pelo editor.
+- [x] Buscar no histórico sem distinção de acentos.
+- [x] Testar seis correções em telas móveis com conta conectada, além da ausência de novos registros de cache e preservação da instalação na prévia.
+- [ ] Confirmar no iPhone físico os fluxos e a atualização instalada: aparelho não disponível no ambiente de testes.
 - [x] Avisar administrador de novos cadastros e Pix informados, com histórico e leitura.
 - [x] Testar avisos automáticos e acesso restrito em banco isolado; verificar abertura e fechamento com administrador conectado, sem criar pagamentos reais.
 - [x] Restaurar cadastro free com teste de 24 horas.

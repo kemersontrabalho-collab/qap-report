@@ -15,3 +15,8 @@
 - Run database access-rule tests with PGlite through the isolated Vitest configuration; why: exercise actual PostgreSQL functions without mutating customer payments or starting the voice relay.
 - Persist signup and reported-Pix admin alerts with unique source IDs via database triggers; expose them only through admin-session functions and poll while the admin panel is open, because manual Pix is not bank-confirmed and alerts must survive closed sessions.
 - Keep device permission checks client-side and stop media tracks immediately after permission requests; browser grants cannot be revoked by the app and checking access must not record users.
+- Validate bulletin narrative on completion in the editor, imports and database transitions; why: headers/questions alone are not a concluded report, including direct API writes.
+- Use shared narrative validation for generation, correction and both audit paths; why: procedural boilerplate must not contradict the officer's explicitly reported facts.
+- Store collective consent in the bulletin edit state and every save, and invalidate list/detail queries after writes; why: reopening and returning to the dashboard must reflect persisted choices.
+- Keep the same-path recovery app-shell worker for one cleanup release, with manifest-only installation and no new worker registrations; why: the deployed precache paths are broken and returning devices must evict them safely without touching messaging caches.
+- Renew Pix atomically from the remaining paid or finite courtesy balance, retaining lifetime access and rejecting duplicate approvals; why: early payment must not remove existing access days.

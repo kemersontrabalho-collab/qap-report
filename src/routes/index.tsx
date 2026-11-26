@@ -21,6 +21,8 @@ export const Route = createFileRoute("/")({
           "Redija boletins BA, BO-COP e BO-TC com apoio de IA e terminologia técnica policial.",
       },
       { property: "og:url", content: "https://qap-report.lovable.app/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [
       { rel: "canonical", href: "https://qap-report.lovable.app/" },

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/bulletins/new")({
-  head: () => ({ meta: [{ title: "Novo boletim · QAP Report" }] }),
+  head: () => ({ meta: [{ title: "Novo boletim · QAP Report" }, { name: "description", content: "Escolha BA, BO-COP ou BO-TC para redigir um boletim no QAP Report." }, { property: "og:title", content: "Novo boletim · QAP Report" }, { property: "og:description", content: "Criação privada de boletins policiais BA, BO-COP e BO-TC." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: NewBulletin,
 });
 

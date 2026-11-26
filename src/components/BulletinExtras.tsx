@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
@@ -275,13 +275,21 @@ export function AuditPanel({
   const [busy, setBusy] = useState<"audit" | "fix" | null>(null);
   const [proposal, setProposal] = useState<string | null>(null);
   const local = localLegalChecks(content);
+  const revision = useRef(0);
+  useEffect(() => {
+    revision.current += 1;
+    setIssues(null);
+    setProposal(null);
+  }, [content, bulletinType]);
 
   if (!content || content.trim().length < 50) return null;
 
   async function runAudit() {
+    const currentRevision = revision.current;
     setBusy("audit");
     try {
       const r = await auditFn({ data: { content, bulletinType } });
+      if (currentRevision !== revision.current) return;
       setIssues(r.issues);
       if (r.issues.length === 0) toast.success("Nenhuma vulnerabilidade encontrada.");
     } catch (e) {
@@ -292,6 +300,7 @@ export function AuditPanel({
   }
 
   async function runFix() {
+    const currentRevision = revision.current;
     const list = [
       ...(issues ?? []).map((i) => `${i.title}: ${i.suggestion}${i.excerpt ? ` (trecho: "${i.excerpt}")` : ""}`),
       ...(issues ? [] : local.map((l) => `${l.title}: ${l.suggestion}`)),
@@ -300,6 +309,7 @@ export function AuditPanel({
     setBusy("fix");
     try {
       const r = await fixFn({ data: { content, issues: list } });
+      if (currentRevision !== revision.current) return;
       setProposal(r.content);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao corrigir");

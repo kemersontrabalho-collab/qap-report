@@ -2,46 +2,17 @@
 // Follows Lovable's PWA skill: never register in dev/preview/iframe and
 // always support `?sw=off` as a kill switch.
 
-const SW_URL = "/sw.js";
-
-function isRefusedContext(): boolean {
-  if (typeof window === "undefined") return true;
-  if (!import.meta.env.PROD) return true;
-  try {
-    if (window.self !== window.top) return true;
-  } catch {
-    return true;
-  }
-  const host = window.location.hostname;
-  if (host.startsWith("id-preview--") || host.startsWith("preview--")) return true;
-  if (host === "lovableproject.com" || host.endsWith(".lovableproject.com")) return true;
-  if (host === "lovableproject-dev.com" || host.endsWith(".lovableproject-dev.com")) return true;
-  if (host === "beta.lovable.dev" || host.endsWith(".beta.lovable.dev")) return true;
-  if (new URLSearchParams(window.location.search).get("sw") === "off") return true;
-  return false;
-}
-
-async function unregisterApp() {
-  if (!("serviceWorker" in navigator)) return;
-  const regs = await navigator.serviceWorker.getRegistrations();
-  await Promise.all(
-    regs
-      .filter((r) => {
-        const url = r.active?.scriptURL || r.installing?.scriptURL || r.waiting?.scriptURL || "";
-        return url.endsWith(SW_URL);
-      })
-      .map((r) => r.unregister()),
-  );
-}
-
 export async function registerPWA(): Promise<void> {
-  if (isRefusedContext()) {
-    await unregisterApp().catch(() => {});
-    return;
-  }
+  // Do not register new app-shell workers during the cleanup release.
+  // Existing registrations fetch the same-path replacement worker via update().
+  if (typeof window === "undefined") return;
   if (!("serviceWorker" in navigator)) return;
   try {
-    await navigator.serviceWorker.register(SW_URL, { scope: "/" });
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.allSettled(regs.filter((r) => {
+      const url = r.active?.scriptURL || r.installing?.scriptURL || r.waiting?.scriptURL;
+      return url && new URL(url).pathname === "/sw.js";
+    }).map((r) => r.update()));
   } catch (err) {
     console.warn("[pwa] registration failed", err);
   }

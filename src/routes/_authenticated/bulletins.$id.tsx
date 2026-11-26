@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useParams, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell, BULLETIN_TYPES } from "@/components/AppShell";
 import { useServerFn } from "@tanstack/react-start";
 import { generateBulletin, reverseGeocode } from "@/lib/bulletins.functions";
@@ -22,6 +22,7 @@ const VoiceDictateButton = lazy(() =>
 import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import { copyWithFeedback } from "@/lib/clipboard";
 import { printBulletin } from "@/lib/print-bulletin";
+import { hasBulletinNarrative } from "@/lib/bulletin-validation";
 import { finalizeBulletinText, stripMarkdown } from "@/lib/bulletin-text";
 import { playUiSound, prepareUiSounds } from "@/lib/ui-sounds";
 import { AuditPanel, InvolvedPartiesSection, SeizedItemsSection } from "@/components/BulletinExtras";
@@ -69,7 +70,7 @@ const bulletinQueryOptions = (id: string) => queryOptions({
 export const Route = createFileRoute("/_authenticated/bulletins/$id")({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(bulletinQueryOptions(params.id)),
   head: () => ({
-    meta: [{ title: "Editar boletim · QAP Report" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Editar boletim · QAP Report" }, { name: "description", content: "Redija e revise seu histórico policial no editor do QAP Report." }, { property: "og:title", content: "Editar boletim · QAP Report" }, { property: "og:description", content: "Editor privado de boletins policiais do QAP Report." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }],
   }),
   component: EditBulletin,
 });
@@ -84,6 +85,7 @@ type Bulletin = {
   content: string;
   status: "draft" | "done";
   is_favorite: boolean;
+  share_to_community: boolean;
   deleted_at: string | null;
   crew_composition: string | null;
   vehicle_prefix: string | null;
@@ -154,6 +156,7 @@ function extractImprovementSuggestions(content: string | null | undefined): stri
 function EditBulletin() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const genFn = useServerFn(generateBulletin);
   const geoFn = useServerFn(reverseGeocode);
 
@@ -206,11 +209,19 @@ function EditBulletin() {
   }
 
   const savingRef = useRef(false);
-  const [shareCommunity, setShareCommunity] = useState(true);
+
 
   async function save(nextStatus?: "draft" | "done", opts?: { silent?: boolean }) {
     const current = bRef.current;
     if (!current || savingRef.current) return;
+    if (nextStatus === "done") {
+      if (!hasBulletinNarrative(current.content)) {
+        toast.error("Escreva ou gere o histórico antes de concluir.");
+        return;
+      }
+      const missing = [!current.title?.trim() && "título", !current.category?.trim() && "categoria", !current.crew_composition?.trim() && "composição da guarnição", !current.occurrence_at && "data e hora", !current.occurrence_address?.trim() && "local da ocorrência"].filter(Boolean);
+      if (missing.length && !confirm(`Faltam: ${missing.join(", ")}. Confira se esses dados se aplicam à ocorrência. Concluir mesmo assim?`)) return;
+    }
     const revAtStart = revRef.current;
     savingRef.current = true;
     setSaving(true);
@@ -225,6 +236,7 @@ function EditBulletin() {
         context: current.context,
         content: finalContent,
         is_favorite: current.is_favorite,
+        share_to_community: current.share_to_community,
         crew_composition: current.crew_composition,
         vehicle_prefix: current.vehicle_prefix,
         support_crew: current.support_crew,
@@ -239,17 +251,18 @@ function EditBulletin() {
         involved_parties: current.involved_parties,
       };
       if (nextStatus) patch.status = nextStatus;
-      if (nextStatus === "done") {
-        (patch as Record<string, unknown>).share_to_community = shareCommunity;
-      }
       if (typeof navigator !== "undefined" && !navigator.onLine && !nextStatus) {
         throw new TypeError("Failed to fetch");
       }
       const { error } = await supabase
         .from("bulletins")
         .update(patch as never)
-        .eq("id", current.id);
+        .eq("id", current.id)
+        .select("id")
+        .single();
       if (error) throw error;
+      void qc.invalidateQueries({ queryKey: ["bulletins"], refetchType: "all" });
+      void qc.invalidateQueries({ queryKey: ["bulletin", current.id] });
       void removePending(current.id).catch(() => {});
       if (localOnlyRef.current) {
         setLocalOnly(false);
@@ -492,6 +505,10 @@ function EditBulletin() {
       toast.error(translateDbError(error));
       return;
     }
+    dirtyRef.current = false;
+    await removePending(b.id).catch(() => {});
+    await qc.invalidateQueries({ queryKey: ["bulletins"], refetchType: "all" });
+    qc.removeQueries({ queryKey: ["bulletin", b.id] });
     playUiSound("deleted");
     navigate({ to: "/dashboard" });
   }
@@ -833,8 +850,8 @@ function EditBulletin() {
               <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                 <input
                   type="checkbox"
-                  checked={shareCommunity}
-                  onChange={(e) => setShareCommunity(e.target.checked)}
+                  checked={b.share_to_community === true}
+                  onChange={(e) => update("share_to_community", e.target.checked)}
                   className="h-3.5 w-3.5 accent-primary"
                 />
                 Enviar anônimo à base coletiva

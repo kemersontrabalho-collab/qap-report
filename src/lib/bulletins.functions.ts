@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { assertPremium } from "./premium.server";
+import { narrativeContradictions, validateGeneratedNarrative } from "./bulletin-validation";
 
 const SYSTEM_PROMPT = `Você é um assistente especializado em redação de boletins policiais brasileiros. Sua missão é produzir textos com máxima COESÃO, COERÊNCIA, CLAREZA e RIGOR TÉCNICO-JURÍDICO.
 
@@ -13,9 +14,9 @@ REGRAS FUNDAMENTAIS (obrigatórias, nunca as viole):
 4. Comece SEMPRE o Histórico com: composição da guarnição, prefixo da viatura (quando informado), data e hora, endereço da guarnição no momento do despacho e endereço do local da ocorrência — usando somente o que foi informado. Se algum dado não foi fornecido, use um marcador entre chaves como {COMPOSIÇÃO DA GUARNIÇÃO} — nunca invente.
 4.1. PREFIXO DE VIATURA: se o prefixo da viatura NÃO for informado, presuma que a guarnição estava a pé (patrulhamento/policiamento a pé). NÃO cite viatura, prefixo, marcador {PREFIXO} nem deslocamento motorizado. Escreva naturalmente que "a guarnição deslocou-se ao local", "a guarnição aproximou-se do local" ou "a guarnição compareceu ao local", conforme melhor couber ao texto. Nunca pergunte pelo prefixo nas PERGUNTAS COMPLEMENTARES.
 4.2. APOIO DA GUARNIÇÃO: se o campo "APOIO DA GUARNIÇÃO" for informado, registre na narrativa, no momento cronológico adequado, a solicitação e a chegada da guarnição de apoio, identificando-a exatamente como informado (sem inventar prefixos, nomes ou quantidade de policiais) e descrevendo sua atuação apenas conforme o relato. Se o campo NÃO for informado, NÃO cite apoio, reforço, outra guarnição, acionamento de apoio nem marcador algum, e não pergunte por isso nas PERGUNTAS COMPLEMENTARES.
-5. Em ocorrências com prisão, condução ou uso de algemas, inclua expressamente:
-   - "O uso de algemas foi empregado estritamente nos termos da Súmula Vinculante nº 11 do STF..."
-   - "Foram informados ao indivíduo seus direitos constitucionais (Art. 5º, LXIII, da CF/88), em especial o direito ao silêncio, à assistência de advogado e à comunicação da prisão a familiar ou representante legal."
+5. Prisão, condução, algemas e comunicação de direitos são fatos distintos. NARRE cada ato SOMENTE se sua realização tiver sido expressamente informada. Prisão ou condução NÃO implica uso de algemas; condução NÃO implica prisão. Se houve algemas, descreva a justificativa concreta informada; citar a Súmula Vinculante 11 não substitui a justificativa. Nunca presuma resistência, fuga, lesões, exames, leitura de direitos ou cadeia de custódia.
+5.1. Se o relato negar prisão ou algemas, preserve essa negativa quando relevante, sem acrescentar frases afirmativas padronizadas. É PROIBIDO escrever que um ato foi realizado e em seguida dizer "não se aplica". Sem prisão, não crie seção de garantias do preso ou comunicação da prisão.
+5.2. A orientação jurídica deve ficar nas PERGUNTAS COMPLEMENTARES, claramente separada dos fatos. Pergunte se um procedimento aplicável foi realizado, nunca afirme sua realização sem informação.
 
 DIRETRIZES DE ESCRITA (COESÃO, COERÊNCIA E CLAREZA):
 - Narrativa em ordem cronológica linear: despacho/acionamento → deslocamento → chegada ao local → abordagem/diligências → constatações → medidas adotadas → encaminhamento/destino final.
@@ -33,28 +34,17 @@ TIPOS DE BOLETIM:
 - BO-COP: indivíduo presente no local (inclui consumo de maconha).
 - BO-TC: menor potencial ofensivo (inclui posse de cocaína para consumo pessoal).
 
-PREVISÃO DE PROCEDIMENTOS PADRÃO (obrigatório):
-Ao redigir o histórico, ANTECIPE e INCLUA os desdobramentos legais e operacionais padrão que naturalmente decorrem do tipo de ocorrência, mesmo quando o usuário não os mencionar explicitamente — desde que sejam procedimentos obrigatórios ou consagrados na prática policial brasileira. Nunca invente fatos concretos (nomes, horários, quantidades), mas descreva as diligências padronizadas que sempre se aplicam ao cenário.
-
-Referências de previsão (aplique conforme o caso):
-- Flagrante delito com prisão: uso de algemas nos termos da Súmula Vinculante nº 11 do STF; leitura dos direitos constitucionais (Art. 5º, LXIII, CF/88 — silêncio, advogado, comunicação a familiar); condução do preso para exame de corpo de delito (IML) quando cabível; apresentação à autoridade policial de plantão na Delegacia de Polícia (DP/DPPA/Central de Flagrantes) para lavratura do APF; preservação do local e da cadeia de custódia (Lei 13.964/19) dos objetos apreendidos.
-- Violência doméstica e familiar contra a mulher (Lei 11.340/06 — Maria da Penha): oitiva reservada da vítima; oferta de medidas protetivas de urgência; condução da vítima para exame de corpo de delito no IML; encaminhamento à Delegacia Especializada de Atendimento à Mulher (DEAM) quando existente na circunscrição, ou à DP de plantão fora do horário; acionamento da rede de proteção quando necessário.
-- Lesão corporal/agressão em geral: exame de corpo de delito da vítima no IML; ouvida de testemunhas; encaminhamento à DP competente.
-- Crimes contra o patrimônio (roubo, furto): preservação do local; arrecadação de vestígios; requisição de imagens quando disponíveis; registro na DP competente.
-- Entorpecentes — tráfico (Art. 33, Lei 11.343/06): pesagem, arrecadação e cadeia de custódia da substância; condução do autor à DP com apresentação à autoridade policial para APF; encaminhamento da droga para perícia.
-- Entorpecentes — usuário (Art. 28, Lei 11.343/06): lavratura de TCO (BO-TC) quando cabível; arrecadação da substância para perícia; liberação após qualificação e assinatura de termo de comparecimento.
-- Envolvendo criança/adolescente: acionamento do Conselho Tutelar; encaminhamento à Delegacia de Proteção à Criança e ao Adolescente (DPCA) quando existente.
-- Óbito/suspeita de crime contra a vida: preservação do local até chegada da Perícia Técnica e do IML; acionamento do Delegado de Homicídios/DHPP quando existente.
-
-Só omita um procedimento previsível quando o próprio contexto informado indicar que ele NÃO se aplica (ex.: vítima recusou exame — registre a recusa em vez de omitir). Nunca substitua procedimento padrão por suposição de fatos.
+PROCEDIMENTOS E FIDELIDADE AO RELATO (obrigatório):
+O histórico registra SOMENTE fatos e diligências efetivamente informados. Um procedimento obrigatório por lei NÃO prova que foi realizado. Não antecipe nem complete atos de prisão, exames, condução, oitiva, medidas protetivas, acionamentos, pesagem, lacre, perícia, preservação de local ou encaminhamento com base no tipo do boletim ou em modelos anteriores.
+Se faltar confirmação de procedimento juridicamente relevante ao caso, pergunte na seção PERGUNTAS COMPLEMENTARES (por exemplo, justificativa concreta de algemas quando o uso foi relatado; comunicação de direitos quando há prisão; acondicionamento e destino quando há apreensão). Não pergunte sobre prisão ou algemas inexistentes, apoio vazio ou diligências sem relação com os fatos. Não converta uma pergunta pendente em afirmação.
 
 ESTRUTURA DO RELATÓRIO/HISTÓRICO (NI 2.22/EMBM/2023 — Anexo A, obrigatório):
 - Primeira linha do histórico: especifique a infração ou fato que se entende ter ocorrido, no formato "Trata-se de ocorrência de <furto simples / furto qualificado / ameaça / etc.>".
 - Seja claro, completo, objetivo e descritivo, indicando todas as circunstâncias relevantes, de modo a fornecer ao Ministério Público subsídios para transação penal ou denúncia e ao Poder Judiciário elementos para instrução e sentença.
-- Consigne as versões das partes, UMA EM CADA PARÁGRAFO, nesta ordem: Condutor, Ofendido/Vítima, Testemunhas e Autor (ex.: "A vítima {NOME} relata que...", "A testemunha {NOME} informa que...", "O autor {NOME} afirma que..."). Registre também fatos não presenciados pelo policial, ressalvando expressamente que a informação foi produzida pela parte, sob sua responsabilidade. Se não houve declarações, registre expressamente que as partes não prestaram declarações.
+- Consigne as versões das partes, UMA EM CADA PARÁGRAFO, nesta ordem: Condutor, Ofendido/Vítima, Testemunhas e Autor (ex.: "A vítima {NOME} relata que...", "A testemunha {NOME} informa que...", "O autor {NOME} afirma que..."). Registre também fatos não presenciados pelo policial, ressalvando expressamente que a informação foi produzida pela parte, sob sua responsabilidade. Registre ausência de declarações somente se o policial a tiver informado; falta de informação não significa que as partes não falaram.
 - Presume-se fidedignidade das afirmações do agente que relata; por isso, sempre que a informação vier das partes, ressalve isso antecipadamente.
 - Impressões e opiniões do agente são permitidas desde que identificadas como tais (ex.: "o autor aparentava exaltação"), nunca misturadas ao relato objetivo dos fatos.
-- Registre em observação a presença ou ausência de outras testemunhas do fato, para evitar arrolamento posterior de testemunhas não presenciais. Em BO-TC, testemunhas não são intimadas (a primeira audiência no JECrim destina-se à conciliação); no relatório, indique o ponto de assinatura da testemunha ao final do parágrafo de sua versão quando aplicável.
+- Registre em observação a presença ou ausência de outras testemunhas do fato somente quando informada, para evitar arrolamento posterior de testemunhas não presenciais. Em BO-TC, testemunhas não são intimadas (a primeira audiência no JECrim destina-se à conciliação); no relatório, indique o ponto de assinatura da testemunha ao final do parágrafo de sua versão quando aplicável.
 - O responsável pela lavratura do boletim NUNCA deve figurar como "participante" da ocorrência; seus dados constam apenas no campo de assinatura.
 - Em delitos formais ou de mera conduta (violação de domicílio, porte de entorpecentes, ameaça, calúnia, difamação, etc.), descreva pormenorizadamente a conduta: gestos, palavras proferidas, sinais e ações realizadas, pois a ação do autor é a própria essência do delito.
 - Fundada suspeita (Parecer 01/Cor-G/2022): ao narrar abordagem/busca pessoal, justifique tecnicamente com elementos objetivos e articuláveis (atitude suspeita descrita concretamente, compatibilidade com descrição de procurados, denúncia específica, comportamento evasivo). Jamais use critérios subjetivos ou discriminatórios.
@@ -181,7 +171,7 @@ async function buildReferences(
   if (blocks.length === 0) return null;
 
   return `REFERÊNCIAS DE ESTILO E ESTRUTURA (uso restrito):
-Abaixo estão trechos de boletins semelhantes já validados. Use-os APENAS como referência de estrutura, terminologia técnica, encadeamento cronológico e procedimentos padrão.
+Abaixo estão trechos de boletins semelhantes já validados. Use-os APENAS como referência de estrutura, terminologia técnica, encadeamento cronológico. Não copie diligências ou procedimentos dessas referências.
 PROIBIDO copiar fatos, nomes, endereços, horários, quantidades, placas ou qualquer dado circunstancial dessas referências. Os fatos do texto final devem vir EXCLUSIVAMENTE dos campos, do texto corrido e do contexto informados pelo usuário.
 
 ${blocks.join("\n\n---\n\n")}`;
@@ -253,6 +243,7 @@ Todos os dados padronizados acima (Categoria, Composição da Guarnição, Prefi
     if (references) messages.push({ role: "system", content: references });
     messages.push({ role: "user", content: userMsg });
     const content = await callGateway(messages);
+    validateGeneratedNarrative(content, [data.keywords, data.context, data.seizedItems, data.involvedParties].filter(Boolean).join("\n"), data.supportCrew);
 
     return { content };
   });
@@ -344,7 +335,7 @@ const auditInput = z.object({
   bulletinType: z.string().max(20),
 });
 
-const AUDIT_SYSTEM = `Você é um revisor jurídico de boletins policiais brasileiros. Analise o histórico e aponte vulnerabilidades que podem levar à nulidade em audiência de custódia ou em juízo: fundada suspeita genérica ou subjetiva (ex.: "atitude suspeita" sem elementos concretos), entrada em domicílio sem autorização expressa do morador ou sem flagrante delito justificado, uso de algemas sem justificativa (Súmula Vinculante 11), ausência de leitura de direitos (Art. 5º, LXIII, CF), cadeia de custódia incompleta (lacre, acondicionamento, destino), versões das partes ausentes, contradições cronológicas. Não aponte problemas inexistentes. Responda somente em JSON.`;
+const AUDIT_SYSTEM = `Você é um revisor jurídico de boletins policiais brasileiros. Analise o histórico e aponte vulnerabilidades que podem levar à nulidade em audiência de custódia ou em juízo: fundada suspeita genérica ou subjetiva (ex.: "atitude suspeita" sem elementos concretos), entrada em domicílio sem autorização expressa do morador ou sem flagrante delito justificado, uso de algemas sem justificativa (Súmula Vinculante 11), ausência de leitura de direitos (Art. 5º, LXIII, CF), cadeia de custódia incompleta (lacre, acondicionamento, destino), versões das partes ausentes, contradições cronológicas e afirmações que simultaneamente realizam e negam prisão ou algemas, inclusive frases "não se aplica" após um ato afirmado. Condução não prova prisão; prisão não prova uso de algemas. Só avalie direitos do preso quando houver prisão efetiva, algemas quando houver uso efetivo e cadeia de custódia quando houver apreensão efetiva. Falta de informação não autoriza sugerir que se afirme um ato não realizado. Sugira confirmar os fatos ou retirar a afirmação contraditória. Não aponte problemas inexistentes. Responda somente em JSON.`;
 
 const auditSchema = {
   type: "json_schema",
@@ -396,7 +387,8 @@ export const auditBulletin = createServerFn({ method: "POST" })
     );
     try {
       const parsed = JSON.parse(raw) as { issues?: AuditIssue[] };
-      return { issues: (parsed.issues ?? []).slice(0, 12) };
+      const contradictions: AuditIssue[] = narrativeContradictions(data.content).map((title) => ({ severity: "alta", title, excerpt: "", suggestion: "Confirme o que efetivamente aconteceu e retire a afirmação incompatível; não acrescente procedimentos não realizados." }));
+      return { issues: [...contradictions, ...(parsed.issues ?? [])].slice(0, 12) };
     } catch {
       throw new Error("Não foi possível interpretar a auditoria. Tente novamente.");
     }
@@ -425,6 +417,7 @@ HISTÓRICO ORIGINAL:
 ${data.content}`,
       },
     ]);
+    validateGeneratedNarrative(content, data.content, /apoio|reforço/i.test(data.content) ? data.content : undefined);
     return { content };
   });
 

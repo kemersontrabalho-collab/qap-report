@@ -208,6 +208,7 @@ function PlanSelector({ selected, onSelect }: { selected: PlanId; onSelect: (p: 
   return (
     <section className="space-y-3">
       <h2 className="text-lg font-semibold">Escolha seu plano</h2>
+      <p className="text-sm text-muted-foreground">Cada Pix aprovado acrescenta 30 dias; na renovação antecipada, os dias restantes são preservados. Acesso vitalício não é reduzido.</p>
       <div className="grid gap-3">
         {(Object.keys(PLANS) as PlanId[]).map((id) => {
           const p = PLANS[id];

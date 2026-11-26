@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSuspenseQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { matchesBulletinSearch } from "@/lib/bulletin-validation";
 import { playUiSound, prepareUiSounds } from "@/lib/ui-sounds";
 import {
   FileText,
@@ -32,6 +33,7 @@ type Bulletin = {
   bulletin_type: string;
   category: string | null;
   title: string;
+  content: string | null;
   status: "draft" | "done";
   is_favorite: boolean;
   deleted_at: string | null;
@@ -46,7 +48,7 @@ const bulletinsQueryOptions = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("bulletins")
-      .select("id, bulletin_type, category, title, status, is_favorite, deleted_at, created_at, updated_at")
+      .select("id, bulletin_type, category, title, content, status, is_favorite, deleted_at, created_at, updated_at")
       .in("bulletin_type", ["BA", "BO-COP", "BO-TC"])
       .order("updated_at", { ascending: false });
     if (error) throw error;
@@ -68,6 +70,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
         property: "og:description",
         content: "Área privada para criar, editar e gerenciar boletins policiais no QAP Report.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -139,7 +143,7 @@ function Dashboard() {
   }, [qc]);
 
   const filtered = useMemo(() => {
-    const s = search.toLowerCase().trim();
+
     return bulletins.filter((b) => {
       if (tab === "trash" && !b.deleted_at) return false;
       if (tab !== "trash" && b.deleted_at) return false;
@@ -148,12 +152,7 @@ function Dashboard() {
       if (tab === "done" && (b.status !== "done" || b.is_favorite)) return false;
       if (tab === "favorites" && !b.is_favorite) return false;
 
-      if (!s) return true;
-      return (
-        b.title.toLowerCase().includes(s) ||
-        (b.category ?? "").toLowerCase().includes(s) ||
-        new Date(b.created_at).toLocaleDateString("pt-BR").includes(s)
-      );
+      return matchesBulletinSearch(b, search);
     });
   }, [bulletins, tab, search]);
 
@@ -279,7 +278,8 @@ function Dashboard() {
     { drafts: 0, done: 0, favorites: 0, trash: 0 },
   );
 
-  const activeTab = tabs.find((t) => t.key === tab)!;
+  const activeTab = tabs.find((t) => t.key === tab) ?? tabs[0];
+  if (!activeTab) return null;
 
   return (
     <AppShell>

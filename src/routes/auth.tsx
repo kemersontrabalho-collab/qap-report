@@ -36,6 +36,8 @@ export const Route = createFileRoute("/auth")({
       },
       { property: "og:url", content: "https://qap-report.lovable.app/auth" },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://qap-report.lovable.app/auth" }],
   }),

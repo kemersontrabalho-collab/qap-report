@@ -29,6 +29,8 @@ export const Route = createFileRoute("/_authenticated/ai-chat")({
           "Área privada para tirar dúvidas jurídico-policiais com apoio de IA no QAP Report.",
       },
       { name: "robots", content: "noindex, nofollow" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AIChatPage,

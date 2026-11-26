@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { hasBulletinNarrative } from "./bulletin-validation";
 import { assertPremium } from "./premium.server";
 
 const saveInput = z.object({
@@ -22,6 +23,7 @@ export const saveExistingBulletin = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => saveInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertPremium(context.supabase, context.userId);
+    if (!hasBulletinNarrative(data.content)) throw new Error("Escreva o histórico antes de salvar um boletim concluído.");
     const { error, data: row } = await context.supabase
       .from("bulletins")
       .insert({
