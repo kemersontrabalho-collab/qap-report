@@ -65,7 +65,11 @@ export function liveVoiceDev(): Plugin {
     configureServer(server) {
       const httpServer = server.httpServer;
       if (!httpServer) throw new Error("Live voice preview requires Vite's HTTP server");
-      const sockets = new WebSocketServer({ noServer: true, maxPayload: 2 * 1024 * 1024 });
+      const sockets = new WebSocketServer({
+        noServer: true,
+        maxPayload: 2 * 1024 * 1024,
+        handleProtocols: (protocols) => (protocols.has("qap-live") ? "qap-live" : false),
+      });
       let disposed = false;
       const upgrade = (request: IncomingMessage, socket: Duplex, head: Buffer) => {
         if (request.url?.split("?", 1)[0] !== "/api/live") return;
@@ -78,7 +82,9 @@ export function liveVoiceDev(): Plugin {
               "/src/lib/live-relay.server.ts",
             )) as typeof import("./src/lib/live-relay.server");
             const config = relay.getLiveConfig();
-            const rejection = relay.validateLiveUpgrade(upgradeRequest(request));
+            const incoming = upgradeRequest(request);
+            const rejection =
+              relay.validateLiveUpgrade(incoming) ?? (await relay.authorizeLiveUpgrade(incoming));
             if (rejection) return rejectUpgrade(socket, rejection.status);
             if (socket.destroyed) return;
             sockets.handleUpgrade(request, socket, head, (connection) => {

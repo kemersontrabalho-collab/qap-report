@@ -103,16 +103,35 @@ function workerSocket(socket: WorkerSocket): LiveSocket {
   };
 }
 
-export function handleLiveRequest(request: Request): Response {
+export const LIVE_SUBPROTOCOL = "qap-live";
+
+/** Verifica sessão e plano antes de aceitar o WebSocket (token vem no subprotocolo, pois o navegador não envia cabeçalhos). */
+export async function authorizeLiveUpgrade(request: Request): Promise<Response | null> {
+  const protocols = (request.headers.get("sec-websocket-protocol") ?? "").split(",").map((p) => p.trim());
+  if (!protocols.includes(LIVE_SUBPROTOCOL)) return new Response("Unauthorized", { status: 401 });
+  const token = protocols.find((p) => p.startsWith("auth."))?.slice(5) ?? "";
+  try {
+    await authorizeCaller(token);
+    return null;
+  } catch {
+    return new Response("Unauthorized", { status: 401 });
+  }
+}
+
+export async function handleLiveRequest(request: Request): Promise<Response> {
   const waitUntil = (request as Request & Partial<LiveExecutionContext>).waitUntil;
   if (!waitUntil) return new Response("Live runtime unavailable", { status: 503 });
   const config = getLiveConfig();
-  const rejected = validateLiveUpgrade(request);
+  const rejected = validateLiveUpgrade(request) ?? (await authorizeLiveUpgrade(request));
   if (rejected) return rejected;
   const pair = new WebSocketPair();
   pair[1].accept();
   bindLiveConnection(workerSocket(pair[1]), config, { waitUntil });
-  const response: ResponseInit & { webSocket: WebSocket } = { status: 101, webSocket: pair[0] };
+  const response: ResponseInit & { webSocket: WebSocket } = {
+    status: 101,
+    webSocket: pair[0],
+    headers: { "Sec-WebSocket-Protocol": LIVE_SUBPROTOCOL },
+  };
   return new Response(null, response);
 }
 

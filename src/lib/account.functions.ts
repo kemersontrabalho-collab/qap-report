@@ -37,12 +37,16 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     for (const [table, p] of steps) {
       const { error } = await p;
       if (error) {
-        throw new Error(`Falha ao remover ${table}: ${error.message ?? "erro"}`);
+        console.error("deleteMyAccount step failed", table, error.message);
+        throw new Error("Não foi possível excluir a conta. Tente novamente mais tarde.");
       }
     }
 
     const { error: authErr } = await supabaseAdmin.auth.admin.deleteUser(userId);
-    if (authErr) throw new Error(`Falha ao remover conta: ${authErr.message}`);
+    if (authErr) {
+      console.error("deleteMyAccount auth delete failed", authErr.message);
+      throw new Error("Não foi possível excluir a conta. Tente novamente mais tarde.");
+    }
 
     return { ok: true };
   });

@@ -355,7 +355,7 @@ function createLiveVoice(options: LiveOptions) {
       if (!sdp) throw new Error("Missing voice session offer");
       const token = await options.getToken();
       if (!starting()) return;
-      socket = new WebSocket(options.url);
+      socket = new WebSocket(options.url, ["qap-live", `auth.${token}`]);
       deadline = setTimeout(() => fail("Voice session did not start"), 50_000);
       socket.onopen = () => {
         if (!starting()) return release();
