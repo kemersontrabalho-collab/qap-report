@@ -2,7 +2,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BellRing, Camera, Clipboard, FolderOpen, Loader2, MapPin, Mic, RefreshCw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { readDevicePermission, requestMediaPermission, type DevicePermission, type DevicePermissionState } from "@/lib/device-permissions";
+import {
+  readDevicePermission,
+  readRememberedDevicePermissions,
+  rememberDevicePermissionState,
+  requestMediaPermission,
+  restoreRememberedDevicePermission,
+  type DevicePermission,
+  type DevicePermissionState,
+} from "@/lib/device-permissions";
 
 const permissions = [
   { kind: "location", label: "Localização", icon: MapPin },
@@ -21,7 +29,12 @@ export function DevicePermissions() {
   const [busy, setBusy] = useState<DevicePermission | null>(null);
   const pending = useRef(false);
   const refresh = useCallback(async () => {
-    const values = await Promise.all(permissions.map(async ({ kind }) => [kind, await readDevicePermission(kind)] as const));
+    const remembered = readRememberedDevicePermissions();
+    const values = await Promise.all(permissions.map(async ({ kind }) => {
+      const state = await readDevicePermission(kind);
+      rememberDevicePermissionState(kind, state);
+      return [kind, restoreRememberedDevicePermission(kind, state, remembered)] as const;
+    }));
     setStates(Object.fromEntries(values));
   }, []);
 
@@ -65,7 +78,10 @@ export function DevicePermissions() {
         : "Não foi possível acessar o recurso. Verifique se está disponível e tente novamente.");
     } finally {
       await refresh();
-      if (result) setStates((previous) => ({ ...previous, [kind]: result }));
+      if (result) {
+        rememberDevicePermissionState(kind, result);
+        setStates((previous) => ({ ...previous, [kind]: result }));
+      }
       pending.current = false;
       setBusy(null);
     }
@@ -93,7 +109,7 @@ export function DevicePermissions() {
         <div className="flex items-center gap-3 py-4"><FolderOpen className="h-5 w-5 shrink-0 text-muted-foreground" /><div><h3 className="text-sm font-medium">Fotos e arquivos</h3><p className="mt-1 text-xs text-muted-foreground">Acesso somente ao arquivo escolhido por você.</p></div></div>
         <div className="flex items-center gap-3 py-4"><Clipboard className="h-5 w-5 shrink-0 text-muted-foreground" /><div><h3 className="text-sm font-medium">Área de transferência</h3><p className="mt-1 text-xs text-muted-foreground">Autorização ao copiar, quando exigida pelo navegador. O app não lê sua área de transferência.</p></div></div>
       </div>
-      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Permissões valem para este aparelho. Para revogar ou liberar um acesso bloqueado, use as configurações do site no navegador ou do app no aparelho. No iPhone, notificações podem exigir o app adicionado à Tela de Início. A autorização não ativa alertas com o app fechado.</p>
+      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">As autorizações concedidas ficam salvas neste aparelho e são recuperadas quando o navegador não informa o estado novamente. Se você bloquear ou revogar um acesso, o bloqueio do aparelho sempre prevalece. No iPhone, notificações podem exigir o app adicionado à Tela de Início. A autorização não ativa alertas com o app fechado.</p>
     </section>
   );
 }

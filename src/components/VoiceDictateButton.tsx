@@ -3,6 +3,7 @@ import { Loader2, Mic, MicOff, Square } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { readTranscriptStream, recordWav, type WavRecording } from "@/lib/voice-recorder";
+import { rememberDevicePermissionState } from "@/lib/device-permissions";
 
 type Props = {
   value: string;
@@ -205,6 +206,7 @@ export function VoiceDictateButton({ value, onChange, label = "Ditar", className
     recog.maxAlternatives = 1;
 
     recog.onresult = (event) => {
+      rememberDevicePermissionState("microphone", "granted");
       let finalText = "";
       let interim = "";
       for (let i = 0; i < event.results.length; i++) {
@@ -224,6 +226,7 @@ export function VoiceDictateButton({ value, onChange, label = "Ditar", className
       if (err === "no-speech" || err === "aborted") return; // onend reinicia
       wantRef.current = false;
       if (err === "not-allowed") {
+        rememberDevicePermissionState("microphone", "denied");
         toast.error("Permissão de microfone negada. Libere o microfone nas configurações do aparelho.");
         return;
       }

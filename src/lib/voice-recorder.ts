@@ -1,6 +1,8 @@
 // Gravação de áudio como WAV completo (decodificável em qualquer navegador,
 // inclusive Safari/iOS) com redução para 16 kHz mono para arquivos leves.
 
+import { rememberDevicePermissionState } from "@/lib/device-permissions";
+
 const TARGET_RATE = 16000;
 
 function downsample(chunks: Float32Array[], fromRate: number): Float32Array {
@@ -56,9 +58,18 @@ function encodeWav(samples: Float32Array, sampleRate: number): Blob {
 export type WavRecording = { stop: () => Promise<File>; cancel: () => void };
 
 export async function recordWav(): Promise<WavRecording> {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 },
-  });
+  let stream: MediaStream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 },
+    });
+    rememberDevicePermissionState("microphone", "granted");
+  } catch (error) {
+    if (error instanceof DOMException && (error.name === "NotAllowedError" || error.name === "SecurityError")) {
+      rememberDevicePermissionState("microphone", "denied");
+    }
+    throw error;
+  }
   const Ctx =
     window.AudioContext ??
     (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;

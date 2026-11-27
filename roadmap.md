@@ -1,4 +1,5 @@
 # Pagamentos e acesso
+- [x] Manter permissões concedidas após reabrir Configurações e após acesso pelo editor/voz; oito testes e fluxo móvel de recarga, navegação e revogação aprovados.
 - [x] Corrigir procedimentos contraditórios e verificar geração, auditoria, correção e PDF em cenários com e sem prisão.
 - [x] Preparar recuperação da instalação antiga no mesmo endereço, preservando manifesto e arquivos locais.
 - [ ] Validar recuperação de instalações antigas na versão publicada: depende da publicação e de um aparelho instalado; simulação isolada do ciclo não completou.

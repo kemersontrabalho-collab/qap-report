@@ -23,6 +23,7 @@ import { translateDbError, translateGeolocationError } from "@/lib/i18n-errors";
 import { copyWithFeedback } from "@/lib/clipboard";
 import { printBulletin } from "@/lib/print-bulletin";
 import { hasBulletinNarrative } from "@/lib/bulletin-validation";
+import { rememberDevicePermissionState } from "@/lib/device-permissions";
 import { finalizeBulletinText, stripMarkdown } from "@/lib/bulletin-text";
 import { playUiSound, prepareUiSounds } from "@/lib/ui-sounds";
 import { AuditPanel, InvolvedPartiesSection, SeizedItemsSection } from "@/components/BulletinExtras";
@@ -452,6 +453,7 @@ function EditBulletin() {
     setLocating(kind);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
+        rememberDevicePermissionState("location", "granted");
         const { latitude, longitude } = pos.coords;
         try {
           const { address } = await geoFn({ data: { lat: latitude, lng: longitude } });
@@ -475,6 +477,7 @@ function EditBulletin() {
         }
       },
       (err) => {
+        if (err.code === 1) rememberDevicePermissionState("location", "denied");
         setLocating(null);
         toast.error(translateGeolocationError(err));
       },

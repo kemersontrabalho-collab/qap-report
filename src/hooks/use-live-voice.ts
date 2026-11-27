@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { rememberDevicePermissionState } from "@/lib/device-permissions";
 
 export type LiveEvent = {
   type: string;
@@ -308,6 +309,7 @@ function createLiveVoice(options: LiveOptions) {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
       });
+      rememberDevicePermissionState("microphone", "granted");
       microphone = stream;
       if (!starting()) {
         stream.getTracks().forEach((track) => track.stop());
@@ -398,6 +400,9 @@ function createLiveVoice(options: LiveOptions) {
         release();
       };
     } catch (error) {
+      if (error instanceof DOMException && (error.name === "NotAllowedError" || error.name === "SecurityError")) {
+        rememberDevicePermissionState("microphone", "denied");
+      }
       fail(error instanceof Error ? error.message : "Não foi possível acessar o microfone.");
     }
   }
