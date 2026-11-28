@@ -3,7 +3,7 @@ import { LegalLayout } from "@/components/LegalLayout";
 
 const TITLE = "Política de Reembolso — QAP Report";
 const DESCRIPTION =
-  "Garantia de reembolso de 30 dias do QAP Report: prazos, como solicitar e como o reembolso é processado.";
+  "Cancelamento do plano mensal Pix do QAP Report, manutenção do período pago e direitos legais de reembolso.";
 const URL = "https://qap-report.lovable.app/reembolso";
 
 export const Route = createFileRoute("/reembolso")({
@@ -24,65 +24,47 @@ export const Route = createFileRoute("/reembolso")({
 
 function RefundPage() {
   return (
-    <LegalLayout title="Política de Reembolso" updatedAt="13 de agosto de 2026">
+    <LegalLayout title="Política de Cancelamento e Reembolso" updatedAt="28 de novembro de 2026">
       <p>
-        O QAP Report, operado por <strong>kemerson</strong>, oferece{" "}
-        <strong>garantia de reembolso de 30 dias</strong>.
+        O QAP Report, operado por <strong>kemerson</strong>, oferece um plano mensal de R$ 10,00
+        pago via Pix, com liberação após aprovação administrativa e sem cobrança automática.
       </p>
 
-      <h2>1. Prazo</h2>
+      <h2>1. Desistência e período de acesso</h2>
       <p>
-        Se você não ficar satisfeito com a compra, pode solicitar o reembolso integral em até{" "}
-        <strong>30 dias corridos</strong> contados da data do pedido, inclusive por simples
-        desistência. Também respeitamos o direito de arrependimento de 7 dias previsto no art. 49 do
-        Código de Defesa do Consumidor, que corre em paralelo a esta garantia.
+        Após a liberação, a simples decisão de não utilizar ou não renovar o plano não gera devolução
+        total ou proporcional, fora dos casos previstos em lei. Seu acesso permanece até a data final
+        exibida no aplicativo. Cada pagamento aprovado acrescenta 30 dias, preservando o saldo existente.
+      </p>
+      <p>
+        Essa regra não afasta o direito de arrependimento de 7 dias previsto no art. 49 do Código
+        de Defesa do Consumidor, quando aplicável, nem reembolsos devidos por cobrança indevida,
+        falha na prestação do serviço ou outros direitos legalmente assegurados.
       </p>
 
       <h2>2. Como solicitar</h2>
       <ul>
         <li>
-          Acesse{" "}
-          <a
-            href="https://paddle.net"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            paddle.net
-          </a>{" "}
-          com o e-mail usado na compra e abra a solicitação de reembolso; ou
-        </li>
-        <li>
           Escreva para{" "}
           <a href="mailto:kemersontrabalho@gmail.com" className="underline">
             kemersontrabalho@gmail.com
           </a>{" "}
-          informando o e-mail da conta e a data da compra — encaminharemos o pedido.
+          informando o e-mail da conta, a data do Pix e o motivo do pedido. Não envie dados de boletins ou de terceiros.
         </li>
       </ul>
 
       <h2>3. Processamento</h2>
       <p>
-        Os reembolsos são processados pelo nosso provedor de pagamentos e Comerciante Registrado, a
-        Paddle, no mesmo meio de pagamento utilizado na compra. O prazo de crédito depende da
-        instituição financeira, normalmente entre 3 e 10 dias úteis após a aprovação. Consulte
-        também a{" "}
-        <a
-          href="https://www.paddle.com/legal/refund-policy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          Política de Reembolso da Paddle
-        </a>
-        .
+        Os pedidos serão avaliados conforme a legislação aplicável. Quando o reembolso for devido,
+        informaremos a forma de devolução e os dados necessários para realizá-la com segurança,
+        respeitando os prazos legais.
       </p>
 
       <h2>4. Cancelamento da assinatura</h2>
       <p>
-        Você pode cancelar a assinatura mensal a qualquer momento; o acesso permanece ativo até o
-        fim do ciclo já pago e não há cobranças posteriores. O cancelamento pode ser feito em
-        paddle.net ou pelo nosso e-mail de contato.
+        Basta não realizar um novo Pix para não renovar. O acesso permanece ativo até o fim do
+        período já pago, sem cobranças posteriores. Para dúvidas ou solicitações, use nosso e-mail
+        de contato. A exclusão da conta é uma ação distinta e pode ser feita nas Configurações.
       </p>
     </LegalLayout>
   );

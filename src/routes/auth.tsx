@@ -9,6 +9,8 @@ import { translateAuthError } from "@/lib/i18n-errors";
 import { setSessionLifetime, getKeepSignedInPreference } from "@/lib/session-lifetime";
 import { storeOAuthRedirect, consumeOAuthRedirect } from "@/lib/oauth-redirect";
 import logoAsset from "@/assets/qap-report-logo.webp.asset.json";
+import { Button } from "@/components/ui/button";
+import { signupConsent } from "@/lib/terms-consent";
 
 const search = z.object({
   mode: z.enum(["login", "signup"]).optional(),
@@ -50,6 +52,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   // Lido apenas após a hidratação: acessar localStorage no initializer do
   // useState faz o HTML do servidor divergir do cliente (hydration mismatch).
   const [keepSignedIn, setKeepSignedIn] = useState(true);
@@ -77,6 +80,7 @@ function AuthPage() {
         toast.success("Bem-vindo(a) de volta!");
         navigate({ to: safeRedirect(), replace: true });
       } else if (mode === "signup") {
+        const consent = signupConsent(termsAccepted);
         const failed = passwordRules.find((r) => !r.test(password));
         if (failed) {
           toast.error(`Senha inválida: ${failed.label.toLowerCase()}.`);
@@ -93,7 +97,7 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}${safeRedirect()}`,
-            data: { full_name: fullName },
+            data: { full_name: fullName, ...consent },
           },
         });
         if (error) throw error;
@@ -115,6 +119,12 @@ function AuthPage() {
   }
 
   async function signInWithProvider(provider: "google" | "apple") {
+    try {
+      signupConsent(termsAccepted);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Aceite os termos para continuar.");
+      return;
+    }
     setLoading(true);
     try {
       // Grava preferências ANTES de iniciar o OAuth: em fluxo com redirect
@@ -242,16 +252,38 @@ function AuthPage() {
                   Manter conectado por 8 horas neste dispositivo
                 </label>
               )}
-              <button
+              {mode === "signup" && (
+                <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+                  <p className="text-sm font-semibold">Responsabilidade e proteção de dados</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Você é responsável pelos dados pessoais que inserir, inclusive de terceiros, e pela revisão dos textos.
+                    A divulgação indevida pode gerar sanções civis, penais e disciplinares.
+                  </p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Ao desistir do plano, o acesso permanece até o fim do período pago, sem devolução por simples desistência,
+                    ressalvados os direitos previstos em lei.
+                  </p>
+                  <Link to="/termos" target="_blank" rel="noopener noreferrer" className="inline-block text-sm text-primary underline">
+                    Ler Termo de Responsabilidade completo
+                  </Link>
+                  <label className="flex items-start gap-3 text-sm leading-relaxed">
+                    <input id="signup-terms" type="checkbox" required checked={termsAccepted}
+                      onChange={(event) => setTermsAccepted(event.target.checked)}
+                      className="mt-1 h-4 w-4 shrink-0 accent-primary" />
+                    <span>Li e aceito o Termo de Responsabilidade, a <Link to="/privacidade" target="_blank" rel="noopener noreferrer" className="text-primary underline">Política de Privacidade</Link> e as condições de assinatura.</span>
+                  </label>
+                </div>
+              )}
+              <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || (mode === "signup" && !termsAccepted)}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {mode === "login" && "Entrar"}
                 {mode === "signup" && "Criar conta"}
                 {mode === "forgot" && "Enviar link"}
-              </button>
+              </Button>
             </form>
 
             {mode !== "forgot" && (
@@ -261,10 +293,19 @@ function AuthPage() {
                   ou
                   <div className="h-px flex-1 bg-border" />
                 </div>
-                <button
+                {mode === "login" && (
+                  <label className="mb-3 flex items-start gap-3 text-sm leading-relaxed text-muted-foreground">
+                    <input type="checkbox" checked={termsAccepted}
+                      onChange={(event) => setTermsAccepted(event.target.checked)}
+                      className="mt-1 h-4 w-4 shrink-0 accent-primary" />
+                    <span>Para continuar com Google ou Apple, li e aceito o <Link to="/termos" target="_blank" rel="noopener noreferrer" className="text-primary underline">Termo de Responsabilidade</Link> e a <Link to="/privacidade" target="_blank" rel="noopener noreferrer" className="text-primary underline">Política de Privacidade</Link>.</span>
+                  </label>
+                )}
+                <Button
                   type="button"
                   onClick={handleGoogle}
-                  disabled={loading}
+                  variant="outline"
+                  disabled={loading || !termsAccepted}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg border bg-background px-4 py-2.5 text-sm font-medium hover:bg-accent disabled:opacity-60"
                 >
                   <svg className="h-4 w-4" viewBox="0 0 48 48" aria-hidden="true">
@@ -286,12 +327,13 @@ function AuthPage() {
                     />
                   </svg>
                   Continuar com Google
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={handleApple}
-                  disabled={loading}
-                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border bg-black px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                  variant="secondary"
+                  disabled={loading || !termsAccepted}
+                  className="mt-2 w-full"
                 >
                   <svg
                     className="h-4 w-4"
@@ -302,7 +344,7 @@ function AuthPage() {
                     <path d="M16.365 1.43c0 1.14-.42 2.22-1.24 3.02-.83.82-2.13 1.44-3.18 1.35-.14-1.09.44-2.22 1.2-2.97.85-.82 2.28-1.4 3.22-1.4zM20.5 17.36c-.55 1.28-.81 1.85-1.53 2.99-.99 1.57-2.39 3.53-4.13 3.55-1.54.02-1.94-1-4.03-.99-2.09.01-2.53 1.01-4.07.99-1.74-.02-3.06-1.79-4.05-3.36C0.09 16.51-.21 11.29 1.61 8.5c1.28-1.96 3.29-3.11 5.19-3.11 1.93 0 3.14 1.06 4.74 1.06 1.55 0 2.5-1.06 4.73-1.06 1.68 0 3.46.92 4.73 2.5-4.15 2.28-3.48 8.22.5 9.47z" />
                   </svg>
                   Continuar com Apple
-                </button>
+                </Button>
               </>
             )}
 

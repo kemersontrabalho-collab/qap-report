@@ -20,3 +20,4 @@
 - Store collective consent in the bulletin edit state and every save, and invalidate list/detail queries after writes; why: reopening and returning to the dashboard must reflect persisted choices.
 - Keep the same-path recovery app-shell worker for one cleanup release, with manifest-only installation and no new worker registrations; why: the deployed precache paths are broken and returning devices must evict them safely without touching messaging caches.
 - Renew Pix atomically from the remaining paid or finite courtesy balance, retaining lifetime access and rejecting duplicate approvals; why: early payment must not remove existing access days.
+- Keep signup consent explicit and versioned, and require consent before starting social sign-in because the provider may create an account; why: no registration action should silently imply acceptance.

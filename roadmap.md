@@ -1,4 +1,5 @@
 # Pagamentos e acesso
+- [x] Atualizar termos e política de cancelamento, exigir aceite explícito no formulário de cadastro e antes do login social; dois testes unitários e verificações de tela em 390 e 1280px aprovados.
 - [x] Manter permissões concedidas após reabrir Configurações e após acesso pelo editor/voz; oito testes e fluxo móvel de recarga, navegação e revogação aprovados.
 - [x] Corrigir procedimentos contraditórios e verificar geração, auditoria, correção e PDF em cenários com e sem prisão.
 - [x] Preparar recuperação da instalação antiga no mesmo endereço, preservando manifesto e arquivos locais.
